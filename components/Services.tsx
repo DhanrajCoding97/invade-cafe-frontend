@@ -47,7 +47,7 @@ export default function ServicesSection() {
           opacity: 0,
           y: 50,
           duration: 0.6,
-          delay: 0.6,
+          delay: 0.4,
           ease: "sine.inOut",
           stagger: 0.3,
           scrollTrigger: {

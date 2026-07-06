@@ -4,6 +4,8 @@ import Badge from "./components/neonblade-ui/badge"
 import CornerCutButton from "./components/neonblade-ui/corner-cut-button"
 import { DatalinesWithGrid } from "./components/neonblade-ui/datalines-with-grid"
 import GlitchText from "./components/neonblade-ui/glitch-text"
+import Reviews from "@/components/Reviews"
+import ReviewsSection from "@/components/Reviews"
 // import Badge from "./components/ui/elements/Badge"
 
 export default function Page() {
@@ -115,6 +117,7 @@ export default function Page() {
     <>
       <HeroSection />
       <ServicesSection />
+      <ReviewsSection />
     </>
   )
 }
