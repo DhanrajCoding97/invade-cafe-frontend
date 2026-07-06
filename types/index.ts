@@ -1,7 +1,7 @@
 export interface Service {
   id: string
   title: string
-  color: "cyan" | "pink" | "purple" | "amber"
+  color: "cyan" | "teal" | "pink" | "purple" | "amber"
   imageSrc: string
   imageAlt: string
   features: string[]
@@ -37,7 +37,7 @@ export const services: Service[] = [
   {
     id: "vr",
     title: "VR",
-    color: "purple",
+    color: "teal",
     imageSrc: "/vr.jpg",
     imageAlt: "VR headset and motion controllers ready for use",
     features: [

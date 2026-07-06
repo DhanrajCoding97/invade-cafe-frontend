@@ -88,6 +88,11 @@
   transition: box-shadow 300ms ease;
 }
 
+/* text-shadow */
+.ngcc-title {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+}
+
 /* ---- Hover effects ----------------------------------------- */
 
 /* gradient — dual-color gradient backdrop (default, matches Features.tsx) */
@@ -206,12 +211,22 @@
 
 /* ---- Size variants — all padding/sizing moved to Tailwind via JSX maps ------------ */
 
-.ngcc-img-overlay-bottom {
+/* .ngcc-img-overlay-bottom {
   background: linear-gradient(
     to bottom,
     transparent 0%,
     transparent 35%,
     rgba(0, 0, 0, 0.85) 100%
+  );
+} */
+.ngcc-img-overlay-bottom {
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    transparent 25%,
+    rgba(0, 0, 0, 0.55) 55%,
+    rgba(0, 0, 0, 0.92) 80%,
+    rgba(0, 0, 0, 0.95) 100%
   );
 }
 
