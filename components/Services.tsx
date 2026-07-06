@@ -69,13 +69,6 @@ export default function ServicesSection() {
   return (
     <section className="min-h-screen bg-black px-6 py-20">
       <div className="mx-auto max-w-6xl">
-        {/* <div className="mb-4 flex justify-center">
-          <span className="inline-flex items-center gap-2 rounded-full border border-cyan-400/40 px-4 py-2 text-xs font-bold tracking-wider text-cyan-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-cyan-400" />
-            WHAT WE OFFER
-          </span>
-        </div> */}
-
         <h2 className="mb-3 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-center text-5xl font-extrabold text-transparent">
           Our Services
         </h2>
@@ -91,32 +84,17 @@ export default function ServicesSection() {
         </div>
 
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {/* {services.map((service) => (
-            <ServiceCard key={service.id} service={service} />
+          {services.map((service) => (
+            // <ServiceCard key={service.id} service={service} />
             <NeonGlowCornerCutCard
               key={service.id}
               title={service.title}
-                description={service.features}
+              imageSrc={service.imageSrc}
+              imageAlt={service.imageAlt}
+              colorA={service.color}
+              features={service.features}
             />
-          ))} */}
-          <NeonGlowCornerCutCard
-            imageSrc="/pc.jpg"
-            imageAlt="High-end PC gaming station with dual monitor setup"
-            imageHeight={420}
-            colorA="cyan"
-            title="PC Gaming"
-            description="Next-gen rigs built for competitive and AAA play."
-            // topContent={
-            //   <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/40 px-4 py-1.5 text-xs text-white backdrop-blur-sm">
-            //     ⭐ Top Pick
-            //   </span>
-            // }
-          >
-            <div className="flex items-center gap-4 text-sm text-white/80">
-              <span>👥 387</span>
-              <span>🖼 1,873</span>
-            </div>
-          </NeonGlowCornerCutCard>
+          ))}
         </div>
       </div>
     </section>
