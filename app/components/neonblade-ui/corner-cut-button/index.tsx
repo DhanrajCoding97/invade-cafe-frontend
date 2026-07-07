@@ -1,26 +1,22 @@
-"use client";
+"use client"
 
-import React, { ButtonHTMLAttributes, ReactNode } from "react";
-import "./corner-cut-button.css";
+import React, { ButtonHTMLAttributes, ReactNode } from "react"
+import "./corner-cut-button.css"
 
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string (e.g. "#ff4400", "hsl(180,100%,50%)") */
-export type CCBColor = "cyan" | "pink" | "green" | (string & {});
+export type CCBColor = "cyan" | "pink" | "green" | (string & {})
 
 /** Button size */
-export type CCBSize = "xs" | "sm" | "md" | "lg" | "xl";
+export type CCBSize = "xs" | "sm" | "md" | "lg" | "xl"
 
 /** Visual style variant */
-export type CCBVariant = "solid" | "outline" | "ghost";
+export type CCBVariant = "solid" | "outline" | "ghost"
 
 /** Which corner is cut */
 export type CCBCorner =
-  | "bottom-right"
-  | "bottom-left"
-  | "top-right"
-  | "top-left"
-  | "all";
+  "bottom-right" | "bottom-left" | "top-right" | "top-left" | "all"
 
 /**
  * Hover animation preset:
@@ -33,17 +29,10 @@ export type CCBCorner =
  * - `none`    — no hover animation
  */
 export type CCBHoverEffect =
-  | "glow"
-  | "shift"
-  | "shine"
-  | "pulse"
-  | "scan"
-  | "flicker"
-  | "default"
-  | "none";
+  "glow" | "shift" | "shine" | "pulse" | "scan" | "flicker" | "default" | "none"
 
 /** Controls the spread radius of the neon glow */
-export type CCBGlowIntensity = "low" | "medium" | "high";
+export type CCBGlowIntensity = "low" | "medium" | "high"
 
 // ---- Maps --------------------------------------------------
 
@@ -51,7 +40,7 @@ const COLOR_PRESETS: Record<string, string> = {
   cyan: "#00f3ff",
   pink: "#ff00ff",
   green: "#39ff14",
-};
+}
 
 const SIZE_CLASSES: Record<CCBSize, string> = {
   xs: "px-4 py-2 text-xs",
@@ -59,7 +48,7 @@ const SIZE_CLASSES: Record<CCBSize, string> = {
   md: "px-8 py-4 text-sm",
   lg: "px-10 py-5 text-base",
   xl: "px-12 py-6 text-lg",
-};
+}
 
 const CORNER_CLASSES: Record<CCBCorner, string> = {
   "bottom-right": "ccb-clip-br",
@@ -67,7 +56,7 @@ const CORNER_CLASSES: Record<CCBCorner, string> = {
   "top-right": "ccb-clip-tr",
   "top-left": "ccb-clip-tl",
   all: "ccb-clip-all",
-};
+}
 
 const HOVER_CLASSES: Record<CCBHoverEffect, string> = {
   glow: "ccb-hover-glow",
@@ -78,31 +67,33 @@ const HOVER_CLASSES: Record<CCBHoverEffect, string> = {
   flicker: "ccb-hover-flicker",
   default: "ccb-hover-default",
   none: "",
-};
+}
 
 const GLOW_SIZES: Record<CCBGlowIntensity, number> = {
   low: 8,
   medium: 15,
   high: 28,
-};
+}
 
 // ---- Component props ---------------------------------------
 
 export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
+  children: ReactNode
+
+  onClick?: () => void
 
   /**
    * Button accent color.
    * Use a preset name ("cyan" | "pink" | "green") or any CSS color value.
    * @default "cyan"
    */
-  color?: CCBColor;
+  color?: CCBColor
 
   /**
    * Button size controlling padding and font size.
    * @default "md"
    */
-  size?: CCBSize;
+  size?: CCBSize
 
   /**
    * Visual variant.
@@ -111,61 +102,62 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
    * - `ghost`   — subtle tinted background with accent text
    * @default "solid"
    */
-  variant?: CCBVariant;
+  variant?: CCBVariant
 
   /**
    * Which corner receives the diagonal cut.
    * @default "bottom-right"
    */
-  corner?: CCBCorner;
+  corner?: CCBCorner
 
   /**
    * Size of the corner cut in pixels.
    * @default 20
    */
-  cornerSize?: number;
+  cornerSize?: number
 
   /**
    * Hover animation/effect.
    * @default "default"
    */
-  hoverEffect?: CCBHoverEffect;
+  hoverEffect?: CCBHoverEffect
 
   /**
    * Glow spread intensity for effects that use a neon glow.
    * @default "medium"
    */
-  glowIntensity?: CCBGlowIntensity;
+  glowIntensity?: CCBGlowIntensity
 
   /**
    * When true an → arrow is appended that slides right on hover.
    * @default false
    */
-  showArrow?: boolean;
+  showArrow?: boolean
 
   /**
    * Hover effect color. Overrides the element color on hover (for glow and shift effects).
    */
-  hoverColor?: CCBColor;
+  hoverColor?: CCBColor
 
   /**
    * When true, a solid button with 'shift' effect becomes outlined on hover.
    * @default false
    */
-  hoverOutlined?: boolean;
+  hoverOutlined?: boolean
 
   /**
    * Overrides the button text color.
    * Use a preset name ("cyan" | "pink" | "green") or any CSS color value.
    * Defaults to `black` for solid variant and the accent color for outline/ghost.
    */
-  textColor?: CCBColor;
+  textColor?: CCBColor
 }
 
 // ---- Component ---------------------------------------------
 
 export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   children,
+  onClick,
   color = "cyan",
   size = "md",
   variant = "solid",
@@ -181,14 +173,14 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   style,
   ...props
 }) => {
-  const resolvedColor = COLOR_PRESETS[color] ?? color;
+  const resolvedColor = COLOR_PRESETS[color] ?? color
   const resolvedHoverColor = hoverColor
     ? (COLOR_PRESETS[hoverColor] ?? hoverColor)
-    : undefined;
+    : undefined
   const resolvedTextColor = textColor
     ? (COLOR_PRESETS[textColor] ?? textColor)
-    : undefined;
-  const glowSize = GLOW_SIZES[glowIntensity];
+    : undefined
+  const glowSize = GLOW_SIZES[glowIntensity]
 
   // Ghost variant needs color-mix background — not expressible in Tailwind
   const ghostStyle =
@@ -197,12 +189,12 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
           backgroundColor: "color-mix(in srgb, var(--ccb-color) 12%, #000)",
           color: "var(--ccb-color)",
         }
-      : undefined;
+      : undefined
 
   return (
     <div
       className={[
-        "relative inline-flex p-px group/ccb",
+        "group/ccb relative inline-flex p-px",
         `ccb-wrapper-${hoverEffect}`,
         // ccb-wrapper class retained ONLY for the flicker :has() selector in CSS
         hoverEffect === "flicker" ? "ccb-wrapper" : "",
@@ -227,7 +219,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
       {/* Border frame: 1px ring on all edges including the diagonal */}
       <div
         className={[
-          "absolute inset-0 pointer-events-none z-0 transition-[background,opacity] duration-300",
+          "pointer-events-none absolute inset-0 z-0 transition-[background,opacity] duration-300",
           CORNER_CLASSES[corner],
           variant === "outline" ? "bg-[var(--ccb-color)]" : "bg-white/[0.08]",
           variant === "solid" && hoverOutlined && hoverEffect === "shift"
@@ -241,7 +233,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
 
       <button
         className={[
-          "flex-1 relative group font-orbitron font-bold tracking-wider uppercase transition-all overflow-hidden cursor-pointer",
+          "group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all",
           SIZE_CLASSES[size],
           CORNER_CLASSES[corner],
           HOVER_CLASSES[hoverEffect],
@@ -280,7 +272,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
           {children}
           {showArrow && (
             <span
-              className="group-hover:translate-x-1 transition-transform inline-block"
+              className="inline-block transition-transform group-hover:translate-x-1"
               aria-hidden="true"
             >
               →
@@ -289,7 +281,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         </span>
       </button>
     </div>
-  );
-};
+  )
+}
 
-export default CornerCutButton;
+export default CornerCutButton
