@@ -60,7 +60,7 @@
 // }
 
 import { Card, CardContent } from "@/components/ui/card"
-// import { FcGoogle } from "react-icons/fc"
+import { FcGoogle } from "react-icons/fc"
 import { Marquee } from "./ui/marquee"
 import { Review } from "@/types"
 import BorderBeamCornerCutCard from "@/app/components/neonblade-ui/border-beam-corner-cut-card"
@@ -155,19 +155,19 @@ function ReviewCard({ review }: { review: Review }) {
   const initial = review.name.trim().charAt(0).toUpperCase()
   return (
     <div className="review-card flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0a0a] p-5">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00d4ff]/10 text-sm font-semibold text-[#00d4ff]">
-          {initial}
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00d4ff]/10 text-sm font-semibold text-[#00d4ff]">
+            {initial}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-white">
+              {review.name}
+            </p>
+            <StarRating rating={review.rating} />
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-white">
-            {review.name}
-          </p>
-          <StarRating rating={review.rating} />
-        </div>
-        <span className="ml-auto shrink-0 text-xs text-white/30">
-          via Google
-        </span>
+        <FcGoogle size={24} />
       </div>
       <p className="line-clamp-4 text-sm leading-relaxed text-[#9a9a9a]">
         {review.text}
@@ -289,7 +289,7 @@ const secondRow = reviews.slice(reviews.length / 2)
 
 export default function ReviewsSection() {
   return (
-    <section className="min-h-screen overflow-hidden bg-black px-6 py-20">
+    <section className="min-h-screen overflow-hidden bg-black py-20">
       <div className="mx-auto mb-12 max-w-6xl">
         <div className="my-4 flex items-center gap-4">
           <div className="h-px w-8 bg-[#00d4ff]" />
