@@ -30,46 +30,6 @@
 //   },
 // ]
 
-function StarRating({ rating }: { rating: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {Array.from({ length: 5 }).map((_, i) => (
-        <span
-          key={i}
-          className={i < rating ? "text-[#FFC145]" : "text-white/15"}
-        >
-          ★
-        </span>
-      ))}
-    </div>
-  )
-}
-
-// function ReviewCard({ review }: { review: Review }) {
-//   const initial = review.name.trim().charAt(0).toUpperCase()
-//   return (
-//     <div className="review-card flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0a0a] p-5">
-//       <div className="flex items-center gap-3">
-//         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00d4ff]/10 text-sm font-semibold text-[#00d4ff]">
-//           {initial}
-//         </div>
-//         <div className="min-w-0">
-//           <p className="truncate text-sm font-semibold text-white">
-//             {review.name}
-//           </p>
-//           <StarRating rating={review.rating} />
-//         </div>
-//         <span className="ml-auto shrink-0 text-xs text-white/30">
-//           via Google
-//         </span>
-//       </div>
-//       <p className="line-clamp-4 text-sm leading-relaxed text-[#9a9a9a]">
-//         {review.text}
-//       </p>
-//     </div>
-//   )
-// }
-
 // export default function Reviews() {
 //   return (
 //     <section className="overflow-hidden bg-black px-6 py-20">
@@ -176,6 +136,46 @@ const reviews: Review[] = [
   },
 ]
 
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div className="flex gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <span
+          key={i}
+          className={i < rating ? "text-[#FFC145]" : "text-white/15"}
+        >
+          ★
+        </span>
+      ))}
+    </div>
+  )
+}
+
+function ReviewCard({ review }: { review: Review }) {
+  const initial = review.name.trim().charAt(0).toUpperCase()
+  return (
+    <div className="review-card flex w-[320px] shrink-0 flex-col gap-3 rounded-xl border border-white/10 bg-[#0a0a0a] p-5">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#00d4ff]/10 text-sm font-semibold text-[#00d4ff]">
+          {initial}
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-sm font-semibold text-white">
+            {review.name}
+          </p>
+          <StarRating rating={review.rating} />
+        </div>
+        <span className="ml-auto shrink-0 text-xs text-white/30">
+          via Google
+        </span>
+      </div>
+      <p className="line-clamp-4 text-sm leading-relaxed text-[#9a9a9a]">
+        {review.text}
+      </p>
+    </div>
+  )
+}
+
 const firstRow = reviews.slice(0, reviews.length / 2)
 const secondRow = reviews.slice(reviews.length / 2)
 
@@ -248,44 +248,44 @@ const secondRow = reviews.slice(reviews.length / 2)
 //   )
 // }
 
-function ReviewCard({ review }: { review: Review }) {
-  const initial = review.name.trim().charAt(0).toUpperCase()
+// function ReviewCard({ review }: { review: Review }) {
+//   const initial = review.name.trim().charAt(0).toUpperCase()
 
-  return (
-    <BorderBeamCornerCutCard
-      className="max-w-[300px] shrink-0"
-      beamColor="cyan"
-      beamColorB="pink"
-      variant="gradient-sweep"
-      glowIntensity="low"
-      corner="bottom-right"
-      borderWidth={1}
-      size="md"
-      innerClassName="gap-4"
-    >
-      <div className="flex items-center gap-3">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-lg font-bold text-cyan-400">
-          {initial}
-        </div>
+//   return (
+//     <BorderBeamCornerCutCard
+//       className="max-w-[300px] shrink-0"
+//       beamColor="cyan"
+//       beamColorB="pink"
+//       variant="gradient-sweep"
+//       glowIntensity="low"
+//       corner="bottom-right"
+//       borderWidth={1}
+//       size="md"
+//       innerClassName="gap-4"
+//     >
+//       <div className="flex items-center gap-3">
+//         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-lg font-bold text-cyan-400">
+//           {initial}
+//         </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="truncate font-semibold text-white">{review.name}</p>
+//         <div className="min-w-0 flex-1">
+//           <p className="truncate font-semibold text-white">{review.name}</p>
 
-          <StarRating rating={review.rating} />
-        </div>
+//           <StarRating rating={review.rating} />
+//         </div>
 
-        <div className="flex items-center gap-1 text-xs text-white/40">
-          {/* <FcGoogle /> */}
-          <span>Google</span>
-        </div>
-      </div>
+//         <div className="flex items-center gap-1 text-xs text-white/40">
+//           {/* <FcGoogle /> */}
+//           <span>Google</span>
+//         </div>
+//       </div>
 
-      <p className="line-clamp-5 text-sm leading-7 text-white/60">
-        {review.text}
-      </p>
-    </BorderBeamCornerCutCard>
-  )
-}
+//       <p className="line-clamp-5 text-sm leading-7 text-white/60">
+//         {review.text}
+//       </p>
+//     </BorderBeamCornerCutCard>
+//   )
+// }
 
 export default function ReviewsSection() {
   return (
