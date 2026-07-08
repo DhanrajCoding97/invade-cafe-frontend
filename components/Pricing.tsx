@@ -5,12 +5,13 @@ import { VrIcon } from "./svgs"
 import { PsIcon } from "./svgs"
 import { RacingSimIcon } from "./svgs"
 import { PcIcon } from "./svgs"
+import { useRef } from "react"
+import gsap from "gsap"
+import { useGSAP } from "@gsap/react"
+
 export default function PricingSection() {
   const router = useRouter()
-  const handleSubmit = () => {
-    console.log("clicked")
-    router.push("/#booking")
-  }
+
   const goToBooking = (
     device: string,
     extra?: Record<string, string | number>
@@ -22,14 +23,57 @@ export default function PricingSection() {
     router.push(`/?${params.toString()}#booking`)
   }
 
+  const sectionRef = useRef<HTMLElement>(null)
+  const eyebrowRef = useRef<HTMLDivElement>(null)
+  const titleRef = useRef<HTMLHeadingElement>(null)
+  const descRef = useRef<HTMLParagraphElement>(null)
+  const cardsRef = useRef<HTMLDivElement>(null)
+
+  // gsap scrollTrigger animation
+  useGSAP(
+    () => {
+      gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
+        opacity: 0,
+        y: 30,
+        duration: 0.4,
+        ease: "power2.out",
+        stagger: 0.3,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 75%",
+          toggleActions: "play none none none",
+        },
+      })
+
+      const cards = cardsRef.current?.children
+      if (cards) {
+        gsap.from(cards, {
+          opacity: 0,
+          y: 50,
+          duration: 0.4,
+          delay: 0.6,
+          ease: "power2.inOut",
+          stagger: 0.33,
+          scrollTrigger: {
+            trigger: cardsRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        })
+      }
+    },
+    { scope: sectionRef }
+  )
+
   return (
-    <section className="min-h-screen bg-black px-6 py-20">
+    <section
+      id="pricing"
+      ref={sectionRef}
+      className="min-h-screen bg-black px-6 py-20"
+    >
       <div className="mx-auto max-w-6xl">
         {/* sub title */}
-        <div
-          // ref={eyebrowRef}
-          className="my-4 flex items-center gap-4"
-        >
+        <div ref={eyebrowRef} className="my-4 flex items-center gap-4">
           <div className="h-px w-8 bg-[#00d4ff]" />
           <span className="text-[10px] leading-3.75 text-[#00d4ff]">
             WHAT IT COSTS
@@ -37,19 +81,19 @@ export default function PricingSection() {
         </div>
         {/* main title */}
         <h2
-          //   ref={titleRef}
+          ref={titleRef}
           className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-5xl font-extrabold text-transparent"
         >
           Pricing
         </h2>
         {/* description */}
-        <p
-          //   ref={descRef}
-          className="mx-auto text-left text-base text-[#9a9a9a]"
-        >
+        <p ref={descRef} className="mx-auto text-left text-base text-[#9a9a9a]">
           Simple rates, no hidden fees. Pick your setup and start playing.
         </p>
-        <div className="mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div
+          ref={cardsRef}
+          className="grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4"
+        >
           {/* PC Gaming */}
           <PricingCard
             onBook={() => goToBooking("pc")}

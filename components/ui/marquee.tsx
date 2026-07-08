@@ -1,4 +1,4 @@
-import { ComponentPropsWithoutRef } from "react"
+import { ComponentPropsWithoutRef, forwardRef } from "react"
 
 import { cn } from "@/lib/utils"
 
@@ -30,19 +30,23 @@ interface MarqueeProps extends ComponentPropsWithoutRef<"div"> {
   repeat?: number
 }
 
-export function Marquee({
-  className,
-  reverse = false,
-  pauseOnHover = false,
-  children,
-  vertical = false,
-  repeat = 4,
-  ...props
-}: MarqueeProps) {
-  return (
-    <>
-      <style>
-        {`
+export const Marquee = forwardRef<HTMLDivElement, MarqueeProps>(
+  (
+    {
+      className,
+      reverse = false,
+      pauseOnHover = false,
+      children,
+      vertical = false,
+      repeat = 4,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <>
+        <style>
+          {`
           @keyframes marquee {
             from {
               transform: translateX(0);
@@ -88,34 +92,35 @@ export function Marquee({
             animation: scroll var(--animation-duration, 40s) var(--animation-direction, forwards) linear infinite;
           }
         `}
-      </style>
-      <div
-        {...props}
-        className={cn(
-          "group flex gap-(--gap) overflow-hidden p-2 [--duration:40s] [--gap:1rem]",
-          {
-            "flex-row": !vertical,
-            "flex-col": vertical,
-            "pause-on-hover": pauseOnHover,
-          },
-          className
-        )}
-      >
-        {Array(repeat)
-          .fill(0)
-          .map((_, i) => (
-            <div
-              key={i}
-              className={cn("flex shrink-0 justify-around gap-(--gap)", {
-                "animate-marquee flex-row": !vertical,
-                "animate-marquee-vertical flex-col": vertical,
-                "animate-reverse": reverse,
-              })}
-            >
-              {children}
-            </div>
-          ))}
-      </div>
-    </>
-  )
-}
+        </style>
+        <div
+          {...props}
+          className={cn(
+            "group flex gap-(--gap) overflow-hidden p-2 [--duration:40s] [--gap:1rem]",
+            {
+              "flex-row": !vertical,
+              "flex-col": vertical,
+              "pause-on-hover": pauseOnHover,
+            },
+            className
+          )}
+        >
+          {Array(repeat)
+            .fill(0)
+            .map((_, i) => (
+              <div
+                key={i}
+                className={cn("flex shrink-0 justify-around gap-(--gap)", {
+                  "animate-marquee flex-row": !vertical,
+                  "animate-marquee-vertical flex-col": vertical,
+                  "animate-reverse": reverse,
+                })}
+              >
+                {children}
+              </div>
+            ))}
+        </div>
+      </>
+    )
+  }
+)

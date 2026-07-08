@@ -30,9 +30,9 @@ export default function ServicesSection() {
         {
           opacity: 0,
           y: 30,
-          duration: 0.6,
+          duration: 0.8,
           ease: "power2.out",
-          stagger: 0.15,
+          stagger: 0.45,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 75%",

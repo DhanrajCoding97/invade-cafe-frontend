@@ -222,9 +222,9 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         className={[
           "pointer-events-none absolute inset-0 z-0 transition-[background,opacity] duration-300",
           CORNER_CLASSES[corner],
-          variant === "outline" ? "bg-[var(--ccb-color)]" : "bg-white/[0.08]",
+          variant === "outline" ? "bg-(--ccb-color)" : "bg-white/8",
           variant === "solid" && hoverOutlined && hoverEffect === "shift"
-            ? "group-hover/ccb:bg-[var(--ccb-hover-color)]"
+            ? "group-hover/ccb:bg-(--ccb-hover-color)"
             : "",
         ]
           .filter(Boolean)
@@ -244,10 +244,10 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
           `ccb-${variant}`,
           hoverOutlined ? "ccb-hover-outlined" : "",
           variant === "solid"
-            ? `bg-[var(--ccb-color)] ${resolvedTextColor ? "text-[var(--ccb-text-color)]" : "text-black"}`
+            ? `bg-(--ccb-color) ${resolvedTextColor ? "text-(--ccb-text-color)" : "text-black"}`
             : "",
           variant === "outline"
-            ? `bg-black ${resolvedTextColor ? "text-[var(--ccb-text-color)]" : "text-[var(--ccb-color)]"}`
+            ? `bg-black ${resolvedTextColor ? "text-(--ccb-text-color)" : "text-(--ccb-color)"}`
             : "",
         ]
           .filter(Boolean)

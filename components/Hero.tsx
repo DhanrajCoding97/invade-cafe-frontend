@@ -3,73 +3,82 @@ import Badge from "@/app/components/neonblade-ui/badge"
 import CornerCutButton from "@/app/components/neonblade-ui/corner-cut-button"
 import { DatalinesWithGrid } from "@/app/components/neonblade-ui/datalines-with-grid"
 import GlitchText from "@/app/components/neonblade-ui/glitch-text"
-
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
 import gsap from "gsap"
-import { useGSAP } from "@gsap/react"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+
 import Image from "next/image"
+import { getLenisInstance } from "@/lib/lenisInstance"
+
+gsap.registerPlugin(ScrollTrigger)
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLElement>(null)
 
-  useGSAP(
-    () => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+  useEffect(() => {
+    // Get the global Lenis instance
+    const lenis = getLenisInstance()
 
-      tl.from(".hero-badge", {
-        opacity: 0,
-        y: -20,
-        duration: 0.6,
-      })
-        .from(
-          ".hero-heading",
-          {
-            opacity: 0,
-            y: 40,
-            duration: 0.9,
-          },
-          "-=0.3"
-        )
-        .from(
-          ".hero-subtext",
-          {
-            opacity: 0,
-            y: 20,
-            duration: 0.7,
-          },
-          "-=0.5"
-        )
-        .from(
-          ".hero-cta",
-          {
-            opacity: 0,
-            y: 20,
-            duration: 0.6,
-            stagger: 0.15,
-          },
-          "-=0.4"
-        )
+    // GSAP animations as normal
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
-      // subtle ambient drift on the glow blobs, runs forever
-      gsap.to(".glow-cyan", {
-        x: 30,
-        y: 20,
-        duration: 8,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      })
-      gsap.to(".glow-fuchsia", {
-        x: -30,
-        y: -20,
-        duration: 9,
-        repeat: -1,
-        yoyo: true,
-        ease: "sine.inOut",
-      })
-    },
-    { scope: containerRef }
-  )
+    tl.from(".hero-badge", {
+      opacity: 0,
+      y: -20,
+      duration: 0.6,
+    })
+      .from(
+        ".hero-heading",
+        {
+          opacity: 0,
+          y: 40,
+          duration: 0.9,
+        },
+        "-=0.3"
+      )
+      .from(
+        ".hero-subtext",
+        {
+          opacity: 0,
+          y: 20,
+          duration: 0.7,
+        },
+        "-=0.5"
+      )
+      .from(
+        ".hero-cta",
+        {
+          opacity: 0,
+          y: 20,
+          duration: 0.6,
+          stagger: 0.15,
+        },
+        "-=0.4"
+      )
+
+    // Ambient drift
+    gsap.to(".glow-cyan", {
+      x: 30,
+      y: 20,
+      duration: 8,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    })
+    gsap.to(".glow-fuchsia", {
+      x: -30,
+      y: -20,
+      duration: 9,
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+    })
+
+    // Cleanup
+    return () => {
+      ScrollTrigger.killAll // Kill ScrollTrigger on unmount (optional, for clean-up)
+    }
+  }, [])
 
   return (
     <section
@@ -128,6 +137,7 @@ export default function HeroSection() {
           </div>
           <div className="hero-cta">
             <CornerCutButton
+              onClick={() => getLenisInstance().scrollTo("#pricing")}
               color="green"
               variant="ghost"
               hoverEffect="pulse"

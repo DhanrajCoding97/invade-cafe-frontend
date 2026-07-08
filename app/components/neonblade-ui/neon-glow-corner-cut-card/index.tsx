@@ -2,6 +2,7 @@
 
 import React, { HTMLAttributes, ReactNode } from "react"
 import Image from "next/image"
+import { FcGoogle } from "react-icons/fc"
 import "./neonglow-cornercut-card.css"
 
 // ---- Types -------------------------------------------------
@@ -15,6 +16,9 @@ export type NGCCHoverEffect =
   "gradient" | "solid" | "glow-only" | "pulse" | "trace" | "none"
 export type NGCCGlowIntensity = "low" | "medium" | "high"
 export type NGCCImageOverlay = "bottom" | "full" | "none"
+
+/** Content layout mode for the card body */
+export type NGCCType = "default" | "marquee"
 
 // ---- Maps --------------------------------------------------
 
@@ -55,6 +59,28 @@ const IMAGE_OVERLAY_CLASSES: Record<NGCCImageOverlay, string> = {
   none: "",
 }
 
+// ---- Star rating (self-contained, no external dep) ---------
+
+function StarRating({ rating }: { rating: number }) {
+  return (
+    <div
+      className="flex items-center gap-0.5"
+      aria-label={`${rating} out of 5 stars`}
+    >
+      {Array.from({ length: 5 }).map((_, i) => (
+        <svg
+          key={i}
+          viewBox="0 0 20 20"
+          className="h-3.5 w-3.5"
+          fill={i < rating ? "#facc15" : "#3f3f46"}
+        >
+          <path d="M10 15.27L16.18 19l-1.64-7.03L20 7.24l-7.19-.61L10 0 7.19 6.63 0 7.24l5.46 4.73L3.82 19z" />
+        </svg>
+      ))}
+    </div>
+  )
+}
+
 // ---- Component props ---------------------------------------
 
 export interface NeonGlowCornerCutCardProps extends HTMLAttributes<HTMLDivElement> {
@@ -62,7 +88,10 @@ export interface NeonGlowCornerCutCardProps extends HTMLAttributes<HTMLDivElemen
   icon?: ReactNode
   title?: string
 
-  /** Bulleted feature list, rendered with a colored dot matching colorA */
+  /** Card content layout — "default" for icon/title/features, "marquee" for review cards */
+  type?: NGCCType
+
+  /** Bulleted feature list, rendered with a colored dot matching colorA (type="default" only) */
   features?: string[]
 
   colorA?: NGCCColor
@@ -79,6 +108,13 @@ export interface NeonGlowCornerCutCardProps extends HTMLAttributes<HTMLDivElemen
   imageHeight?: number
   imageOverlay?: NGCCImageOverlay
   topContent?: ReactNode
+
+  // ---- Review / marquee-mode props ----
+  reviewerName?: string
+  reviewerInitial?: string
+  reviewRating?: number
+  reviewText?: string
+  showGoogleIcon?: boolean
 }
 
 const CARD_PADDING: Record<NGCCSize, string> = {
@@ -118,6 +154,7 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
   children,
   icon,
   title,
+  type = "default",
   features,
   colorA = "cyan",
   colorB = "pink",
@@ -132,6 +169,11 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
   imageHeight = 420,
   imageOverlay = "bottom",
   topContent,
+  reviewerName,
+  reviewerInitial,
+  reviewRating = 5,
+  reviewText,
+  showGoogleIcon = true,
   className = "",
   style,
   ...props
@@ -140,6 +182,7 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
   const resolvedB = COLOR_PRESETS[colorB] ?? colorB
   const { glow, blur } = GLOW_SIZES[glowIntensity]
   const isMediaMode = Boolean(imageSrc)
+  const isMarquee = type === "marquee"
 
   if (isMediaMode && !imageAlt) {
     console.warn(
@@ -157,14 +200,40 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
             FEATURE_SIZE[size],
           ].join(" ")}
         >
-          <span
-            className="h-1 w-1 shrink-0 rounded-full"
-            style={{ backgroundColor: "white" }}
-          />
+          <span className="h-1 w-1 shrink-0 rounded-full bg-white" />
           {feature}
         </li>
       ))}
     </ul>
+  )
+
+  const marqueeContent = (
+    <>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-semibold"
+            style={{
+              backgroundColor: `${resolvedA}1a`,
+              color: resolvedA,
+            }}
+          >
+            {reviewerInitial ?? reviewerName?.charAt(0) ?? "?"}
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-white">
+              {reviewerName}
+            </p>
+            <StarRating rating={reviewRating} />
+          </div>
+        </div>
+        {showGoogleIcon && <FcGoogle size={24} />}
+      </div>
+      <p className="mt-3 line-clamp-4 text-sm leading-relaxed text-[#9a9a9a]">
+        {reviewText}
+      </p>
+      {children}
+    </>
   )
 
   return (
@@ -202,7 +271,7 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
         className={[
           "ngcc-card group relative z-10 flex h-full flex-col overflow-hidden transition-shadow duration-300",
           CORNER_CLASSES[corner],
-          isMediaMode ? "" : CARD_PADDING[size],
+          isMediaMode ? "" : isMarquee ? "gap-3 p-5" : CARD_PADDING[size],
         ].join(" ")}
         style={{
           backgroundColor: bgColor ?? "#0a0a0a",
@@ -274,6 +343,8 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
               {children}
             </div>
           </>
+        ) : isMarquee ? (
+          marqueeContent
         ) : (
           <>
             {icon && (
