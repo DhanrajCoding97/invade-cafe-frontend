@@ -65,7 +65,7 @@ export default function ServicesSection() {
     <section
       id="services"
       ref={sectionRef}
-      className="min-h-screen bg-black px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
+      className="min-h-screen bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20"
     >
       <div className="mx-auto max-w-6xl">
         {/* sub title */}

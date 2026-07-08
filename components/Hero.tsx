@@ -101,7 +101,7 @@ export default function HeroSection() {
         overlay
       />
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
         <div className="hero-badge">
           <Badge
             responsive
