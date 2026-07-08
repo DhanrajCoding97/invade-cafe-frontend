@@ -83,6 +83,13 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
   onClick?: () => void
 
   /**
+   * When true, the button stretches to full width on mobile (below `sm`)
+   * and reverts to content-sized on larger screens.
+   * @default false
+   */
+  fullWidthOnMobile?: boolean
+
+  /**
    * Button accent color.
    * Use a preset name ("cyan" | "pink" | "green") or any CSS color value.
    * @default "cyan"
@@ -158,6 +165,7 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
 export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   children,
   onClick,
+  fullWidthOnMobile,
   color = "cyan",
   size = "md",
   variant = "solid",
@@ -196,6 +204,9 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
     <div
       className={[
         "group/ccb relative inline-flex p-px",
+        fullWidthOnMobile
+          ? "flex w-full sm:inline-flex sm:w-auto"
+          : "inline-flex",
         `ccb-wrapper-${hoverEffect}`,
         // ccb-wrapper class retained ONLY for the flicker :has() selector in CSS
         hoverEffect === "flicker" ? "ccb-wrapper" : "",
@@ -271,7 +282,14 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         )}
 
         {/* Content sits above decorative layers */}
-        <span className="relative z-10 flex items-center gap-2">
+        <span
+          className={[
+            "relative z-10 flex items-center gap-2",
+            fullWidthOnMobile ? "justify-center" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
+        >
           {children}
           {showArrow && (
             <span

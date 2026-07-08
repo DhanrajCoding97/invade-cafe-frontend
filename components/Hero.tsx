@@ -7,8 +7,8 @@ import { useEffect, useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 
-import Image from "next/image"
 import { getLenisInstance } from "@/lib/lenisInstance"
+import Image from "next/image"
 
 gsap.registerPlugin(ScrollTrigger)
 
@@ -82,8 +82,9 @@ export default function HeroSection() {
 
   return (
     <section
+      id="hero"
       ref={containerRef}
-      className="relative h-screen w-full overflow-hidden bg-black"
+      className="relative min-h-screen w-full overflow-hidden bg-black"
     >
       <div className="glow-cyan pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]" />
       <div className="glow-fuchsia pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]" />
@@ -100,11 +101,11 @@ export default function HeroSection() {
         overlay
       />
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-6">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-16 sm:px-6 sm:py-20 lg:px-8">
         <div className="hero-badge">
           <Badge
+            responsive
             color="green"
-            size="md"
             variant="outline"
             dot="pulse"
             glow={false}
@@ -120,32 +121,34 @@ export default function HeroSection() {
         </div>
 
         <div className="mt-8 max-w-3xl text-center">
-          <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-6xl font-extrabold text-transparent md:text-7xl lg:text-8xl">
+          <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent">
             <GlitchText mode="hover">Invade Gaming Cafe</GlitchText>
           </h1>
-          <p className="hero-subtext mx-auto mt-6 max-w-xl text-lg font-normal text-[#B6B6B6]">
+          <p className="hero-subtext mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] font-normal text-[#e1ebe8]">
             Laid-back hangout featuring PC and PlayStation games, plus racing
             simulators and VR options.
           </p>
         </div>
 
-        <div className="mt-10 flex items-center justify-center gap-4">
-          <div className="hero-cta">
-            <CornerCutButton color="cyan" showArrow hoverEffect="shift">
-              Book Now
-            </CornerCutButton>
-          </div>
-          <div className="hero-cta">
-            <CornerCutButton
-              onClick={() => getLenisInstance().scrollTo("#pricing")}
-              color="green"
-              variant="ghost"
-              hoverEffect="pulse"
-              glowIntensity="high"
-            >
-              View Pricing
-            </CornerCutButton>
-          </div>
+        <div className="hero-cta mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row">
+          <CornerCutButton
+            color="cyan"
+            variant="outline"
+            hoverEffect="shift"
+            fullWidthOnMobile={true}
+          >
+            Book Now
+          </CornerCutButton>
+          <CornerCutButton
+            onClick={() => getLenisInstance().scrollTo("#pricing")}
+            color="green"
+            variant="ghost"
+            hoverEffect="pulse"
+            glowIntensity="high"
+            fullWidthOnMobile={true}
+          >
+            View Pricing
+          </CornerCutButton>
         </div>
       </div>
     </section>

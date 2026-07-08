@@ -46,7 +46,7 @@ const secondRow = reviews.slice(reviews.length / 2)
 
 // gsap animations
 
-export default function ReviewsSection() {
+export default function TestimonialSection() {
   const sectionRef = useRef<HTMLElement>(null)
   const eyebrowRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
@@ -99,10 +99,11 @@ export default function ReviewsSection() {
 
   return (
     <section
+      id="testimonials"
       ref={sectionRef}
-      className="min-h-screen overflow-hidden bg-black py-20"
+      className="min-h-screen overflow-hidden bg-black px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
     >
-      <div className="mx-auto mb-12 max-w-6xl">
+      <div className="mx-auto mb-12 max-w-6xl px-6">
         <div ref={eyebrowRef} className="my-4 flex items-center gap-4">
           <div className="h-px w-8 bg-[#00d4ff]" />
           <span className="text-[10px] leading-3.75 text-[#00d4ff]">
@@ -168,8 +169,8 @@ export default function ReviewsSection() {
             </Link>
           ))}
         </Marquee>
-        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-gradient-to-r from-black to-transparent" />
-        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-gradient-to-l from-black to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-black to-transparent" />
+        <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-black to-transparent" />
         {/* <div className="pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-background"></div>
         <div className="pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-background"></div> */}
       </div>

@@ -4,6 +4,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme {
+  --breakpoint-xs: 30rem; /* 480px */
+}
+
 @theme inline {
   --font-sans: var(--font-orbitron);
   --font-heading: var(--font-orbitron);
