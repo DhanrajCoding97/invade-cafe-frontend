@@ -122,9 +122,9 @@ export default function HeroSection() {
 
         <div className="mt-8 max-w-3xl text-center">
           <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent">
-            <GlitchText customSpeed="3s" mode="active">
-              Invade Gaming Cafe
-            </GlitchText>
+            Invade Gaming Cafe
+            {/* <GlitchText customSpeed="3s" mode="active">
+            </GlitchText> */}
           </h1>
           <p className="hero-subtext mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] font-normal text-[#e1ebe8]">
             Laid-back hangout featuring PC and PlayStation games, plus racing

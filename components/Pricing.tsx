@@ -69,7 +69,7 @@ export default function PricingSection() {
     <section
       id="pricing"
       ref={sectionRef}
-      className="min-h-screen bg-black px-6 py-20"
+      className="min-h-screen bg-black px-4 py-16 sm:px-6 sm:py-20 lg:px-8"
     >
       <div className="mx-auto max-w-6xl">
         {/* sub title */}
@@ -82,7 +82,7 @@ export default function PricingSection() {
         {/* main title */}
         <h2
           ref={titleRef}
-          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-5xl font-extrabold text-transparent"
+          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent"
         >
           Pricing
         </h2>
