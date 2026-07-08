@@ -11,6 +11,17 @@ export default function PricingSection() {
     console.log("clicked")
     router.push("/#booking")
   }
+  const goToBooking = (
+    device: string,
+    extra?: Record<string, string | number>
+  ) => {
+    const params = new URLSearchParams({
+      device,
+      ...(extra as Record<string, string>),
+    })
+    router.push(`/?${params.toString()}#booking`)
+  }
+
   return (
     <section className="min-h-screen bg-black px-6 py-20">
       <div className="mx-auto max-w-6xl">
@@ -41,7 +52,7 @@ export default function PricingSection() {
         <div className="mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {/* PC Gaming */}
           <PricingCard
-            onBook={() => alert("Booking PC gaming...")}
+            onBook={() => goToBooking("pc")}
             icon={<PcIcon className="h-16 w-16" />}
             title="PC gaming"
             subtitle="Per hour"
@@ -58,15 +69,18 @@ export default function PricingSection() {
             title="PS5"
             subtitle="Price scales with players"
             pricingMode="per-player"
+            playerPriceMap={{ 1: 100, 2: 160, 3: 240, 4: 300 }}
             pricePerPlayer={100}
             minPlayers={1}
-            maxPlayers={6}
+            maxPlayers={4}
             currency="₹"
             priceUnit="/hr"
             featured
             featuredLabel="Most popular"
             accentColor="cyan"
-            onBook={handleSubmit}
+            onBook={({ players }) =>
+              goToBooking("ps5", { players: players ?? 1 })
+            }
           />
 
           {/* Racing cockpit — tiered */}
@@ -81,7 +95,9 @@ export default function PricingSection() {
             ]}
             currency="₹"
             accentColor="cyan"
-            onBook={() => alert("Booking Racing cockpit...")}
+            onBook={({ tier }) =>
+              goToBooking("racing", { tier: tier ?? "Single Player" })
+            }
           />
 
           {/* PSVR */}
@@ -94,7 +110,7 @@ export default function PricingSection() {
             priceUnit="/hr"
             pricingMode="fixed"
             accentColor="cyan"
-            onBook={() => alert("Booking PSVR...")}
+            onBook={() => goToBooking("vr")}
           />
         </div>
       </div>

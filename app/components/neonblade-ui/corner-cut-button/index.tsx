@@ -171,6 +171,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   textColor,
   className = "",
   style,
+  type = "button",
   ...props
 }) => {
   const resolvedColor = COLOR_PRESETS[color] ?? color
@@ -232,6 +233,8 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
       />
 
       <button
+        type={type}
+        onClick={onClick}
         className={[
           "group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all",
           SIZE_CLASSES[size],

@@ -1,5 +1,5 @@
 "use client"
-
+import "./pricing-card.css"
 import React, { HTMLAttributes, ReactNode, useState } from "react"
 import CornerCutButton from "@/app/components/neonblade-ui/corner-cut-button"
 // ---- Types -------------------------------------------------
@@ -28,10 +28,11 @@ export interface PricingCardProps extends HTMLAttributes<HTMLDivElement> {
   featured?: boolean
   featuredLabel?: string
   ctaLabel?: string
-  onBook?: () => void
+  onBook?: (info: { players?: number; tier?: string }) => void
   accentColor?: NBColor
   size?: NBSize
   children?: ReactNode
+  playerPriceMap?: Record<number, number>
 }
 
 // ---- Helpers -----------------------------------------------
@@ -91,6 +92,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   minPlayers = 1,
   maxPlayers = 4,
   pricePerPlayer = 100,
+
   featured = false,
   featuredLabel = "Most popular",
   ctaLabel = "Book Now",
@@ -100,14 +102,21 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   children,
   className = "",
   style,
+  playerPriceMap,
   ...props
 }) => {
   const [players, setPlayers] = useState(minPlayers)
+  const [selectedTierIndex, setSelectedTierIndex] = useState(0)
   const accent = COLOR_PRESETS[accentColor] ?? accentColor
   const s = SIZE_MAP[size]
 
   const computedPrice =
-    pricingMode === "per-player" ? pricePerPlayer * players : (price ?? 0)
+    pricingMode === "per-player"
+      ? (playerPriceMap?.[players] ?? pricePerPlayer * players)
+      : (price ?? 0)
+
+  // const computedPrice =
+  //   pricingMode === "per-player" ? pricePerPlayer * players : (price ?? 0)
 
   const handleDecrease = () => setPlayers((p) => Math.max(minPlayers, p - 1))
   const handleIncrease = () => setPlayers((p) => Math.min(maxPlayers, p + 1))
@@ -115,7 +124,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
   return (
     <div
       className={[
-        "relative flex h-full flex-col overflow-visible rounded-2xl",
+        "pricing-card relative flex h-full flex-col overflow-visible rounded-2xl",
         className,
       ].join(" ")}
       style={
@@ -152,28 +161,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         ].join(" ")}
       >
         {/* Icon box */}
-        {icon && (
-          // <div
-          //   className={[
-          //     "flex shrink-0 items-center justify-center rounded-2xl",
-          //     s.iconBox,
-          //   ].join(" ")}
-          //   style={{
-          //     background: "linear-gradient(135deg, #1a2d45 0%, #0f1e30 100%)",
-          //     border: "1px solid rgba(255,255,255,0.10)",
-          //   }}
-          // >
-          //   <span
-          //     className={["flex items-center justify-center", s.iconInner].join(
-          //       " "
-          //     )}
-          //     style={{ color: accent }}
-          //   >
-          //     {icon}
-          //   </span>
-          // </div>
-          <>{icon}</>
-        )}
+        {icon && <>{icon}</>}
 
         {/* Title */}
         {title && (
@@ -244,7 +232,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         )}
 
         {/* Tiered pricing rows */}
-        {pricingMode === "tiered" && tiers && (
+        {/* {pricingMode === "tiered" && tiers && (
           <div className="mt-1 w-full">
             {tiers.map((tier, i) => (
               <div
@@ -271,6 +259,66 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               </div>
             ))}
           </div>
+        )} */}
+        {/* Tiered pricing — now selectable via radio */}
+        {pricingMode === "tiered" && tiers && (
+          <div className="mt-1 w-full">
+            {tiers.map((tier, i) => {
+              const isSelected = i === selectedTierIndex
+              return (
+                <label
+                  key={i}
+                  className="flex cursor-pointer items-center justify-between py-3 text-sm"
+                  style={{
+                    borderBottom:
+                      i < tiers.length - 1
+                        ? "1px solid rgba(255,255,255,0.08)"
+                        : "none",
+                  }}
+                >
+                  <span className="flex items-center gap-2.5">
+                    <input
+                      type="radio"
+                      name={`tier-${title}`}
+                      checked={isSelected}
+                      onChange={() => setSelectedTierIndex(i)}
+                      className="sr-only"
+                    />
+                    <span
+                      className="flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 transition-colors"
+                      style={{
+                        borderColor: isSelected
+                          ? accent
+                          : "rgba(255,255,255,0.3)",
+                      }}
+                    >
+                      {isSelected && (
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ background: accent }}
+                        />
+                      )}
+                    </span>
+                    <span
+                      className={isSelected ? "text-white" : "text-white/70"}
+                    >
+                      {tier.label}
+                    </span>
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <div
+                      className="flex items-center font-bold"
+                      style={{ color: accent }}
+                    >
+                      <span>{currency}</span>
+                      <span>{tier.price}</span>
+                    </div>
+                    <span className="text-sm text-[#00d4e8]">{priceUnit}</span>
+                  </div>
+                </label>
+              )
+            })}
+          </div>
         )}
 
         {/* Custom children */}
@@ -282,35 +330,21 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         {/* CTA */}
         <CornerCutButton
           className="mt-auto"
-          onClick={onBook}
+          onClick={() =>
+            onBook?.({
+              players: pricingMode === "per-player" ? players : undefined,
+              tier:
+                pricingMode === "tiered"
+                  ? tiers?.[selectedTierIndex]?.label
+                  : undefined,
+            })
+          }
           color="cyan"
           showArrow
           hoverEffect="shift"
         >
           Book Now
         </CornerCutButton>
-        {/* <button
-          onClick={onBook}
-          className="mt-6 w-full rounded-xl py-3.5 text-base font-bold transition-all duration-200 active:scale-95"
-          style={{
-            background: accent,
-            color: "#0a1525",
-            boxShadow: `0 0 20px 0 ${accent}55`,
-          }}
-          onMouseEnter={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
-              `0 0 36px 4px ${accent}88`
-            ;(e.currentTarget as HTMLButtonElement).style.filter =
-              "brightness(1.12)"
-          }}
-          onMouseLeave={(e) => {
-            ;(e.currentTarget as HTMLButtonElement).style.boxShadow =
-              `0 0 20px 0 ${accent}55`
-            ;(e.currentTarget as HTMLButtonElement).style.filter = ""
-          }}
-        >
-          {ctaLabel}
-        </button> */}
       </div>
     </div>
   )
