@@ -14,6 +14,7 @@ gsap.registerPlugin(ScrollTrigger)
 
 export default function HeroSection() {
   const containerRef = useRef<HTMLElement>(null)
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640
 
   useEffect(() => {
     // Get the global Lenis instance
@@ -84,12 +85,22 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-screen w-full overflow-hidden bg-black"
+      className="relative min-h-[85vh] w-full overflow-hidden bg-black sm:min-h-screen"
     >
       <div className="glow-cyan pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]" />
       <div className="glow-fuchsia pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]" />
-
       <DatalinesWithGrid
+        lineColor="#15b4fe"
+        shadowColor="#00ff66"
+        cellSize={isMobile ? 40 : 60}
+        maxLines={isMobile ? 4 : 8}
+        baseSpeed={1.5}
+        lineLength={isMobile ? 80 : 120}
+        spawnProbability={isMobile ? 0.03 : 0.04}
+        bgGridColor="rgba(0,255,102,0.06)"
+        overlay
+      />
+      {/* <DatalinesWithGrid
         lineColor="#15b4fe"
         shadowColor="#00ff66"
         cellSize={60}
@@ -99,9 +110,9 @@ export default function HeroSection() {
         spawnProbability={0.04}
         bgGridColor="rgba(0,255,102,0.06)"
         overlay
-      />
+      /> */}
 
-      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
+      <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
         <div className="hero-badge">
           <Badge
             responsive
@@ -119,7 +130,6 @@ export default function HeroSection() {
             Console Rentals Now Available
           </Badge>
         </div>
-
         <div className="mt-8 max-w-3xl text-center">
           <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent">
             Invade Gaming Cafe
@@ -131,11 +141,11 @@ export default function HeroSection() {
             simulators and VR options.
           </p>
         </div>
-
         <div className="hero-cta mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row">
           <CornerCutButton
             color="cyan"
-            variant="outline"
+            variant="solid"
+            showArrow
             hoverEffect="shift"
             fullWidthOnMobile={true}
           >
