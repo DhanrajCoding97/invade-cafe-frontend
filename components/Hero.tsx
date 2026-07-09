@@ -130,7 +130,16 @@ export default function HeroSection() {
             Console Rentals Now Available
           </Badge>
         </div>
-        <div className="mt-8 max-w-3xl text-center">
+        <div className="relative mt-8 max-w-3xl text-center">
+          {/* Text-safety scrim — sits behind heading+subtext only */}
+          <div
+            className="pointer-events-none absolute inset-0 -z-10 rounded-[3rem] blur-2xl"
+            style={{
+              background:
+                "radial-gradient(ellipse 100% 80% at center, rgba(0,0,0,0.65) 0%, transparent 75%)",
+            }}
+          />
+
           <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent">
             Invade Gaming Cafe
             {/* <GlitchText customSpeed="3s" mode="active">
