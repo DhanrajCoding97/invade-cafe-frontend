@@ -49,7 +49,7 @@ export default function PricingSection() {
       if (cards) {
         gsap.from(cards, {
           opacity: 0,
-          y: 50,
+          y: 0,
           duration: 0.4,
           delay: 0.6,
           ease: "power2.inOut",
@@ -69,7 +69,7 @@ export default function PricingSection() {
     <section
       id="pricing"
       ref={sectionRef}
-      className="min-h-screen bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20"
+      className="bg-black px-4 py-8 sm:min-h-screen sm:px-6 sm:py-12 lg:px-8 lg:py-20"
     >
       <div className="mx-auto max-w-6xl">
         {/* sub title */}
@@ -92,7 +92,7 @@ export default function PricingSection() {
         </p>
         <div
           ref={cardsRef}
-          className="grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4"
+          className="mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4"
         >
           {/* PC Gaming */}
           <PricingCard

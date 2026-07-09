@@ -50,6 +50,9 @@ importers:
       shadcn:
         specifier: ^4.13.0
         version: 4.13.0(typescript@5.9.3)
+      swiper:
+        specifier: ^14.0.2
+        version: 14.0.2
       tailwind-merge:
         specifier: ^3.6.0
         version: 3.6.0
@@ -4181,6 +4184,10 @@ packages:
     resolution: {integrity: sha512-+wn7I4p7YgJhHs38k2TNjy1vCfPIfLIJWR5MnCStsN8WuuTcBnRKcMHQLMM2ijxGZmDoZwNv8ipl5aTTen62ng==}
     engines: {node: '>=14.0.0'}
     hasBin: true
+
+  swiper@14.0.2:
+    resolution: {integrity: sha512-KRFQZP0zXUh6MEmSQOJKSw27ARqS884OX/dfBz4i2/It9aixL7svh7/Ng0yZ0FE+PrjrW5vzBcjCfmNnq109XQ==}
+    engines: {node: '>= 4.7.0'}
 
   systeminformation@5.31.13:
     resolution: {integrity: sha512-iUJXJoKzm4vtLSeT3nwe2s9QjoJAxHg7wYJ0KaQ54Xy2u9jsTq0ULWQQ0+T72FXjX2XnGqubazNx9lUfng7ELw==}
@@ -8900,6 +8907,8 @@ snapshots:
       csso: 5.0.5
       picocolors: 1.1.1
       sax: 1.6.0
+
+  swiper@14.0.2: {}
 
   systeminformation@5.31.13: {}
 

@@ -130,7 +130,7 @@ export default function TestimonialSection() {
         <Marquee ref={cardsRef} pauseOnHover className="[--duration:22s]">
           {firstRow.map((review, index) => (
             <Link
-              className="flex w-[320px] shrink-0"
+              className="flex w-[clamp(260px,80vw,320px)] shrink-0"
               key={index}
               href="https://biturl.in/Home/Index/54F66B24"
               target="_blank"
@@ -152,7 +152,7 @@ export default function TestimonialSection() {
         <Marquee reverse pauseOnHover className="[--duration:22s]">
           {secondRow.map((review, index) => (
             <Link
-              className="flex w-[320px] shrink-0"
+              className="flex w-[clamp(260px,80vw,320px)] shrink-0"
               key={index}
               href="https://biturl.in/Home/Index/54F66B24"
               target="_blank"
