@@ -65,21 +65,40 @@ export default function HeroSection() {
       )
 
     // Ambient drift
+    // gsap.to(".glow-cyan", {
+    //   x: 30,
+    //   y: 20,
+    //   duration: 8,
+    //   repeat: -1,
+    //   yoyo: true,
+    //   ease: "sine.inOut",
+    // })
+    // gsap.to(".glow-fuchsia", {
+    //   x: -30,
+    //   y: -20,
+    //   duration: 9,
+    //   repeat: -1,
+    //   yoyo: true,
+    //   ease: "sine.inOut",
+    // })
     gsap.to(".glow-cyan", {
-      x: 30,
-      y: 20,
-      duration: 8,
+      x: 80,
+      y: 60,
+      scale: 1.15,
+      duration: 10,
       repeat: -1,
       yoyo: true,
       ease: "sine.inOut",
     })
     gsap.to(".glow-fuchsia", {
-      x: -30,
-      y: -20,
-      duration: 9,
+      x: -70,
+      y: -50,
+      scale: 1.2,
+      duration: 11,
       repeat: -1,
       yoyo: true,
-      ease: "sine.inOut",
+      ease: "power2.in",
+      delay: 1.5, // offset so both blobs don't peak/trough in sync
     })
 
     // Cleanup
@@ -95,7 +114,7 @@ export default function HeroSection() {
     <section
       id="hero"
       ref={containerRef}
-      className="relative min-h-[85vh] w-full overflow-hidden bg-black sm:min-h-screen"
+      className="relative min-h-[94vh] w-full overflow-hidden bg-black sm:min-h-screen"
     >
       <div className="glow-cyan pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]" />
       <div className="glow-fuchsia pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]" />
@@ -110,18 +129,6 @@ export default function HeroSection() {
         bgGridColor="rgba(0,255,102,0.06)"
         overlay
       />
-      {/* <DatalinesWithGrid
-        lineColor="#15b4fe"
-        shadowColor="#00ff66"
-        cellSize={60}
-        maxLines={8}
-        baseSpeed={1.5}
-        lineLength={120}
-        spawnProbability={0.04}
-        bgGridColor="rgba(0,255,102,0.06)"
-        overlay
-      /> */}
-
       <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20">
         <div className="hero-badge">
           <Badge
@@ -150,7 +157,7 @@ export default function HeroSection() {
             }}
           />
 
-          <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent">
+          <h1 className="hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]">
             Invade Gaming Cafe
             {/* <GlitchText customSpeed="3s" mode="active">
             </GlitchText> */}

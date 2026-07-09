@@ -114,7 +114,7 @@ export default function TestimonialSection() {
         </div>
         <h2
           ref={titleRef}
-          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.4rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent"
+          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.4rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
         >
           Testimonials
         </h2>
