@@ -90,8 +90,8 @@ export default function HeroSection() {
       <div className="glow-cyan pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]" />
       <div className="glow-fuchsia pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]" />
       <DatalinesWithGrid
-        lineColor="#15b4fe"
-        shadowColor="#00ff66"
+        lineColor="#38FA14"
+        shadowColor="#071F02"
         cellSize={isMobile ? 40 : 60}
         maxLines={isMobile ? 4 : 8}
         baseSpeed={1.5}
