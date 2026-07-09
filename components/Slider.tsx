@@ -1,16 +1,14 @@
 "use client"
-
-// import Image from "next/image"
 import { useRef } from "react"
 import { Swiper, SwiperSlide } from "swiper/react"
 import { Pagination, Mousewheel } from "swiper/modules"
-
-// import { EffectCoverflow } from "swiper/modules"
+import gsap from "gsap"
 import "swiper/css/effect-coverflow"
 
 import "swiper/css"
 import "swiper/css/pagination"
 
+import "./custom-swiper.css"
 const images = [
   { src: "/gallery1.webp", title: "gallery 1" },
   { src: "/gallery2.webp", title: "gallery 2" },
@@ -61,10 +59,11 @@ export default function GallerySlider() {
     //     </SwiperSlide>
     //   ))}
     // </Swiper>
-    <div>
+    <div className="flex flex-col items-center justify-center">
       <Swiper
         modules={[Mousewheel, Pagination]}
         grabCursor={true}
+        // loop={true}
         initialSlide={4}
         centeredSlides={true}
         slidesPerView="auto"
@@ -76,6 +75,14 @@ export default function GallerySlider() {
         onSwiper={(swiper) => {
           swiperWrapperRef.current = swiper.wrapperEl
           swiper.on("resize", adjustMargin)
+        }}
+        onSlideChange={(swiper) => {
+          const activeSlide = swiper.slides[swiper.activeIndex]
+          gsap.fromTo(
+            activeSlide,
+            { scale: 0.08 },
+            { scale: 1, duration: 1, ease: "back.inOut" }
+          )
         }}
       >
         {images.map((image, index) => (

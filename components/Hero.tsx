@@ -143,6 +143,7 @@ export default function HeroSection() {
               src={"./headerIcon.svg"}
               height={24}
               width={24}
+              style={{ width: 24, height: 24 }}
             />
             Console Rentals Now Available
           </Badge>
