@@ -20,6 +20,13 @@ export default function HeroSection() {
     // Get the global Lenis instance
     const lenis = getLenisInstance()
 
+    // Recalculate trigger positions once layout has settled
+    const refresh = () => ScrollTrigger.refresh()
+    window.addEventListener("load", refresh)
+
+    // Also refresh shortly after mount, covers images/fonts that load async
+    const t = setTimeout(refresh, 300)
+
     // GSAP animations as normal
     const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
@@ -77,7 +84,10 @@ export default function HeroSection() {
 
     // Cleanup
     return () => {
-      ScrollTrigger.killAll // Kill ScrollTrigger on unmount (optional, for clean-up)
+      window.removeEventListener("load", refresh)
+      clearTimeout(t)
+      tl.kill()
+      ScrollTrigger.getAll().forEach((t) => t.kill())
     }
   }, [])
 

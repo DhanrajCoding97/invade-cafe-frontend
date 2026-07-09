@@ -8,6 +8,7 @@ import { useRef } from "react"
 import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { useGSAP } from "@gsap/react"
+import { REVEAL } from "@/lib/animation-presets"
 const reviews: Review[] = [
   {
     id: "1",
@@ -65,10 +66,11 @@ export default function TestimonialSection() {
         ],
         {
           opacity: 0,
-          y: 30,
-          duration: 0.8,
-          ease: "power2.out",
-          stagger: 0.45,
+          // y: 30,
+          // duration: 0.8,
+          // ease: "power2.out",
+          // stagger: 0.45,
+          ...REVEAL.header,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 75%",

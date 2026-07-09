@@ -1,5 +1,5 @@
 "use client"
-
+import { REVEAL } from "@/lib/animation-presets"
 import { services, Service } from "@/types"
 import NeonGlowCornerCutCard from "@/app/components/neonblade-ui/neon-glow-corner-cut-card"
 import { useRef } from "react"
@@ -29,10 +29,11 @@ export default function ServicesSection() {
         ],
         {
           opacity: 0,
-          y: 30,
-          duration: 0.8,
-          ease: "power2.out",
-          stagger: 0.45,
+          ...REVEAL.header,
+          // y: 30,
+          // duration: 0.8,
+          // ease: "power2.out",
+          // stagger: 0.45,
           scrollTrigger: {
             trigger: sectionRef.current,
             start: "top 75%",
