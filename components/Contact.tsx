@@ -1,35 +1,25 @@
 "use client"
 
 import Link from "next/link"
-import React from "react"
+import { WhatsappIcon, PhoneIcon, MailIcon, InstagramIcon } from "./svgs"
+
 import { useRef } from "react"
-import {
-  WhatsappIcon,
-  PhoneIcon,
-  MailIcon,
-  InstagramIcon,
-  LocationIcon,
-  ClockIcon,
-  PhoneIcon3,
-  MapArrowIcon,
-} from "./svgs"
+import gsap from "gsap"
+import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useGSAP } from "@gsap/react"
+import { REVEAL } from "@/lib/animation-presets"
 function InfoCard({
   label,
   children,
-  icon,
 }: {
   label: string
   children: React.ReactNode
-  icon: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-white/10 bg-[#0a0a0a] p-5">
-      <div className="mb-2 flex items-center justify-start gap-1">
-        {icon}
-        <p className="text-[11px] tracking-wide text-white/40 uppercase">
-          {label}
-        </p>
-      </div>
+    <div className="space-y-2 rounded-xl border border-white/10 bg-[#0a0a0a] p-5 transition-colors hover:border-[#00d4ff]/30">
+      <p className="text-[11px] tracking-wide text-[#00D4FF] uppercase sm:text-base">
+        {label}
+      </p>
       {children}
     </div>
   )
@@ -39,23 +29,31 @@ function ContactLink({
   icon,
   href,
   children,
+  accent = "#00d4ff",
 }: {
   icon: React.ReactNode
   href: string
   children: React.ReactNode
+  accent?: string
 }) {
   return (
     <Link
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-2.5 text-sm text-white transition-colors hover:text-[#00d4ff]"
+      className="group flex items-center gap-3 text-sm text-white/80 transition-colors hover:text-[#00D4FF]"
     >
-      <span className="text-[#00d4ff]">{icon}</span>
+      <span
+        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110"
+        style={{ background: `${accent}1a`, color: accent }}
+      >
+        {icon}
+      </span>
       {children}
     </Link>
   )
 }
+
 function HoursRow({
   day,
   time,
@@ -78,9 +76,62 @@ export default function Contact() {
   const eyebrowRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const descRef = useRef<HTMLParagraphElement>(null)
+  const contactCardsRef = useRef<HTMLDivElement>(null)
+  const mapsRef = useRef<HTMLDivElement>(null)
+
+  // gsap scrollTrigger animation
+  useGSAP(
+    () => {
+      gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
+        opacity: 0,
+        ...REVEAL.header,
+        // y: 30,
+        // duration: 0.8,
+        // ease: "power2.out",
+        // stagger: 0.45,
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          start: "top 75%",
+          toggleActions: "play none none none",
+        },
+      })
+
+      const cards = contactCardsRef.current?.children
+      if (cards) {
+        gsap.from(cards, {
+          opacity: 0,
+          y: 50,
+          duration: 0.6,
+          delay: 0.4,
+          ease: "sine.inOut",
+          stagger: 0.3,
+          scrollTrigger: {
+            trigger: contactCardsRef.current,
+            start: "top 80%",
+            toggleActions: "play none none none",
+          },
+        })
+      }
+
+      gsap.from(mapsRef.current, {
+        opacity: 0,
+        y: 50,
+        duration: 0.8,
+        delay: 0.4,
+        ease: "sine.inOut",
+        scrollTrigger: {
+          trigger: mapsRef.current,
+          start: "top 80%",
+          toggleActions: "play none none none",
+        },
+      })
+    },
+    { scope: sectionRef }
+  )
+
   return (
     <section
-      id="pricing"
+      id="contact"
       ref={sectionRef}
       className="bg-black px-4 py-8 sm:min-h-screen sm:px-6 sm:py-12 lg:px-8 lg:py-20"
     >
@@ -104,13 +155,47 @@ export default function Contact() {
           Our location, hours, and the easiest ways to reach us.
         </p>
         {/* Two-column body */}
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]">
+        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]">
           {/* Info column */}
-          <div className="order-2 flex flex-col gap-4 md:order-1">
-            <InfoCard
-              label="Address"
-              icon={<MapArrowIcon height={32} width={32} />}
-            >
+          <div
+            ref={contactCardsRef}
+            className="order-2 flex flex-col gap-4 md:order-1"
+          >
+            {/* social links card */}
+            <InfoCard label="Get in touch">
+              <div className="flex flex-col gap-2.5">
+                <ContactLink
+                  icon={<WhatsappIcon height={16} width={16} />}
+                  href="https://wa.me/918291158779"
+                  accent="#25D366"
+                >
+                  WhatsApp us
+                </ContactLink>
+                <ContactLink
+                  icon={<InstagramIcon height={16} width={16} />}
+                  href="https://instagram.com/invadegamingcafe"
+                  accent="#E1306C"
+                >
+                  @invadegamingcafe
+                </ContactLink>
+                <ContactLink
+                  icon={<PhoneIcon height={16} width={16} />}
+                  href="tel:+918291158779"
+                  accent="#00d4ff"
+                >
+                  +91 82911 58779
+                </ContactLink>
+                <ContactLink
+                  icon={<MailIcon height={16} width={16} />}
+                  href="mailto:hello@invadecafe.com"
+                  accent="#FDD267"
+                >
+                  hello@invadecafe.com
+                </ContactLink>
+              </div>
+            </InfoCard>
+            {/* address */}
+            <InfoCard label="Address">
               <p className="text-sm text-white">
                 Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
                 opposite Juinagar Railway Station, Sector 11,
@@ -118,45 +203,20 @@ export default function Contact() {
                 Sanpada, Navi Mumbai, Maharashtra 400705
               </p>
             </InfoCard>
-
-            <InfoCard
-              label="Get in touch"
-              icon={<PhoneIcon3 height={32} width={32} />}
-            >
-              <div className="flex flex-col gap-2.5">
-                <ContactLink
-                  icon={<WhatsappIcon height={20} width={20} />}
-                  href="https://wa.me/918291158779"
-                >
-                  WhatsApp us
-                </ContactLink>
-                <ContactLink
-                  icon={<InstagramIcon height={20} width={20} />}
-                  href="https://instagram.com/invadegamingcafe"
-                >
-                  @invadegamingcafe
-                </ContactLink>
-                <ContactLink
-                  icon={<PhoneIcon height={20} width={20} />}
-                  href="tel:+918291158779"
-                >
-                  +91 82911 58779
-                </ContactLink>
-                <ContactLink
-                  icon={<MailIcon height={20} width={20} />}
-                  href="mailto:hello@invadecafe.com"
-                >
-                  hello@invadecafe.com
-                </ContactLink>
-              </div>
-            </InfoCard>
-
-            <InfoCard label="Hours" icon={<ClockIcon height={20} width={20} />}>
+            {/* hours card */}
+            <InfoCard label="Hours">
               <HoursRow day="Mon – Sun" time="10 AM – 11 PM" />
+              <p className="mt-2 text-xs text-white/40">
+                Walk-ins welcome, booking recommended on weekends.
+              </p>
             </InfoCard>
           </div>
           {/* Map */}
-          <div className="order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 md:order-2">
+          <div
+            ref={mapsRef}
+            className="group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2"
+          >
+            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-[#00d4ff]/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />{" "}
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.5212078436365!2d73.01288567520483!3d19.05530278214504!2m3!1f0!2f0!3f0!3m2!1i1020!2i768!4f13.1!3m3!1m2!1s0x3be7c17d6e4b5365%3A0x3ef9695a4157527c!2sINVADE%20GAMING%20CAFE!5e1!3m2!1sen!2sin!4v1783675916752!5m2!1sen!2sin"
               width="100%"

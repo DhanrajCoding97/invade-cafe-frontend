@@ -56,6 +56,7 @@ export default function RootLayout({
               { label: "Services", href: "#services" },
               { label: "Pricing", href: "#pricing" },
               { label: "Testimonials", href: "#testimonials" },
+              { label: "Contact", href: "#contact" },
             ]}
             authSlot={
               <CornerCutButton
