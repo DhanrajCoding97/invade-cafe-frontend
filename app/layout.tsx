@@ -8,6 +8,7 @@ import { FcGoogle } from "react-icons/fc"
 import CornerCutButton from "./components/neonblade-ui/corner-cut-button"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
+import SignInWithGoogle from "@/components/SignInWithGoogle"
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
@@ -59,21 +60,22 @@ export default function RootLayout({
               { label: "Contact", href: "#contact" },
             ]}
             authSlot={
-              <CornerCutButton
-                cornerSize={0}
-                size="sm"
-                color="cyan"
-                variant="outline"
-                hoverEffect="default"
-                onClick={() => router.push("/login")}
-              >
-                Login
-                <FcGoogle />
-              </CornerCutButton>
+              // <CornerCutButton
+              //   cornerSize={0}
+              //   size="sm"
+              //   color="cyan"
+              //   variant="outline"
+              //   hoverEffect="default"
+              //   onClick={() => router.push("/login")}
+              // >
+              //   Login
+              //   <FcGoogle />
+              // </CornerCutButton>
               // <Button variant="secondary" className="cursor-pointer">
               //   {" "}
               //   Login <FcGoogle />{" "}
               // </Button>
+              <SignInWithGoogle />
             }
           />
           {children}
