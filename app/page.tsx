@@ -4,6 +4,7 @@ import ServicesSection from "@/components/Services"
 import TestimonialSection from "@/components/Reviews"
 import PricingSection from "@/components/Pricing"
 import GallerySection from "@/components/Gallery"
+import Contact from "@/components/Contact"
 export default function Page() {
   return (
     <>
@@ -12,6 +13,7 @@ export default function Page() {
       <PricingSection />
       <TestimonialSection />
       <GallerySection />
+      <Contact />
     </>
   )
 }
