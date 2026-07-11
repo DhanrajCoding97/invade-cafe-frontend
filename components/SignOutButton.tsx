@@ -4,6 +4,7 @@ export default function SignOutButton() {
   return (
     <form action={signOut}>
       <CornerCutButton
+        type="submit"
         cornerSize={0}
         size="sm"
         color="cyan"
