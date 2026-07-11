@@ -3,7 +3,7 @@ import { getLenisInstance } from "@/lib/lenisInstance"
 import React, { useState, useEffect, useRef, ReactNode } from "react"
 import "./navbar.css"
 import CornerCutButton from "../corner-cut-button"
-import { signOut } from "@/app/actions/auth"
+
 /** Intercepts hash-link clicks and routes them through Lenis if available. */
 import { createClient } from "@/lib/supabase/client"
 
@@ -495,21 +495,6 @@ function ProfileDropdown({
       )}
     </div>
   )
-}
-
-const SignOutButton = () => {
-  ;<form action={signOut}>
-    <CornerCutButton
-      cornerSize={0}
-      size="sm"
-      color="cyan"
-      variant="outline"
-      hoverEffect="default"
-    >
-      Logout
-      {/* <FcGoogle /> */}
-    </CornerCutButton>
-  </form>
 }
 
 // ---- Main Component ----------------------------------------

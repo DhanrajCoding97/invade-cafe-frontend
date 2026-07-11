@@ -45,3 +45,8 @@ interface BookkingModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
 }
+
+export function BookingModal({ open, onOpenChange }: BookkingModalProps) {
+  const searchParams = useSearchParams()
+  const router = useRouter()
+}

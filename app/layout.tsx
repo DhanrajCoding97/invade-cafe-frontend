@@ -1,10 +1,12 @@
-// import { createClient } from "@/lib/supabase/server"
+import { Toaster } from "@/components/ui/sonner"
+
 import AuthSlot from "@/components/AuthSlot"
 import { Orbitron } from "next/font/google"
 import "./globals.css"
 import { cn } from "@/lib/utils"
 import SmoothScroll from "@/components/SmoothScroll"
 import NavBar from "./components/neonblade-ui/navbar"
+import { Toast } from "radix-ui"
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
@@ -64,6 +66,7 @@ export default async function RootLayout({
           />
           {children}
         </SmoothScroll>
+        <Toaster />
       </body>
     </html>
   )
