@@ -1,25 +1,26 @@
-"use client"
+// import { createClient } from "@/lib/supabase/server"
+import AuthSlot from "@/components/AuthSlot"
 import { Orbitron } from "next/font/google"
 import "./globals.css"
 import { cn } from "@/lib/utils"
 import SmoothScroll from "@/components/SmoothScroll"
 import NavBar from "./components/neonblade-ui/navbar"
-import { FcGoogle } from "react-icons/fc"
-import CornerCutButton from "./components/neonblade-ui/corner-cut-button"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
-import SignInWithGoogle from "@/components/SignInWithGoogle"
 const orbitron = Orbitron({
   subsets: ["latin"],
   variable: "--font-orbitron",
 })
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const router = useRouter()
+  // const supabase = await createClient()
+
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser()
+
   return (
     <html
       lang="en"
@@ -59,24 +60,7 @@ export default function RootLayout({
               { label: "Testimonials", href: "#testimonials" },
               { label: "Contact", href: "#contact" },
             ]}
-            authSlot={
-              // <CornerCutButton
-              //   cornerSize={0}
-              //   size="sm"
-              //   color="cyan"
-              //   variant="outline"
-              //   hoverEffect="default"
-              //   onClick={() => router.push("/login")}
-              // >
-              //   Login
-              //   <FcGoogle />
-              // </CornerCutButton>
-              // <Button variant="secondary" className="cursor-pointer">
-              //   {" "}
-              //   Login <FcGoogle />{" "}
-              // </Button>
-              <SignInWithGoogle />
-            }
+            authSlot={<AuthSlot />}
           />
           {children}
         </SmoothScroll>
