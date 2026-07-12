@@ -1,57 +1,57 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { WhatsappIcon, PhoneIcon, MailIcon, InstagramIcon } from "./svgs"
+import Link from 'next/link';
+import { WhatsappIcon, PhoneIcon, MailIcon, InstagramIcon } from './svgs';
 
-import { useRef } from "react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { useGSAP } from "@gsap/react"
-import { REVEAL } from "@/lib/animation-presets"
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
+import { REVEAL } from '@/lib/animation-presets';
 function InfoCard({
   label,
   children,
 }: {
-  label: string
-  children: React.ReactNode
+  label: string;
+  children: React.ReactNode;
 }) {
   return (
-    <div className="space-y-2 rounded-xl border border-white/10 bg-[#0a0a0a] p-5 transition-colors hover:border-[#00d4ff]/30">
-      <p className="text-[11px] tracking-wide text-[#00D4FF] uppercase sm:text-base">
+    <div className='space-y-2 rounded-xl border border-white/10 bg-[#0a0a0a] p-5 transition-colors hover:border-[#00d4ff]/30'>
+      <p className='text-[12px] tracking-wide text-[#00D4FF] uppercase sm:text-base'>
         {label}
       </p>
       {children}
     </div>
-  )
+  );
 }
 
 function ContactLink({
   icon,
   href,
   children,
-  accent = "#00d4ff",
+  accent = '#00d4ff',
 }: {
-  icon: React.ReactNode
-  href: string
-  children: React.ReactNode
-  accent?: string
+  icon: React.ReactNode;
+  href: string;
+  children: React.ReactNode;
+  accent?: string;
 }) {
   return (
     <Link
       href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex items-center gap-3 text-sm text-white/80 transition-colors hover:text-[#00D4FF]"
+      target='_blank'
+      rel='noopener noreferrer'
+      className='group flex items-center gap-3 text-xs sm:text-sm text-[#bcbcbc] transition-colors hover:text-[#00D4FF]'
     >
       <span
-        className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110"
+        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110'
         style={{ background: `${accent}1a`, color: accent }}
       >
         {icon}
       </span>
       {children}
     </Link>
-  )
+  );
 }
 
 function HoursRow({
@@ -59,25 +59,25 @@ function HoursRow({
   time,
   last = false,
 }: {
-  day: string
-  time: string
-  last?: boolean
+  day: string;
+  time: string;
+  last?: boolean;
 }) {
   return (
-    <div className="flex items-center justify-between py-1.5 text-sm">
-      <span className="text-white/60">{day}</span>
-      <span className="font-medium text-white">{time}</span>
+    <div className='flex items-center justify-between py-1.5 text-sm'>
+      <span className='text-[#bbb]'>{day}</span>
+      <span className='font-medium text-white'>{time}</span>
     </div>
-  )
+  );
 }
 
 export default function Contact() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const eyebrowRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const descRef = useRef<HTMLParagraphElement>(null)
-  const contactCardsRef = useRef<HTMLDivElement>(null)
-  const mapsRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const contactCardsRef = useRef<HTMLDivElement>(null);
+  const mapsRef = useRef<HTMLDivElement>(null);
 
   // gsap scrollTrigger animation
   useGSAP(
@@ -91,26 +91,26 @@ export default function Contact() {
         // stagger: 0.45,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top 75%",
-          toggleActions: "play none none none",
+          start: 'top 75%',
+          toggleActions: 'play none none none',
         },
-      })
+      });
 
-      const cards = contactCardsRef.current?.children
+      const cards = contactCardsRef.current?.children;
       if (cards) {
         gsap.from(cards, {
           opacity: 0,
           y: 50,
           duration: 0.6,
           delay: 0.4,
-          ease: "sine.inOut",
+          ease: 'sine.inOut',
           stagger: 0.3,
           scrollTrigger: {
             trigger: contactCardsRef.current,
-            start: "top 80%",
-            toggleActions: "play none none none",
+            start: 'top 80%',
+            toggleActions: 'play none none none',
           },
-        })
+        });
       }
 
       gsap.from(mapsRef.current, {
@@ -118,85 +118,88 @@ export default function Contact() {
         y: 50,
         duration: 0.8,
         delay: 0.4,
-        ease: "sine.inOut",
+        ease: 'sine.inOut',
         scrollTrigger: {
           trigger: mapsRef.current,
-          start: "top 80%",
-          toggleActions: "play none none none",
+          start: 'top 80%',
+          toggleActions: 'play none none none',
         },
-      })
+      });
     },
-    { scope: sectionRef }
-  )
+    { scope: sectionRef },
+  );
 
   return (
     <section
-      id="contact"
+      id='contact'
       ref={sectionRef}
-      className="bg-black px-4 py-8 sm:min-h-screen sm:px-6 sm:py-12 lg:px-8 lg:py-20"
+      className='bg-black px-4 py-8 sm:min-h-screen sm:px-6 sm:py-12 lg:px-8 lg:py-20'
     >
-      <div className="mx-auto max-w-6xl">
+      <div className='mx-auto max-w-6xl'>
         {/* sub title */}
-        <div ref={eyebrowRef} className="my-4 flex items-center gap-4">
-          <div className="h-px w-8 bg-[#00d4ff]" />
-          <span className="text-[10px] leading-3.75 text-[#00d4ff]">
+        <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
+          <div className='h-px w-8 bg-[#00d4ff]' />
+          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
             FIND US
           </span>
         </div>
         {/* main title */}
         <h2
           ref={titleRef}
-          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+          className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
         >
           Visit Invade
         </h2>
         {/* description */}
-        <p ref={descRef} className="mx-auto text-left text-base text-[#9a9a9a]">
+        <p
+          ref={descRef}
+          className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+        >
           Our location, hours, and the easiest ways to reach us.
         </p>
         {/* Two-column body */}
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]">
+        <div className='mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
           {/* Info column */}
           <div
             ref={contactCardsRef}
-            className="order-2 flex flex-col gap-4 md:order-1"
+            className='order-2 flex flex-col gap-4 md:order-1'
           >
             {/* social links card */}
-            <InfoCard label="Get in touch">
-              <div className="flex flex-col gap-2.5">
+            <InfoCard label='Get in touch'>
+              <div className='flex flex-col gap-2.5'>
                 <ContactLink
                   icon={<WhatsappIcon height={16} width={16} />}
-                  href="https://wa.me/918291158779"
-                  accent="#25D366"
+                  href='https://wa.me/918291158779'
+                  accent='#25D366'
                 >
                   WhatsApp us
                 </ContactLink>
                 <ContactLink
                   icon={<InstagramIcon height={16} width={16} />}
-                  href="https://instagram.com/invadegamingcafe"
-                  accent="#E1306C"
+                  href='https://instagram.com/invadegamingcafe'
+                  accent='#E1306C'
                 >
                   @invadegamingcafe
                 </ContactLink>
                 <ContactLink
                   icon={<PhoneIcon height={16} width={16} />}
-                  href="tel:+918291158779"
-                  accent="#00d4ff"
+                  href='tel:+918291158779'
+                  accent='#00d4ff'
                 >
                   +91 82911 58779
                 </ContactLink>
                 <ContactLink
                   icon={<MailIcon height={16} width={16} />}
-                  href="mailto:hello@invadecafe.com"
-                  accent="#FDD267"
+                  href='mailto:hello@invadecafe.com'
+                  accent='#FDD267'
                 >
                   hello@invadecafe.com
                 </ContactLink>
               </div>
             </InfoCard>
             {/* address */}
-            <InfoCard label="Address">
-              <p className="text-sm text-white">
+            <InfoCard label='Address'>
+              <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
                 Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
                 opposite Juinagar Railway Station, Sector 11,
                 <br />
@@ -204,30 +207,27 @@ export default function Contact() {
               </p>
             </InfoCard>
             {/* hours card */}
-            <InfoCard label="Hours">
-              <HoursRow day="Mon – Sun" time="10 AM – 11 PM" />
-              <p className="mt-2 text-xs text-white/40">
-                Walk-ins welcome, booking recommended on weekends.
-              </p>
+            <InfoCard label='Hours'>
+              <HoursRow day='Mon – Sun' time='10 AM – 11 PM' />
             </InfoCard>
           </div>
           {/* Map */}
           <div
             ref={mapsRef}
-            className="group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2"
+            className='group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2'
           >
-            <div className="pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-[#00d4ff]/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />{" "}
+            <div className='pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-[#00d4ff]/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100' />{' '}
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.5212078436365!2d73.01288567520483!3d19.05530278214504!2m3!1f0!2f0!3f0!3m2!1i1020!2i768!4f13.1!3m3!1m2!1s0x3be7c17d6e4b5365%3A0x3ef9695a4157527c!2sINVADE%20GAMING%20CAFE!5e1!3m2!1sen!2sin!4v1783675916752!5m2!1sen!2sin"
-              width="100%"
-              height="100%"
+              src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.5212078436365!2d73.01288567520483!3d19.05530278214504!2m3!1f0!2f0!3f0!3m2!1i1020!2i768!4f13.1!3m3!1m2!1s0x3be7c17d6e4b5365%3A0x3ef9695a4157527c!2sINVADE%20GAMING%20CAFE!5e1!3m2!1sen!2sin!4v1783675916752!5m2!1sen!2sin'
+              width='100%'
+              height='100%'
               style={{ border: 0, minHeight: 340 }}
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
+              loading='lazy'
+              referrerPolicy='no-referrer-when-downgrade'
             />
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

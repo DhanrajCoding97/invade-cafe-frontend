@@ -1,21 +1,21 @@
-"use client"
-import { REVEAL } from "@/lib/animation-presets"
-import { services, Service } from "@/types"
-import NeonGlowCornerCutCard from "@/app/components/neonblade-ui/neon-glow-corner-cut-card"
-import { useRef } from "react"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
-import { useGSAP } from "@gsap/react"
+'use client';
+import { REVEAL } from '@/lib/animation-presets';
+import { services, Service } from '@/types';
+import NeonGlowCornerCutCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 export default function ServicesSection() {
-  const sectionRef = useRef<HTMLElement>(null)
-  const eyebrowRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const descRef = useRef<HTMLParagraphElement>(null)
-  const badgeRef = useRef<HTMLDivElement>(null)
-  const cardsRef = useRef<HTMLDivElement>(null)
+  const sectionRef = useRef<HTMLElement>(null);
+  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const descRef = useRef<HTMLParagraphElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
 
   // gsap scrollTrigger animation
   useGSAP(
@@ -36,70 +36,70 @@ export default function ServicesSection() {
           // stagger: 0.45,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: "top 75%",
-            toggleActions: "play none none none",
+            start: 'top 75%',
+            toggleActions: 'play none none none',
           },
-        }
-      )
+        },
+      );
 
-      const cards = cardsRef.current?.children
+      const cards = cardsRef.current?.children;
       if (cards) {
         gsap.from(cards, {
           opacity: 0,
           y: 50,
           duration: 0.6,
           delay: 0.4,
-          ease: "sine.inOut",
+          ease: 'sine.inOut',
           stagger: 0.3,
           scrollTrigger: {
             trigger: cardsRef.current,
-            start: "top 80%",
-            toggleActions: "play none none none",
+            start: 'top 80%',
+            toggleActions: 'play none none none',
           },
-        })
+        });
       }
     },
-    { scope: sectionRef }
-  )
+    { scope: sectionRef },
+  );
 
   return (
     <section
-      id="services"
+      id='services'
       ref={sectionRef}
-      className="min-h-screen bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20"
+      className='min-h-screen bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20'
     >
-      <div className="mx-auto max-w-6xl">
+      <div className='mx-auto max-w-6xl'>
         {/* sub title */}
-        <div ref={eyebrowRef} className="my-4 flex items-center gap-4">
-          <div className="h-px w-8 bg-[#00d4ff]" />
-          <span className="text-[10px] leading-3.75 text-[#00d4ff]">
+        <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
+          <div className='h-px w-8 bg-[#00d4ff]' />
+          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
             WHAT WE OFFER
           </span>
         </div>
         {/* main title */}
         <h2
           ref={titleRef}
-          className="mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]"
+          className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
         >
           SERVICES
         </h2>
         {/* description */}
         <p
           ref={descRef}
-          className="mx-auto mb-4 text-left text-base text-[#9a9a9a]"
+          className='mx-auto mb-4 text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
         >
           Everything you need for the ultimate gaming experience.
         </p>
         {/* snacks badge */}
-        <div ref={badgeRef} className="mb-12 flex justify-start">
-          <span className="inline-flex items-center gap-2 rounded-full border border-green-400/40 bg-green-400/5 px-4 py-1.5 text-xs text-green-400">
+        <div ref={badgeRef} className='mb-12 flex justify-start'>
+          <span className='inline-flex items-center gap-2 rounded-full border border-green-400/40 bg-green-400/5 px-4 py-1.5 text-xs text-green-400'>
             🍿 Snacks & drinks available on-site
           </span>
         </div>
 
         <div
           ref={cardsRef}
-          className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4"
+          className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4'
         >
           {services.map((service) => (
             <NeonGlowCornerCutCard
@@ -114,5 +114,5 @@ export default function ServicesSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

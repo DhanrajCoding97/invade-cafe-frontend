@@ -22,7 +22,7 @@ img {
   width: 500px;
 }
 .swiper-slide::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   width: 100%;

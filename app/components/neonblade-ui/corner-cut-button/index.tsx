@@ -1,22 +1,22 @@
-"use client"
+'use client';
 
-import React, { ButtonHTMLAttributes, ReactNode } from "react"
-import "./corner-cut-button.css"
+import React, { ButtonHTMLAttributes, ReactNode } from 'react';
+import './corner-cut-button.css';
 
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string (e.g. "#ff4400", "hsl(180,100%,50%)") */
-export type CCBColor = "cyan" | "pink" | "green" | (string & {})
+export type CCBColor = 'cyan' | 'pink' | 'green' | (string & {});
 
 /** Button size */
-export type CCBSize = "xs" | "sm" | "md" | "lg" | "xl"
+export type CCBSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 /** Visual style variant */
-export type CCBVariant = "solid" | "outline" | "ghost"
+export type CCBVariant = 'solid' | 'outline' | 'ghost';
 
 /** Which corner is cut */
 export type CCBCorner =
-  "bottom-right" | "bottom-left" | "top-right" | "top-left" | "all"
+  'bottom-right' | 'bottom-left' | 'top-right' | 'top-left' | 'all';
 
 /**
  * Hover animation preset:
@@ -29,78 +29,85 @@ export type CCBCorner =
  * - `none`    — no hover animation
  */
 export type CCBHoverEffect =
-  "glow" | "shift" | "shine" | "pulse" | "scan" | "flicker" | "default" | "none"
+  | 'glow'
+  | 'shift'
+  | 'shine'
+  | 'pulse'
+  | 'scan'
+  | 'flicker'
+  | 'default'
+  | 'none';
 
 /** Controls the spread radius of the neon glow */
-export type CCBGlowIntensity = "low" | "medium" | "high"
+export type CCBGlowIntensity = 'low' | 'medium' | 'high';
 
 // ---- Maps --------------------------------------------------
 
 const COLOR_PRESETS: Record<string, string> = {
-  cyan: "#00f3ff",
-  pink: "#ff00ff",
-  green: "#39ff14",
-}
+  cyan: '#00f3ff',
+  pink: '#ff00ff',
+  green: '#39ff14',
+};
 
 const SIZE_CLASSES: Record<CCBSize, string> = {
-  xs: "px-4 py-2 text-xs",
-  sm: "px-6 py-3 text-xs",
-  md: "px-8 py-4 text-sm",
-  lg: "px-10 py-5 text-base",
-  xl: "px-12 py-6 text-lg",
-}
+  xs: 'px-4 py-2 text-xs',
+  sm: 'px-6 py-3 text-xs',
+  md: 'px-8 py-4 text-sm',
+  lg: 'px-10 py-5 text-base',
+  xl: 'px-12 py-6 text-lg',
+};
 
 const CORNER_CLASSES: Record<CCBCorner, string> = {
-  "bottom-right": "ccb-clip-br",
-  "bottom-left": "ccb-clip-bl",
-  "top-right": "ccb-clip-tr",
-  "top-left": "ccb-clip-tl",
-  all: "ccb-clip-all",
-}
+  'bottom-right': 'ccb-clip-br',
+  'bottom-left': 'ccb-clip-bl',
+  'top-right': 'ccb-clip-tr',
+  'top-left': 'ccb-clip-tl',
+  all: 'ccb-clip-all',
+};
 
 const HOVER_CLASSES: Record<CCBHoverEffect, string> = {
-  glow: "ccb-hover-glow",
-  shift: "ccb-hover-shift",
-  shine: "ccb-hover-shine",
-  pulse: "ccb-hover-pulse",
-  scan: "ccb-hover-scan",
-  flicker: "ccb-hover-flicker",
-  default: "ccb-hover-default",
-  none: "",
-}
+  glow: 'ccb-hover-glow',
+  shift: 'ccb-hover-shift',
+  shine: 'ccb-hover-shine',
+  pulse: 'ccb-hover-pulse',
+  scan: 'ccb-hover-scan',
+  flicker: 'ccb-hover-flicker',
+  default: 'ccb-hover-default',
+  none: '',
+};
 
 const GLOW_SIZES: Record<CCBGlowIntensity, number> = {
   low: 8,
   medium: 15,
   high: 28,
-}
+};
 
 // ---- Component props ---------------------------------------
 
 export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode
+  children: ReactNode;
 
-  onClick?: () => void
+  onClick?: () => void;
 
   /**
    * When true, the button stretches to full width on mobile (below `sm`)
    * and reverts to content-sized on larger screens.
    * @default false
    */
-  fullWidthOnMobile?: boolean
+  fullWidthOnMobile?: boolean;
 
   /**
    * Button accent color.
    * Use a preset name ("cyan" | "pink" | "green") or any CSS color value.
    * @default "cyan"
    */
-  color?: CCBColor
+  color?: CCBColor;
 
   /**
    * Button size controlling padding and font size.
    * @default "md"
    */
-  size?: CCBSize
+  size?: CCBSize;
 
   /**
    * Visual variant.
@@ -109,55 +116,55 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
    * - `ghost`   — subtle tinted background with accent text
    * @default "solid"
    */
-  variant?: CCBVariant
+  variant?: CCBVariant;
 
   /**
    * Which corner receives the diagonal cut.
    * @default "bottom-right"
    */
-  corner?: CCBCorner
+  corner?: CCBCorner;
 
   /**
    * Size of the corner cut in pixels.
    * @default 20
    */
-  cornerSize?: number
+  cornerSize?: number;
 
   /**
    * Hover animation/effect.
    * @default "default"
    */
-  hoverEffect?: CCBHoverEffect
+  hoverEffect?: CCBHoverEffect;
 
   /**
    * Glow spread intensity for effects that use a neon glow.
    * @default "medium"
    */
-  glowIntensity?: CCBGlowIntensity
+  glowIntensity?: CCBGlowIntensity;
 
   /**
    * When true an → arrow is appended that slides right on hover.
    * @default false
    */
-  showArrow?: boolean
+  showArrow?: boolean;
 
   /**
    * Hover effect color. Overrides the element color on hover (for glow and shift effects).
    */
-  hoverColor?: CCBColor
+  hoverColor?: CCBColor;
 
   /**
    * When true, a solid button with 'shift' effect becomes outlined on hover.
    * @default false
    */
-  hoverOutlined?: boolean
+  hoverOutlined?: boolean;
 
   /**
    * Overrides the button text color.
    * Use a preset name ("cyan" | "pink" | "green") or any CSS color value.
    * Defaults to `black` for solid variant and the accent color for outline/ghost.
    */
-  textColor?: CCBColor
+  textColor?: CCBColor;
 }
 
 // ---- Component ---------------------------------------------
@@ -166,63 +173,63 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   children,
   onClick,
   fullWidthOnMobile,
-  color = "cyan",
-  size = "md",
-  variant = "solid",
-  corner = "bottom-right",
+  color = 'cyan',
+  size = 'md',
+  variant = 'solid',
+  corner = 'bottom-right',
   cornerSize = 20,
-  hoverEffect = "default",
-  glowIntensity = "medium",
+  hoverEffect = 'default',
+  glowIntensity = 'medium',
   showArrow = false,
   hoverColor,
   hoverOutlined = false,
   textColor,
-  className = "",
+  className = '',
   style,
-  type = "button",
+  type = 'button',
   ...props
 }) => {
-  const resolvedColor = COLOR_PRESETS[color] ?? color
+  const resolvedColor = COLOR_PRESETS[color] ?? color;
   const resolvedHoverColor = hoverColor
     ? (COLOR_PRESETS[hoverColor] ?? hoverColor)
-    : undefined
+    : undefined;
   const resolvedTextColor = textColor
     ? (COLOR_PRESETS[textColor] ?? textColor)
-    : undefined
-  const glowSize = GLOW_SIZES[glowIntensity]
+    : undefined;
+  const glowSize = GLOW_SIZES[glowIntensity];
 
   // Ghost variant needs color-mix background — not expressible in Tailwind
   const ghostStyle =
-    variant === "ghost"
+    variant === 'ghost'
       ? {
-          backgroundColor: "color-mix(in srgb, var(--ccb-color) 12%, #000)",
-          color: "var(--ccb-color)",
+          backgroundColor: 'color-mix(in srgb, var(--ccb-color) 12%, #000)',
+          color: 'var(--ccb-color)',
         }
-      : undefined
+      : undefined;
 
   return (
     <div
       className={[
-        "group/ccb relative inline-flex p-px",
+        'group/ccb relative inline-flex p-px',
         fullWidthOnMobile
-          ? "flex w-full sm:inline-flex sm:w-auto"
-          : "inline-flex",
+          ? 'flex w-full sm:inline-flex sm:w-auto'
+          : 'inline-flex',
         `ccb-wrapper-${hoverEffect}`,
         // ccb-wrapper class retained ONLY for the flicker :has() selector in CSS
-        hoverEffect === "flicker" ? "ccb-wrapper" : "",
+        hoverEffect === 'flicker' ? 'ccb-wrapper' : '',
         className,
       ]
         .filter(Boolean)
-        .join(" ")}
+        .join(' ')}
       style={
         {
-          "--ccb-color": resolvedColor,
-          "--ccb-hover-color": resolvedHoverColor ?? resolvedColor,
-          "--ccb-hover-bg": resolvedHoverColor ?? "#ffffff",
-          "--ccb-corner-size": `${cornerSize}px`,
-          "--ccb-glow-size": `${glowSize}px`,
+          '--ccb-color': resolvedColor,
+          '--ccb-hover-color': resolvedHoverColor ?? resolvedColor,
+          '--ccb-hover-bg': resolvedHoverColor ?? '#ffffff',
+          '--ccb-corner-size': `${cornerSize}px`,
+          '--ccb-glow-size': `${glowSize}px`,
           ...(resolvedTextColor
-            ? { "--ccb-text-color": resolvedTextColor }
+            ? { '--ccb-text-color': resolvedTextColor }
             : {}),
           ...style,
         } as React.CSSProperties
@@ -231,70 +238,70 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
       {/* Border frame: 1px ring on all edges including the diagonal */}
       <div
         className={[
-          "pointer-events-none absolute inset-0 z-0 transition-[background,opacity] duration-300",
+          'pointer-events-none absolute inset-0 z-0 transition-[background,opacity] duration-300',
           CORNER_CLASSES[corner],
-          variant === "outline" ? "bg-(--ccb-color)" : "bg-white/8",
-          variant === "solid" && hoverOutlined && hoverEffect === "shift"
-            ? "group-hover/ccb:bg-(--ccb-hover-color)"
-            : "",
+          variant === 'outline' ? 'bg-(--ccb-color)' : 'bg-white/8',
+          variant === 'solid' && hoverOutlined && hoverEffect === 'shift'
+            ? 'group-hover/ccb:bg-(--ccb-hover-color)'
+            : '',
         ]
           .filter(Boolean)
-          .join(" ")}
-        aria-hidden="true"
+          .join(' ')}
+        aria-hidden='true'
       />
 
       <button
         type={type}
         onClick={onClick}
         className={[
-          "group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all",
+          'group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all',
           SIZE_CLASSES[size],
           CORNER_CLASSES[corner],
           HOVER_CLASSES[hoverEffect],
           // Class kept for compound hover-state CSS selectors (.ccb-solid.ccb-hover-glow:hover etc.)
           `ccb-${variant}`,
-          hoverOutlined ? "ccb-hover-outlined" : "",
-          variant === "solid"
-            ? `bg-(--ccb-color) ${resolvedTextColor ? "text-(--ccb-text-color)" : "text-black"}`
-            : "",
-          variant === "outline"
-            ? `bg-black ${resolvedTextColor ? "text-(--ccb-text-color)" : "text-(--ccb-color)"}`
-            : "",
+          hoverOutlined ? 'ccb-hover-outlined' : '',
+          variant === 'solid'
+            ? `bg-(--ccb-color) ${resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-black'}`
+            : '',
+          variant === 'outline'
+            ? `bg-black ${resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-(--ccb-color)'}`
+            : '',
         ]
           .filter(Boolean)
-          .join(" ")}
+          .join(' ')}
         style={{
           ...ghostStyle,
-          ...(resolvedTextColor && variant === "ghost"
+          ...(resolvedTextColor && variant === 'ghost'
             ? { color: resolvedTextColor }
             : {}),
         }}
         {...props}
       >
         {/* Shine sweep layer — only rendered when needed */}
-        {hoverEffect === "shine" && (
-          <span className="ccb-shine-layer" aria-hidden="true" />
+        {hoverEffect === 'shine' && (
+          <span className='ccb-shine-layer' aria-hidden='true' />
         )}
 
         {/* Scan line layer — only rendered when needed */}
-        {hoverEffect === "scan" && (
-          <span className="ccb-scan-layer" aria-hidden="true" />
+        {hoverEffect === 'scan' && (
+          <span className='ccb-scan-layer' aria-hidden='true' />
         )}
 
         {/* Content sits above decorative layers */}
         <span
           className={[
-            "relative z-10 flex items-center gap-2",
-            fullWidthOnMobile ? "justify-center" : "",
+            'relative z-10 flex items-center gap-2',
+            fullWidthOnMobile ? 'justify-center' : '',
           ]
             .filter(Boolean)
-            .join(" ")}
+            .join(' ')}
         >
           {children}
           {showArrow && (
             <span
-              className="inline-block transition-transform group-hover:translate-x-1"
-              aria-hidden="true"
+              className='inline-block transition-transform group-hover:translate-x-1'
+              aria-hidden='true'
             >
               →
             </span>
@@ -302,7 +309,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         </span>
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default CornerCutButton
+export default CornerCutButton;

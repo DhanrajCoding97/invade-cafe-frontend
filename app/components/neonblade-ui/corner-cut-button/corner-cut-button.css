@@ -168,7 +168,7 @@
 }
 
 .ccb-shine-layer::after {
-  content: "";
+  content: '';
   position: absolute;
   top: -10%;
   left: 0;

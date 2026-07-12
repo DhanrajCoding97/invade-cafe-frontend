@@ -1,21 +1,21 @@
-import { Toaster } from "@/components/ui/sonner"
+import { Toaster } from '@/components/ui/sonner';
 
-import AuthSlot from "@/components/AuthSlot"
-import { Orbitron } from "next/font/google"
-import "./globals.css"
-import { cn } from "@/lib/utils"
-import SmoothScroll from "@/components/SmoothScroll"
-import NavBar from "./components/neonblade-ui/navbar"
-import { Toast } from "radix-ui"
+import AuthSlot from '@/components/AuthSlot';
+import { Orbitron } from 'next/font/google';
+import './globals.css';
+import { cn } from '@/lib/utils';
+import SmoothScroll from '@/components/SmoothScroll';
+import NavBar from './components/neonblade-ui/navbar';
+import { Toast } from 'radix-ui';
 const orbitron = Orbitron({
-  subsets: ["latin"],
-  variable: "--font-orbitron",
-})
+  subsets: ['latin'],
+  variable: '--font-orbitron',
+});
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   // const supabase = await createClient()
 
@@ -25,9 +25,9 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang='en'
       suppressHydrationWarning
-      className={cn("antialiased", orbitron.variable)}
+      className={cn('antialiased', orbitron.variable)}
     >
       <body>
         <SmoothScroll>
@@ -47,20 +47,20 @@ export default async function RootLayout({
             ]}
           /> */}
           <NavBar
-            variant="standard"
-            position="fixed"
-            transparency="transparent"
-            color="cyan"
-            logoText="Invade"
+            variant='standard'
+            position='fixed'
+            transparency='transparent'
+            color='cyan'
+            logoText='Invade'
             scrollEffect
             hideOnScroll
-            navAlign="center"
+            navAlign='center'
             items={[
-              { label: "Home", href: "#hero" },
-              { label: "Services", href: "#services" },
-              { label: "Pricing", href: "#pricing" },
-              { label: "Testimonials", href: "#testimonials" },
-              { label: "Contact", href: "#contact" },
+              { label: 'Home', href: '#hero' },
+              { label: 'Services', href: '#services' },
+              { label: 'Pricing', href: '#pricing' },
+              { label: 'Testimonials', href: '#testimonials' },
+              { label: 'Contact', href: '#contact' },
             ]}
             authSlot={<AuthSlot />}
           />
@@ -69,5 +69,5 @@ export default async function RootLayout({
         <Toaster />
       </body>
     </html>
-  )
+  );
 }

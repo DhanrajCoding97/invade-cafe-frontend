@@ -1,14 +1,14 @@
-import type { NextConfig } from "next"
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   webpack(config) {
     // Find the existing rule that handles SVG files
     const fileLoaderRule = config.module.rules.find((rule: any) =>
-      rule.test?.test?.(".svg")
-    )
+      rule.test?.test?.('.svg'),
+    );
 
     if (!fileLoaderRule) {
-      return config
+      return config;
     }
 
     config.module.rules.push(
@@ -26,15 +26,15 @@ const nextConfig: NextConfig = {
         resourceQuery: {
           not: [...(fileLoaderRule.resourceQuery?.not || []), /url/],
         },
-        use: ["@svgr/webpack"],
-      }
-    )
+        use: ['@svgr/webpack'],
+      },
+    );
 
     // Exclude SVGs from the default file loader
-    fileLoaderRule.exclude = /\.svg$/i
+    fileLoaderRule.exclude = /\.svg$/i;
 
-    return config
+    return config;
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

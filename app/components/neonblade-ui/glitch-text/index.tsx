@@ -1,11 +1,11 @@
-"use client";
-import React, { HTMLAttributes, ReactNode, useEffect, useState } from "react";
-import "./glitch-text.css";
+'use client';
+import React, { HTMLAttributes, ReactNode, useEffect, useState } from 'react';
+import './glitch-text.css';
 
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string */
-export type GTColor = "cyan" | "pink" | "green" | (string & {});
+export type GTColor = 'cyan' | 'pink' | 'green' | (string & {});
 
 /**
  * Glitch displacement intensity:
@@ -14,7 +14,7 @@ export type GTColor = "cyan" | "pink" | "green" | (string & {});
  * - `heavy`   — 4 px offsets, highly visible
  * - `chaos`   — 6 px offsets + skew, full-cycle, non-stop
  */
-export type GTIntensity = "subtle" | "normal" | "heavy" | "chaos";
+export type GTIntensity = 'subtle' | 'normal' | 'heavy' | 'chaos';
 
 /**
  * Animation speed shorthand:
@@ -23,25 +23,25 @@ export type GTIntensity = "subtle" | "normal" | "heavy" | "chaos";
  * - `fast`    — 0.45 s
  * - `frenzy`  — 0.2 s
  */
-export type GTSpeed = "slow" | "normal" | "fast" | "frenzy";
+export type GTSpeed = 'slow' | 'normal' | 'fast' | 'frenzy';
 
 // ---- Maps --------------------------------------------------
 
 const COLOR_PRESETS: Record<string, string> = {
-  cyan: "#00f3ff",
-  pink: "#ff00ff",
-  green: "#39ff14",
+  cyan: '#00f3ff',
+  pink: '#ff00ff',
+  green: '#39ff14',
 };
 
 const SPEED_MAP: Record<GTSpeed, string> = {
-  slow: "2s",
-  normal: "1s",
-  fast: "0.45s",
-  frenzy: "0.2s",
+  slow: '2s',
+  normal: '1s',
+  fast: '0.45s',
+  frenzy: '0.2s',
 };
 
 // For chaos the default speed is tighter; override if user doesn't set one.
-const CHAOS_DEFAULT_SPEED = "0.8s";
+const CHAOS_DEFAULT_SPEED = '0.8s';
 
 // ---- Props -------------------------------------------------
 
@@ -60,7 +60,7 @@ export interface GlitchTextProps extends HTMLAttributes<HTMLSpanElement> {
    * - `hover`  — glitch plays only while the element is hovered (default)
    * - `active` — glitch plays continuously
    */
-  mode?: "active" | "hover";
+  mode?: 'active' | 'hover';
 
   /**
    * Color of the `::before` (channel A) pseudo-element text-shadow.
@@ -127,18 +127,18 @@ export interface GlitchTextProps extends HTMLAttributes<HTMLSpanElement> {
 export const GlitchText: React.FC<GlitchTextProps> = ({
   children,
   text,
-  mode = "hover",
-  colorA = "pink",
-  colorB = "cyan",
-  intensity = "normal",
-  speed = "normal",
+  mode = 'hover',
+  colorA = 'pink',
+  colorB = 'cyan',
+  intensity = 'normal',
+  speed = 'normal',
   customSpeed,
   offset = 2,
   neon = false,
   neonFlicker = false,
   glowColor,
   glitchDuration, // legacy
-  className = "",
+  className = '',
   style,
   ...props
 }) => {
@@ -148,7 +148,7 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
     setMounted(true);
   }, []);
 
-  const resolvedText = text ?? (typeof children === "string" ? children : "");
+  const resolvedText = text ?? (typeof children === 'string' ? children : '');
 
   const resolvedA = COLOR_PRESETS[colorA] ?? colorA;
   const resolvedB = COLOR_PRESETS[colorB] ?? colorB;
@@ -162,7 +162,7 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
     resolvedSpeed = customSpeed;
   } else if (glitchDuration !== undefined) {
     resolvedSpeed = `${glitchDuration}s`;
-  } else if (intensity === "chaos" && speed === "normal") {
+  } else if (intensity === 'chaos' && speed === 'normal') {
     // chaos has its own tighter default
     resolvedSpeed = CHAOS_DEFAULT_SPEED;
   } else {
@@ -170,16 +170,16 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
   }
 
   const classes = [
-    "glitch-wrapper",
-    "relative inline-block",
-    mode === "active" ? "activeglitch" : "hoverglitch",
-    intensity !== "normal" ? `gt-${intensity}` : "",
-    neon ? "gt-neon" : "",
-    neon && neonFlicker ? "gt-neon-flicker" : "",
+    'glitch-wrapper',
+    'relative inline-block',
+    mode === 'active' ? 'activeglitch' : 'hoverglitch',
+    intensity !== 'normal' ? `gt-${intensity}` : '',
+    neon ? 'gt-neon' : '',
+    neon && neonFlicker ? 'gt-neon-flicker' : '',
     className,
   ]
     .filter(Boolean)
-    .join(" ");
+    .join(' ');
 
   return (
     <span
@@ -187,18 +187,18 @@ export const GlitchText: React.FC<GlitchTextProps> = ({
       data-text={resolvedText}
       style={
         {
-          "--gt-color-a": resolvedA,
-          "--gt-color-b": resolvedB,
-          "--gt-offset": `${offset}px`,
-          "--gt-speed": resolvedSpeed,
-          "--gt-glow-color": resolvedGlow,
+          '--gt-color-a': resolvedA,
+          '--gt-color-b': resolvedB,
+          '--gt-offset': `${offset}px`,
+          '--gt-speed': resolvedSpeed,
+          '--gt-glow-color': resolvedGlow,
           ...style,
         } as React.CSSProperties
       }
       {...props}
     >
-      {mounted ? children : <span className="invisible">{children}</span>}
-      {!mounted && <span className="absolute inset-0">{children}</span>}
+      {mounted ? children : <span className='invisible'>{children}</span>}
+      {!mounted && <span className='absolute inset-0'>{children}</span>}
     </span>
   );
 };
