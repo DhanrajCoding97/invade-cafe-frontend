@@ -1,17 +1,8 @@
 'use client';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { FcGoogle } from 'react-icons/fc';
-import { createClient } from '@/lib/supabase/client';
+import { handleOAuthLogin } from '@/lib/auth/oauth';
 export default function SignInWithGoogle() {
-  const handleOAuthLogin = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-  };
   return (
     <div>
       <CornerCutButton

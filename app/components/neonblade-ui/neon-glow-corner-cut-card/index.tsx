@@ -119,7 +119,7 @@ export interface NeonGlowCornerCutCardProps extends HTMLAttributes<HTMLDivElemen
 
 const CARD_PADDING: Record<NGCCSize, string> = {
   sm: 'p-5',
-  md: 'p-8',
+  md: 'p-4',
   lg: 'p-10',
   xl: 'p-12',
 };
@@ -236,9 +236,16 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
     </>
   );
 
+  const wrapperHeight = isMediaMode ? 'h-78  lg:h-104' : 'h-auto';
+
   return (
     <div
-      className={['relative h-full p-px', HOVER_CLASSES[hoverEffect], className]
+      className={[
+        'relative p-px',
+        wrapperHeight,
+        HOVER_CLASSES[hoverEffect],
+        className,
+      ]
         .filter(Boolean)
         .join(' ')}
       style={
@@ -261,7 +268,7 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
       <div
         className={[
           'ngcc-border-frame',
-          'pointer-events-none absolute inset-0 z-[5] bg-white/10 transition-[background,opacity] duration-300',
+          'pointer-events-none absolute inset-0 z-5 bg-white/10 transition-[background,opacity] duration-300',
           CORNER_CLASSES[corner],
         ].join(' ')}
         aria-hidden='true'
@@ -269,13 +276,13 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
 
       <div
         className={[
-          'ngcc-card group relative z-10 flex h-full flex-col overflow-hidden transition-shadow duration-300',
+          'ngcc-card group relative z-10 flex h-full flex-col items-start justify-start overflow-hidden transition-shadow duration-300',
           CORNER_CLASSES[corner],
           isMediaMode ? '' : isMarquee ? 'gap-3 p-5' : CARD_PADDING[size],
         ].join(' ')}
         style={{
           backgroundColor: bgColor ?? '#0a0a0a',
-          minHeight: isMediaMode ? imageHeight : undefined,
+          // minHeight: isMediaMode ? imageHeight : undefined,
         }}
       >
         {isMediaMode ? (
@@ -283,9 +290,13 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
             <Image
               src={imageSrc!}
               alt={imageAlt ?? ''}
+              sizes='
+                (max-width: 640px) 100vw,
+                (max-width: 1024px) 50vw,
+                33vw
+              '
               fill
-              sizes='(max-width: 768px) 100vw, 33vw'
-              className='object-cover transition-transform duration-500 ease-out group-hover:scale-110'
+              className='object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105'
             />
 
             {imageOverlay !== 'none' && (
@@ -305,15 +316,14 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
             )}
 
             <div
-              className={[
-                'relative z-20 flex flex-1 flex-col justify-end',
-                CARD_PADDING[size],
-              ].join(' ')}
+              className={['relative z-20 mt-auto', CARD_PADDING[size]].join(
+                ' ',
+              )}
             >
               {icon && (
                 <div
                   className={[
-                    'ngcc-icon-box mb-4 flex shrink-0 items-center justify-center rounded-[4px] border border-white/10 bg-black/40 backdrop-blur-sm',
+                    'ngcc-icon-box mb-4 flex shrink-0 items-center justify-center h-64 rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm',
                     ICON_BOX_SIZE[size],
                   ].join(' ')}
                 >
@@ -350,7 +360,7 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
             {icon && (
               <div
                 className={[
-                  'ngcc-icon-box mb-6 flex shrink-0 items-center justify-center rounded-[4px] border border-white/10 bg-black transition-[border-color,box-shadow] duration-300',
+                  'ngcc-icon-box mb-6 flex shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black transition-[border-color,box-shadow] duration-300',
                   ICON_BOX_SIZE[size],
                 ].join(' ')}
               >

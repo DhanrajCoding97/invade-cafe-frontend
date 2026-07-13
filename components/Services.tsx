@@ -66,9 +66,9 @@ export default function ServicesSection() {
     <section
       id='services'
       ref={sectionRef}
-      className='min-h-screen bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20'
+      className='bg-black py-16 sm:py-20 lg:py-24'
     >
-      <div className='mx-auto max-w-6xl'>
+      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
           <div className='h-px w-8 bg-[#00d4ff]' />

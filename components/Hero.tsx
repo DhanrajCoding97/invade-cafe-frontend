@@ -170,6 +170,7 @@ export default function HeroSection() {
         </div>
         <div className='hero-cta mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
+            onClick={() => getLenisInstance().scrollTo('#booking')}
             color='cyan'
             variant='solid'
             showArrow

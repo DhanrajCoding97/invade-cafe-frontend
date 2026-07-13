@@ -7,6 +7,7 @@ export const bookingSchema = z.object({
   startTime: z.string().min(1, 'Select a start time'),
   duration: z.number().min(1),
   players: z.number().optional(),
+  tier: z.enum(['single', 'multiplayer']).optional(),
 });
 
 export type BookingFormValues = z.infer<typeof bookingSchema>;

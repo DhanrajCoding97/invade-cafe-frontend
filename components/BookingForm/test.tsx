@@ -10,7 +10,6 @@ import DeviceStep from './steps/DeviceStep';
 import OptionsStep from './steps/OptionsStep';
 import StationStep from './steps/StationStep';
 import DateTimeStep from './steps/DateTimeStep';
-// import SummaryStep from './steps/SummaryStep';
 import PaymentStep from './steps/PaymentStep';
 import ConfirmedStep from './steps/ConfirmedStep';
 import {
@@ -119,15 +118,12 @@ export default function BookingForm() {
     const device = form.getValues('device');
 
     if (STEPS[next] === 'options' && !needsOptionsStep(device)) next++;
-    // if (STEPS[next] === 'login' && session) next++;
-
     setStepIndex(next);
   }
 
   function goBack() {
     let prev = stepIndex - 1;
     const device = form.getValues('device');
-    // if (STEPS[prev] === 'login' && session) prev--;
     if (STEPS[prev] === 'options' && !needsOptionsStep(device)) prev--;
     setStepIndex(Math.max(prev, 0));
   }
@@ -156,37 +152,12 @@ export default function BookingForm() {
                 change
               </button>
             </div>
-            // <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-sm text-white/70'>
-            //   {deviceFromUrl.toUpperCase()}
-            //   {playersParam &&
-            //     ` · ${playersParam} player${playersParam !== '1' ? 's' : ''}`}
-            //   <button
-            //     type='button'
-            //     onClick={() => setStepIndex(STEPS.indexOf('device'))}
-            //     className='text-cyan-400'
-            //   >
-            //     change
-            //   </button>
-            // </div>
           )}
-          {/* {step === 'duration' && <DurationStep />} */}
-          {/* {step === 'login' && (
-            <LoginStep
-            onGoogleLogin={handleGoogleLogin}
-            />
-          )} */}
 
           {step === 'device' && <DeviceStep />}
           {step === 'options' && <OptionsStep />}
           {step === 'station' && <StationStep />}
           {step === 'datetime' && <DateTimeStep />}
-          {/* {step === 'summary' && (
-            <SummaryStep
-              session={session}
-              onGoogleLogin={handleGoogleLogin}
-              onContinue={goNext}
-            />
-          )} */}
           {step === 'summary' && (
             <SummaryStep
               session={session}
@@ -213,7 +184,7 @@ export default function BookingForm() {
                   Back
                 </button>
               )}
-              {step !== 'payment' && (
+              {step !== 'payment' && step !== 'summary' && (
                 <button
                   type='button'
                   onClick={goNext}

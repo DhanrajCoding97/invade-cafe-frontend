@@ -25,7 +25,7 @@ function InfoCard({
   );
 }
 
-function ContactLink({
+export function ContactLink({
   icon,
   href,
   children,
@@ -133,7 +133,7 @@ export default function Contact() {
     <section
       id='contact'
       ref={sectionRef}
-      className='bg-black px-4 py-8 sm:min-h-screen sm:px-6 sm:py-12 lg:px-8 lg:py-20'
+      className='bg-black px-4 py-8 sm:px-6 sm:py-12 lg:px-8 lg:py-20'
     >
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}

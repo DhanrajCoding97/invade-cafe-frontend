@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/SmoothScroll';
 import NavBar from './components/neonblade-ui/navbar';
 import { Toast } from 'radix-ui';
+import { Providers } from '@/providers/QueryProvider';
 const orbitron = Orbitron({
   subsets: ['latin'],
   variable: '--font-orbitron',
@@ -27,7 +28,7 @@ export default async function RootLayout({
     <html
       lang='en'
       suppressHydrationWarning
-      className={cn('antialiased', orbitron.variable)}
+      className={cn('antialiased dark', orbitron.variable)}
     >
       <body>
         <SmoothScroll>
@@ -64,7 +65,7 @@ export default async function RootLayout({
             ]}
             authSlot={<AuthSlot />}
           />
-          {children}
+          <Providers>{children}</Providers>
         </SmoothScroll>
         <Toaster />
       </body>

@@ -46,8 +46,8 @@ export default function DeviceStep() {
                     className={[
                       'cursor-pointer min-h-40 flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-all hover:border-cyan-400 hover:bg-cyan-400/5',
                       selected
-                        ? 'border-cyan-400 bg-cyan-400/5'
-                        : 'border-white/10',
+                        ? 'border-cyan-400 bg-cyan-400/10 text-white'
+                        : 'border-cyan-400/40 text-cyan-300',
                     ].join(' ')}
                   >
                     <Icon className='h-8 w-8 text-white' />

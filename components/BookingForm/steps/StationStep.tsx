@@ -1,11 +1,144 @@
-// components/BookingForm/steps/StationStep.tsx
+// // components/BookingForm/steps/StationStep.tsx
+// 'use client';
+
+// import { useEffect, useState } from 'react';
+// import { Controller, useFormContext } from 'react-hook-form';
+// import { Field, FieldLabel, FieldError } from '@/components/ui/field';
+// import { createClient } from '@/lib/supabase/client';
+// import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
+
+// interface Station {
+//   id: string;
+//   name: string;
+//   specs: Record<string, string> | null;
+//   hourly_rate: number;
+//   status: 'available' | 'booked' | 'maintenance';
+// }
+
+// export default function StationStep() {
+//   const { control, watch } = useFormContext<BookingFormValues>();
+//   const device = watch('device');
+
+//   const [stations, setStations] = useState<Station[]>([]);
+//   const [loading, setLoading] = useState(true);
+//   const [error, setError] = useState<string | null>(null);
+
+//   useEffect(() => {
+//     if (!device) return;
+
+//     let cancelled = false;
+//     setLoading(true);
+//     setError(null);
+
+//     const supabase = createClient();
+//     supabase
+//       .from('stations')
+//       .select('id, name, specs, hourly_rate, status')
+//       .eq('type', device)
+//       .then(({ data, error }) => {
+//         if (cancelled) return;
+//         if (error) {
+//           setError(error.message);
+//         } else {
+//           setStations(data ?? []);
+//         }
+//         setLoading(false);
+//       });
+
+//     return () => {
+//       cancelled = true;
+//     };
+//   }, [device]);
+
+//   if (loading) {
+//     return <p className='text-sm text-white/50'>Loading stations…</p>;
+//   }
+
+//   if (error) {
+//     return (
+//       <p className='text-sm text-red-400'>Couldn't load stations: {error}</p>
+//     );
+//   }
+
+//   return (
+//     <Controller
+//       name='stationId'
+//       control={control}
+//       render={({ field, fieldState }) => (
+//         <Field data-invalid={fieldState.invalid}>
+//           <FieldLabel>Choose your preferred station</FieldLabel>
+//           <div className='space-y-2'>
+//             {stations.map((station) => {
+//               const selected = field.value === station.id;
+//               const disabled = station.status !== 'available';
+//               return (
+//                 <button
+//                   key={station.id}
+//                   type='button'
+//                   disabled={disabled}
+//                   onClick={() => field.onChange(station.id)}
+//                   aria-pressed={selected}
+//                   className={[
+//                     'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors',
+//                     selected
+//                       ? 'border-cyan-400 bg-cyan-400/5'
+//                       : 'border-white/10',
+//                     disabled
+//                       ? 'cursor-not-allowed opacity-40'
+//                       : 'hover:border-white/25',
+//                   ].join(' ')}
+//                 >
+//                   <div>
+//                     <p className='text-sm font-semibold text-white'>
+//                       {station.name}
+//                     </p>
+//                     {station.specs && (
+//                       <p className='text-xs text-white/50'>
+//                         {Object.values(station.specs).join(' · ')}
+//                       </p>
+//                     )}
+//                   </div>
+//                   <div className='text-right'>
+//                     <p className='text-sm font-bold text-cyan-400'>
+//                       ₹{station.hourly_rate}/hr
+//                     </p>
+//                     <p className='text-xs text-white/40'>
+//                       {disabled ? 'Booked' : 'Available'}
+//                     </p>
+//                   </div>
+//                 </button>
+//               );
+//             })}
+//             {stations.length === 0 && (
+//               <p className='text-sm text-white/50'>
+//                 No stations found for this device.
+//               </p>
+//             )}
+//           </div>
+//           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+//         </Field>
+//       )}
+//     />
+//   );
+// }
+
+// async function fetchStations(device: string): Promise<Station[]> {
+//   const supabase = createClient();
+//   const { data, error } = await supabase
+//     .from('stations')
+//     .select('id, name, specs, hourly_rate, status')
+//     .eq('type', device);
+//   if (error) throw error;
+//   return data ?? [];
+// }
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
+import { useQuery } from '@tanstack/react-query';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { createClient } from '@/lib/supabase/client';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
+import { getDisplayRate } from '@/lib/pricing';
 
 interface Station {
   id: string;
@@ -15,50 +148,57 @@ interface Station {
   status: 'available' | 'booked' | 'maintenance';
 }
 
+async function fetchStations(
+  device: string,
+  tier?: string,
+): Promise<Station[]> {
+  const supabase = createClient();
+  let query = supabase
+    .from('stations')
+    .select('id, name, specs, hourly_rate, max_players, status')
+    .eq('type', device === 'vr' ? 'ps5' : device); // vr books a ps5 slot, handled separately below
+
+  if (device === 'racing' && tier === 'multiplayer') {
+    query = query.gte('max_players', 2);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data ?? [];
+}
+
 export default function StationStep() {
   const { control, watch } = useFormContext<BookingFormValues>();
   const device = watch('device');
+  const players = watch('players');
+  const tier = watch('tier');
 
-  const [stations, setStations] = useState<Station[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const {
+    data: stations = [],
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ['stations', device, tier],
+    queryFn: () => fetchStations(device!, tier),
+    enabled: !!device,
+    staleTime: 30_000, // stations don't change every second — 30s cache is plenty
+  });
 
-  useEffect(() => {
-    if (!device) return;
-
-    let cancelled = false;
-    setLoading(true);
-    setError(null);
-
-    const supabase = createClient();
-    supabase
-      .from('stations')
-      .select('id, name, specs, hourly_rate, status')
-      .eq('type', device)
-      .then(({ data, error }) => {
-        if (cancelled) return;
-        if (error) {
-          setError(error.message);
-        } else {
-          setStations(data ?? []);
-        }
-        setLoading(false);
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [device]);
-
-  if (loading) {
+  if (isLoading)
     return <p className='text-sm text-white/50'>Loading stations…</p>;
-  }
+  if (error)
+    return <p className='text-sm text-red-400'>Couldn't load stations</p>;
 
-  if (error) {
-    return (
-      <p className='text-sm text-red-400'>Couldn't load stations: {error}</p>
-    );
-  }
+  const STATUS_LABEL: Record<Station['status'], string> = {
+    available: 'Available',
+    booked: 'Booked',
+    maintenance: 'Under maintenance',
+  };
+  const STATUS_COLOR: Record<Station['status'], string> = {
+    available: 'text-white/40',
+    booked: 'text-amber-400',
+    maintenance: 'text-red-400',
+  };
 
   return (
     <Controller
@@ -71,21 +211,27 @@ export default function StationStep() {
             {stations.map((station) => {
               const selected = field.value === station.id;
               const disabled = station.status !== 'available';
+              const rate = getDisplayRate({
+                device,
+                players,
+                tier,
+                fallbackRate: station.hourly_rate,
+              });
+
               return (
                 <button
                   key={station.id}
                   type='button'
                   disabled={disabled}
                   onClick={() => field.onChange(station.id)}
-                  aria-pressed={selected}
                   className={[
                     'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors',
                     selected
-                      ? 'border-cyan-400 bg-cyan-400/5'
-                      : 'border-white/10',
+                      ? 'border-cyan-400 bg-cyan-400/10 text-white'
+                      : 'border-cyan-400/40 text-cyan-300',
                     disabled
                       ? 'cursor-not-allowed opacity-40'
-                      : 'hover:border-white/25',
+                      : 'hover:border-cyan-400',
                   ].join(' ')}
                 >
                   <div>
@@ -100,20 +246,15 @@ export default function StationStep() {
                   </div>
                   <div className='text-right'>
                     <p className='text-sm font-bold text-cyan-400'>
-                      ₹{station.hourly_rate}/hr
+                      ₹{rate}/hr
                     </p>
-                    <p className='text-xs text-white/40'>
-                      {disabled ? 'Booked' : 'Available'}
+                    <p className={`text-xs ${STATUS_COLOR[station.status]}`}>
+                      {STATUS_LABEL[station.status]}
                     </p>
                   </div>
                 </button>
               );
             })}
-            {stations.length === 0 && (
-              <p className='text-sm text-white/50'>
-                No stations found for this device.
-              </p>
-            )}
           </div>
           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
         </Field>
