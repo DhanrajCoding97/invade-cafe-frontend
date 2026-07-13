@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { z } from 'zod';
+import { BookingFormSkeleton } from '../skeletons/BookingSkeleton';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { FormProvider } from 'react-hook-form';
 import { createClient } from '@/lib/supabase/client';
@@ -68,7 +68,7 @@ export default function BookingForm() {
   const [stepIndex, setStepIndex] = useState(STEPS.indexOf(initialStep));
   const [session, setSession] = useState<{ id: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
-
+  const [isRestoring, setIsRestoring] = useState(true);
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -83,24 +83,50 @@ export default function BookingForm() {
 
   const step = STEPS[stepIndex];
   //get session on mount
+  // useEffect(() => {
+  //   supabase.auth.getSession().then(({ data }) => {
+  //     if (data.session) setSession({ id: data.session.user.id });
+  //   });
+  //   const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+  //     setSession(sess ? { id: sess.user.id } : null);
+  //   });
+  //   return () => sub.subscription.unsubscribe();
+  // }, [supabase]);
+  //restore form values after login
+  // useEffect(() => {
+  //   const draft = loadBookingDraft();
+  //   if (draft) {
+  //     form.reset(draft.values);
+  //     setStepIndex(STEPS.indexOf(draft.step));
+  //     clearBookingDraft(); // one-time restore, don't reuse stale state after this
+  //   }
+  // }, []);
+
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    console.log('Session:', session);
+  }, [session]);
+
+  useEffect(() => {
+    async function restore() {
+      const { data } = await supabase.auth.getSession();
       if (data.session) setSession({ id: data.session.user.id });
-    });
+      const draft = loadBookingDraft();
+      if (draft) {
+        form.reset(draft.values);
+        setStepIndex(STEPS.indexOf(draft.step));
+        clearBookingDraft();
+      }
+
+      setIsRestoring(false);
+    }
+    restore();
+
     const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess ? { id: sess.user.id } : null);
     });
     return () => sub.subscription.unsubscribe();
   }, [supabase]);
-  //restore form values after login
-  useEffect(() => {
-    const draft = loadBookingDraft();
-    if (draft) {
-      form.reset(draft.values);
-      setStepIndex(STEPS.indexOf(draft.step));
-      clearBookingDraft(); // one-time restore, don't reuse stale state after this
-    }
-  }, []);
+
   async function goNext() {
     if (step === 'options') {
       const device = form.getValues('device');
@@ -134,7 +160,7 @@ export default function BookingForm() {
 
   async function handleGoogleLogin() {
     saveBookingDraft(form.getValues(), 'summary');
-    await handleOAuthLogin('/booking');
+    await handleOAuthLogin('/#booking');
   }
 
   const currentDevice = form.watch('device');
@@ -175,54 +201,51 @@ export default function BookingForm() {
             onGoogleLogin={handleGoogleLogin}
             />
           )} */}
-
-          {step === 'device' && <DeviceStep />}
-          {step === 'options' && <OptionsStep />}
-          {step === 'station' && <StationStep />}
-          {step === 'datetime' && <DateTimeStep />}
-          {/* {step === 'summary' && (
-            <SummaryStep
-              session={session}
-              onGoogleLogin={handleGoogleLogin}
-              onContinue={goNext}
-            />
-          )} */}
-          {step === 'summary' && (
-            <SummaryStep
-              session={session}
-              onGoogleLogin={handleGoogleLogin}
-              onContinue={goNext}
-            />
-          )}
-          {step === 'payment' && (
-            <PaymentStep
-            // submitting={submitting}
-            // onPay={form.handleSubmit(handlePayment)}
-            />
-          )}
-          {step === 'confirmed' && <ConfirmedStep />}
-
-          {step !== 'confirmed' && (
-            <div className='mt-6 flex justify-between'>
-              {stepIndex > 0 && (
-                <button
-                  type='button'
-                  onClick={goBack}
-                  className='text-white/60'
-                >
-                  Back
-                </button>
+          {isRestoring ? (
+            <BookingFormSkeleton />
+          ) : (
+            <>
+              {step === 'device' && <DeviceStep />}
+              {step === 'options' && <OptionsStep />}
+              {step === 'station' && <StationStep />}
+              {step === 'datetime' && <DateTimeStep />}
+              {step === 'summary' && (
+                <SummaryStep
+                  session={session}
+                  onGoogleLogin={handleGoogleLogin}
+                  onContinue={goNext}
+                />
               )}
-              {step !== 'payment' && (
-                <button
-                  type='button'
-                  onClick={goNext}
-                  className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
-                >
-                  Next
-                </button>
+              {step === 'payment' && (
+                <PaymentStep
+                // submitting={submitting}
+                // onPay={form.handleSubmit(handlePayment)}
+                />
               )}
-            </div>
+              {step === 'confirmed' && <ConfirmedStep />}
+              {step !== 'confirmed' && (
+                <div className='mt-6 flex justify-between'>
+                  {stepIndex > 0 && (
+                    <button
+                      type='button'
+                      onClick={goBack}
+                      className='text-white/60'
+                    >
+                      Back
+                    </button>
+                  )}
+                  {step !== 'payment' && step !== 'summary' && (
+                    <button
+                      type='button'
+                      onClick={goNext}
+                      className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
+                    >
+                      Next
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
         </FormProvider>
       </div>

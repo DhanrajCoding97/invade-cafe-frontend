@@ -5,6 +5,10 @@ const PS5_PLAYER_RATES: Record<number, number> = {
   3: 240,
   4: 300,
 };
+
+const PC_RATE = 80;
+const PSVR_RATE = 200;
+
 const RACING_TIER_RATES = { single: 150, multiplayer: 300 } as const;
 
 interface RateArgs {
@@ -20,9 +24,22 @@ export function getDisplayRate({
   tier,
   fallbackRate,
 }: RateArgs): number {
-  if (device === 'ps5') return PS5_PLAYER_RATES[players ?? 1] ?? fallbackRate;
-  if (device === 'racing') return RACING_TIER_RATES[tier ?? 'single'];
-  return fallbackRate;
+  switch (device) {
+    case 'pc':
+      return PC_RATE;
+
+    case 'vr':
+      return PSVR_RATE;
+
+    case 'ps5':
+      return PS5_PLAYER_RATES[players ?? 1] ?? fallbackRate;
+
+    case 'racing':
+      return RACING_TIER_RATES[tier ?? 'single'];
+
+    default:
+      return fallbackRate;
+  }
 }
 
 export function calculateTotal(rate: number, durationHours: number): number {

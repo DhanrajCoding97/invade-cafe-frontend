@@ -12,6 +12,8 @@ export async function GET(request: Request) {
     // if "next" is not a relative URL, use the default
     next = '/';
   }
+  console.log('CALLBACK ROUTE HIT:', request.url); // temp
+  console.log('code:', code, 'next:', next); // temp
 
   if (code) {
     const supabase = await createClient();

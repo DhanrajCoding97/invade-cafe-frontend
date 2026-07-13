@@ -7,6 +7,8 @@ import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
+import { FcGoogle } from 'react-icons/fc';
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 
 async function fetchStationName(stationId: string): Promise<string> {
   const supabase = createClient();
@@ -46,7 +48,7 @@ export default function SummaryStep({
     fallbackRate: 0, // resolved server-side/at payment too — display-only here
   });
   const total = calculateTotal(rate, values.duration);
-
+  console.log('total from summary', total);
   const rows = [
     { label: 'Device', value: values.device?.toUpperCase() },
     { label: 'Station', value: isLoading ? '…' : stationName },
@@ -71,12 +73,15 @@ export default function SummaryStep({
   ];
 
   return (
-    <div className='space-y-6'>
+    <div className='flex flex-column gap-6'>
       <h3 className='text-lg font-semibold text-white'>Review your booking</h3>
 
-      <div className='space-y-2 rounded-xl border border-white/10 p-4'>
+      <div className='space-y-2 rounded-xl border border-cyan-400 p-4'>
         {rows.map((row) => (
-          <div key={row.label} className='flex justify-between text-sm'>
+          <div
+            key={row.label}
+            className='flex justify-between text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+          >
             <span className='text-white/50'>{row.label}</span>
             <span className='text-white'>{row.value}</span>
           </div>
@@ -88,21 +93,30 @@ export default function SummaryStep({
       </div>
 
       {session ? (
-        <button
-          type='button'
+        // <button
+        //   type='button'
+        //   onClick={onContinue}
+        //   className='w-full rounded-lg bg-cyan-400 px-4 py-3 font-semibold text-black'
+        // >
+        //   Continue to Payment
+        // </button>
+        <CornerCutButton
           onClick={onContinue}
-          className='w-full rounded-lg bg-cyan-400 px-4 py-3 font-semibold text-black'
+          variant='outline'
+          className='ml-auto'
+          size='sm'
         >
-          Continue to Payment
-        </button>
+          Checkout
+        </CornerCutButton>
       ) : (
-        <button
-          type='button'
+        <CornerCutButton
           onClick={onGoogleLogin}
-          className='flex w-full items-center justify-center gap-2 rounded-lg bg-white px-4 py-3 font-semibold text-black'
+          variant='ghost'
+          className='ml-auto'
+          size='sm'
         >
-          Sign in with Google to Continue
-        </button>
+          Continue with <FcGoogle size={20} />
+        </CornerCutButton>
       )}
     </div>
   );
