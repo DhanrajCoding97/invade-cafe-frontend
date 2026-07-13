@@ -73,7 +73,7 @@ export default function SummaryStep({
   ];
 
   return (
-    <div className='flex flex-column gap-6'>
+    <div className='flex flex-col gap-6'>
       <h3 className='text-lg font-semibold text-white'>Review your booking</h3>
 
       <div className='space-y-2 rounded-xl border border-cyan-400 p-4'>
