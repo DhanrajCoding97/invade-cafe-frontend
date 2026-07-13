@@ -10,7 +10,7 @@ import DeviceStep from './steps/DeviceStep';
 import OptionsStep from './steps/OptionsStep';
 import StationStep from './steps/StationStep';
 import DateTimeStep from './steps/DateTimeStep';
-// import SummaryStep from './steps/SummaryStep';
+import SummaryStep from './steps/SummaryStep';
 import PaymentStep from './steps/PaymentStep';
 import ConfirmedStep from './steps/ConfirmedStep';
 import {
@@ -23,7 +23,6 @@ import {
   type BookingFormValues,
 } from '@/lib/schemas/BookingFormSchema';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
-import SummaryStep from './steps/SummaryStep';
 
 // order matters - index = step number
 export const STEPS = [
@@ -83,28 +82,6 @@ export default function BookingForm() {
 
   const step = STEPS[stepIndex];
   //get session on mount
-  // useEffect(() => {
-  //   supabase.auth.getSession().then(({ data }) => {
-  //     if (data.session) setSession({ id: data.session.user.id });
-  //   });
-  //   const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-  //     setSession(sess ? { id: sess.user.id } : null);
-  //   });
-  //   return () => sub.subscription.unsubscribe();
-  // }, [supabase]);
-  //restore form values after login
-  // useEffect(() => {
-  //   const draft = loadBookingDraft();
-  //   if (draft) {
-  //     form.reset(draft.values);
-  //     setStepIndex(STEPS.indexOf(draft.step));
-  //     clearBookingDraft(); // one-time restore, don't reuse stale state after this
-  //   }
-  // }, []);
-
-  useEffect(() => {
-    console.log('Session:', session);
-  }, [session]);
 
   useEffect(() => {
     async function restore() {
@@ -195,12 +172,6 @@ export default function BookingForm() {
             //   </button>
             // </div>
           )}
-          {/* {step === 'duration' && <DurationStep />} */}
-          {/* {step === 'login' && (
-            <LoginStep
-            onGoogleLogin={handleGoogleLogin}
-            />
-          )} */}
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
