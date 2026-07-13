@@ -1,8 +1,10 @@
 'use client';
+import { Suspense } from 'react';
 import BookingForm from './BookingForm';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { BookingFormSkeleton } from './skeletons/BookingSkeleton';
 
 export default function BookingSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -57,7 +59,9 @@ export default function BookingSection() {
         >
           Reserve From competitive PCs to VR and Sim Racing
         </p>
-        <BookingForm />
+        <Suspense fallback={<BookingFormSkeleton />}>
+          <BookingForm />
+        </Suspense>
       </div>
     </section>
   );

@@ -99,6 +99,8 @@ export default function DateTimeStep() {
 
   const nowString = getCurrentTimeString();
   const nowHour = new Date().getHours();
+  const cafeIsOpenNow = nowHour >= OPEN_HOUR && nowHour < CLOSE_HOUR; // <- missing check
+
   const playNowFits = nowHour + duration <= CLOSE_HOUR;
   const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
   const canPlayNow = today && playNowFits && !playNowConflict;
@@ -238,7 +240,7 @@ export default function DateTimeStep() {
 
             {date && !isLoading && (
               <>
-                {today && (
+                {today && cafeIsOpenNow && (
                   <button
                     type='button'
                     disabled={!canPlayNow}
@@ -258,6 +260,14 @@ export default function DateTimeStep() {
                       ? `Play now — starts ${nowString}`
                       : 'Play now unavailable'}
                   </button>
+                )}
+
+                {today && !cafeIsOpenNow && (
+                  <p className='mb-3 text-sm text-white/50'>
+                    Cafe opens at{' '}
+                    <span className='text-primary'>{OPEN_HOUR}:00</span> — book
+                    a slot for later today instead.
+                  </p>
                 )}
 
                 <div className='grid start-time-grid grid-cols-4 gap-2'>
