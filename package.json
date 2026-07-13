@@ -11,11 +11,6 @@
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit"
   },
-  "pnpm": {
-    "overrides": {
-      "zod": "4.4.3"
-    }
-  },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@hookform/resolvers": "^5.4.0",
