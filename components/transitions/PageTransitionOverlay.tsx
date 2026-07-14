@@ -56,37 +56,37 @@ export default function PageTransitionOverlay() {
     >
       <div className='flex flex-1'>
         <div
-          className='block flex-1 origin-top bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-top bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-top bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-top bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-top bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-top bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-top bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-top bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
       </div>
       <div className='flex flex-1'>
         <div
-          className='block flex-1 origin-bottom bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-bottom bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-bottom bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-bottom bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-bottom bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-bottom bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
         <div
-          className='block flex-1 origin-bottom bg-[#0a0a0a] will-change-transform'
+          className='block flex-1 origin-bottom bg-black will-change-transform'
           style={{ visibility: 'visible', transform: 'scaleY(1)' }}
         />
       </div>

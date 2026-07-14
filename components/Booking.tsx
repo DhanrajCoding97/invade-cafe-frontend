@@ -1,10 +1,15 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
-import BookingForm from './BookingForm';
+// import BookingForm from './BookingForm';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { BookingFormSkeleton } from './skeletons/BookingSkeleton';
+
+const BookingForm = dynamic(() => import('./BookingForm'), {
+  loading: () => <BookingFormSkeleton />,
+});
 
 export default function BookingSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -18,6 +23,7 @@ export default function BookingSection() {
       gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
         opacity: 0,
         y: 30,
+        delay: 1,
         duration: 0.4,
         ease: 'power2.out',
         stagger: 0.3,
@@ -59,9 +65,7 @@ export default function BookingSection() {
         >
           Reserve From competitive PCs to VR and Sim Racing
         </p>
-        <Suspense fallback={<BookingFormSkeleton />}>
-          <BookingForm />
-        </Suspense>
+        <BookingForm />
       </div>
     </section>
   );

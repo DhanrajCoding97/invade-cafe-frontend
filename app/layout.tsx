@@ -1,30 +1,37 @@
-import { Toaster } from '@/components/ui/sonner';
+// const supabase = await createClient()
 
+// const {
+//   data: { user },
+// } = await supabase.auth.getUser()
+import { Toast } from 'radix-ui';
+import PageTransitionOverlay from '@/components/transitions/PageTransitionOverlay';
+
+import { Metadata } from 'next';
+import { Toaster } from '@/components/ui/sonner';
 import AuthSlot from '@/components/AuthSlot';
 import { Orbitron } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/SmoothScroll';
 import NavBar from './components/neonblade-ui/navbar';
-import { Toast } from 'radix-ui';
 import { Providers } from '@/providers/QueryProvider';
-import PageTransitionOverlay from '@/components/transitions/PageTransitionOverlay';
 const orbitron = Orbitron({
   subsets: ['latin'],
   variable: '--font-orbitron',
+  weight: ['400', '600', '900'],
 });
+
+export const metadata: Metadata = {
+  title: 'Invade Gaming Cafe',
+  description:
+    'Level up at Invade Gaming Cafe. Experience powerful gaming PCs, PS5, PSVR, Sim Racing, and book your gaming session online in seconds.',
+};
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // const supabase = await createClient()
-
-  // const {
-  //   data: { user },
-  // } = await supabase.auth.getUser()
-
   return (
     <html
       lang='en'
@@ -33,21 +40,6 @@ export default async function RootLayout({
     >
       <body>
         <SmoothScroll>
-          {/* <NavBar
-            variant="standard"
-            position="fixed"
-            transparency="transparent"
-            color="cyan"
-            logoText="Invade"
-            scrollEffect
-            hideOnScroll
-            items={[
-              { label: "Home", href: "#hero" },
-              { label: "Services", href: "#services" },
-              { label: "Pricing", href: "#pricing" },
-              { label: "Testimonials", href: "#testimonials" },
-            ]}
-          /> */}
           <NavBar
             variant='standard'
             position='fixed'
@@ -68,10 +60,7 @@ export default async function RootLayout({
             ]}
             authSlot={<AuthSlot />}
           />
-          <Providers>
-            <PageTransitionOverlay />
-            {children}
-          </Providers>
+          <Providers>{children}</Providers>
         </SmoothScroll>
         <Toaster />
       </body>

@@ -83,14 +83,42 @@ export default function BookingForm() {
   const step = STEPS[stepIndex];
   //get session on mount
 
+  // useEffect(() => {
+  //   async function restore() {
+  //     const { data } = await supabase.auth.getSession();
+  //     if (data.session) setSession({ id: data.session.user.id });
+  //     const draft = loadBookingDraft();
+  //     if (draft) {
+  //       form.reset(draft.values);
+  //       setStepIndex(STEPS.indexOf(draft.step));
+  //       clearBookingDraft();
+  //     }
+
+  //     setIsRestoring(false);
+  //   }
+  //   restore();
+
+  //   const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+  //     setSession(sess ? { id: sess.user.id } : null);
+  //   });
+  //   return () => sub.subscription.unsubscribe();
+  // }, [supabase]);
+
   useEffect(() => {
     async function restore() {
       const { data } = await supabase.auth.getSession();
       if (data.session) setSession({ id: data.session.user.id });
-      const draft = loadBookingDraft();
-      if (draft) {
-        form.reset(draft.values);
-        setStepIndex(STEPS.indexOf(draft.step));
+
+      if (!deviceParam) {
+        // no fresh deep link — safe to restore an interrupted draft (e.g. post-OAuth return)
+        const draft = loadBookingDraft();
+        if (draft) {
+          form.reset(draft.values);
+          setStepIndex(STEPS.indexOf(draft.step));
+          clearBookingDraft();
+        }
+      } else {
+        // fresh deep link takes priority — discard any stale draft
         clearBookingDraft();
       }
 

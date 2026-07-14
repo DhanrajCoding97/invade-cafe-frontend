@@ -2,10 +2,9 @@
 import Badge from '@/app/components/neonblade-ui/badge';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { DatalinesWithGrid } from '@/app/components/neonblade-ui/datalines-with-grid';
-import { useEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
 import { getLenisInstance } from '@/lib/lenisInstance';
 import { playSectionTransition } from '@/lib/PageTransition';
 import Image from 'next/image';
@@ -17,77 +16,162 @@ export default function HeroSection() {
   const containerRef = useRef<HTMLElement>(null);
   // const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
-  useEffect(() => {
-    //reduce grid lines for mobile
+  // useLayoutEffect(() => {
+  //   //reduce grid lines for mobile
+  //   const checkMobile = () => setIsMobile(window.innerWidth < 640);
+  //   checkMobile(); // set correct value on mount
+  //   window.addEventListener('resize', checkMobile);
+  //   // return () => window.removeEventListener('resize', checkMobile);
+
+  //   // Get the global Lenis instance
+  //   const lenis = getLenisInstance();
+
+  //   // Recalculate trigger positions once layout has settled
+  //   const refresh = () => ScrollTrigger.refresh();
+  //   window.addEventListener('load', refresh);
+
+  //   // Also refresh shortly after mount, covers images/fonts that load async
+  //   const t = setTimeout(refresh, 300);
+
+  //   // GSAP animations as normal
+  //   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+  //   tl.from('.hero-badge', {
+  //     opacity: 0,
+  //     y: -20,
+  //     duration: 0.6,
+  //   })
+  //     .from(
+  //       '.hero-heading',
+  //       {
+  //         opacity: 0,
+  //         y: 40,
+  //         duration: 0.9,
+  //       },
+  //       '-=0.3',
+  //     )
+  //     .from(
+  //       '.hero-subtext',
+  //       {
+  //         opacity: 0,
+  //         y: 20,
+  //         duration: 0.7,
+  //       },
+  //       '-=0.5',
+  //     )
+  //     .from(
+  //       '.hero-cta',
+  //       {
+  //         opacity: 0,
+  //         y: 20,
+  //         duration: 0.6,
+  //         stagger: 0.15,
+  //       },
+  //       '-=0.4',
+  //     );
+
+  //   gsap.to('.glow-cyan', {
+  //     x: 80,
+  //     y: 60,
+  //     scale: 1.15,
+  //     duration: 10,
+  //     repeat: -1,
+  //     yoyo: true,
+  //     ease: 'sine.inOut',
+  //   });
+  //   gsap.to('.glow-fuchsia', {
+  //     x: -70,
+  //     y: -50,
+  //     scale: 1.2,
+  //     duration: 11,
+  //     repeat: -1,
+  //     yoyo: true,
+  //     ease: 'power2.in',
+  //     delay: 1.5, // offset so both blobs don't peak/trough in sync
+  //   });
+
+  //   // Cleanup
+  //   return () => {
+  //     window.removeEventListener('resize', checkMobile);
+  //     window.removeEventListener('load', refresh);
+  //     clearTimeout(t);
+  //     tl.kill();
+  //     ScrollTrigger.getAll().forEach((t) => t.kill());
+  //   };
+  // }, []);
+  useLayoutEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile(); // set correct value on mount
+    checkMobile();
     window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
 
-    // Get the global Lenis instance
     const lenis = getLenisInstance();
-
-    // Recalculate trigger positions once layout has settled
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
-
-    // Also refresh shortly after mount, covers images/fonts that load async
     const t = setTimeout(refresh, 300);
 
-    // GSAP animations as normal
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    const tl = gsap.timeline({
+      defaults: { ease: 'power4.inOut' },
+    });
 
-    tl.from('.hero-badge', {
-      opacity: 0,
-      y: -20,
-      duration: 0.6,
-    })
-      .from(
-        '.hero-heading',
-        {
-          opacity: 0,
-          y: 40,
-          duration: 0.9,
-        },
-        '-=0.3',
-      )
-      .from(
+    tl.fromTo(
+      '.hero-heading',
+      { autoAlpha: 0, y: 40 },
+      { autoAlpha: 1, y: 0, duration: 0.6 },
+    )
+      .fromTo(
         '.hero-subtext',
-        {
-          opacity: 0,
-          y: 20,
-          duration: 0.7,
-        },
-        '-=0.5',
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.6 },
+        '-=0.2',
       )
-      .from(
-        '.hero-cta',
-        {
-          opacity: 0,
-          y: 20,
-          duration: 0.6,
-          stagger: 0.15,
-        },
-        '-=0.4',
+      .fromTo(
+        '.hero-badge',
+        { autoAlpha: 0, y: -20 },
+        { autoAlpha: 1, y: 0, duration: 0.5 },
+        '-=0.2',
+      )
+      .fromTo(
+        '.hero-cta-book-now',
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.4 },
+        '-=0.2',
+      )
+      .fromTo(
+        '.hero-cta-pricing',
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.4 },
+        '-=0.3',
       );
 
-    // Ambient drift
-    // gsap.to(".glow-cyan", {
-    //   x: 30,
-    //   y: 20,
-    //   duration: 8,
-    //   repeat: -1,
-    //   yoyo: true,
-    //   ease: "sine.inOut",
-    // })
-    // gsap.to(".glow-fuchsia", {
-    //   x: -30,
-    //   y: -20,
-    //   duration: 9,
-    //   repeat: -1,
-    //   yoyo: true,
-    //   ease: "sine.inOut",
-    // })
+    // tl.fromTo(
+    //   '.hero-badge',
+    //   { autoAlpha: 0, y: -20 },
+    //   { autoAlpha: 1, y: 0, duration: 1 },
+    // )
+    //   .fromTo(
+    //     '.hero-heading',
+    //     { autoAlpha: 0, y: 40 },
+    //     { autoAlpha: 1, y: 0, duration: 0.4 },
+    //   )
+    //   .fromTo(
+    //     '.hero-subtext',
+    //     { autoAlpha: 0, y: 20 },
+    //     { autoAlpha: 1, y: 0 },
+    //     '-=0.5',
+    //   )
+    //   .fromTo(
+    //     '.hero-cta-book-now',
+    //     { autoAlpha: 0, y: 20 },
+    //     { autoAlpha: 1, y: 0 },
+    //     '-=0.5',
+    //   )
+    //   .fromTo(
+    //     '.hero-cta-pricing',
+    //     { autoAlpha: 0, y: 20 },
+    //     { autoAlpha: 1, y: 0 },
+    //     '-=0.5',
+    //   );
+
     gsap.to('.glow-cyan', {
       x: 80,
       y: 60,
@@ -105,15 +189,15 @@ export default function HeroSection() {
       repeat: -1,
       yoyo: true,
       ease: 'power2.in',
-      delay: 1.5, // offset so both blobs don't peak/trough in sync
+      delay: 1.5,
     });
 
-    // Cleanup
     return () => {
+      window.removeEventListener('resize', checkMobile);
       window.removeEventListener('load', refresh);
       clearTimeout(t);
       tl.kill();
-      ScrollTrigger.getAll().forEach((t) => t.kill());
+      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, []);
 
@@ -137,7 +221,7 @@ export default function HeroSection() {
         overlay
       />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
-        <div className='hero-badge'>
+        <div className='hero-badge opacity-0'>
           <Badge
             responsive
             color='green'
@@ -155,7 +239,7 @@ export default function HeroSection() {
             Console Rentals Now Available
           </Badge>
         </div>
-        <div className='relative mt-8 max-w-3xl text-center'>
+        <div className='relative mt-8 max-w-3xl text-center '>
           {/* Text-safety scrim — sits behind heading+subtext only */}
           <div
             className='pointer-events-none absolute inset-0 -z-10 rounded-[3rem] blur-2xl'
@@ -165,21 +249,24 @@ export default function HeroSection() {
             }}
           />
 
-          <h1 className='hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+          <h1 className='hero-heading opacity-0 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
             Invade Gaming Cafe
             {/* <GlitchText customSpeed="3s" mode="active">
             </GlitchText> */}
           </h1>
-          <p className='hero-subtext mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
+          <p className='hero-subtext opacity-0 mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
             Laid-back hangout featuring PC and PlayStation games, plus racing
             simulators and VR options.
           </p>
         </div>
-        <div className='hero-cta mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
+        <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
+            className='opacity-0 hero-cta-book-now'
             onClick={() =>
               playSectionTransition(() => {
-                getLenisInstance().scrollTo('#booking', { immediate: true });
+                getLenisInstance().scrollTo('#booking', {
+                  offset: 40,
+                });
               })
             }
             color='cyan'
@@ -191,9 +278,12 @@ export default function HeroSection() {
             Book Now
           </CornerCutButton>
           <CornerCutButton
+            className='opacity-0 hero-cta-pricing'
             onClick={() =>
               playSectionTransition(() => {
-                getLenisInstance().scrollTo('#pricing', { immediate: true });
+                getLenisInstance().scrollTo('#pricing', {
+                  offset: 40,
+                });
               })
             }
             color='green'

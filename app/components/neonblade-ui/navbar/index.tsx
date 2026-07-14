@@ -11,7 +11,7 @@ function scrollToSection(href?: string): boolean {
   playSectionTransition(() => {
     const lenis = getLenisInstance();
     if (lenis && typeof lenis.scrollTo === 'function') {
-      lenis.scrollTo(href, { immediate: true }); // instant jump while covered
+      lenis.scrollTo(href, { offset: 40 }); // instant jump while covered
     } else {
       document.querySelector(href)?.scrollIntoView({ behavior: 'auto' });
     }
