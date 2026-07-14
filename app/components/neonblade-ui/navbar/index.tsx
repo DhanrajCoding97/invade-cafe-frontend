@@ -676,7 +676,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   return (
     <>
       <nav
-        className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-50 w-full ${className}`}
+        className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-100 w-full ${className}`}
         style={cssVars}
         aria-label='Navigation'
       >
