@@ -2,21 +2,28 @@
 import Badge from '@/app/components/neonblade-ui/badge';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { DatalinesWithGrid } from '@/app/components/neonblade-ui/datalines-with-grid';
-import GlitchText from '@/app/components/neonblade-ui/glitch-text';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import { getLenisInstance } from '@/lib/lenisInstance';
+import { playSectionTransition } from '@/lib/PageTransition';
 import Image from 'next/image';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function HeroSection() {
+  const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+  // const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
   useEffect(() => {
+    //reduce grid lines for mobile
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile(); // set correct value on mount
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+
     // Get the global Lenis instance
     const lenis = getLenisInstance();
 
@@ -170,7 +177,11 @@ export default function HeroSection() {
         </div>
         <div className='hero-cta mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
-            onClick={() => getLenisInstance().scrollTo('#booking')}
+            onClick={() =>
+              playSectionTransition(() => {
+                getLenisInstance().scrollTo('#booking', { immediate: true });
+              })
+            }
             color='cyan'
             variant='solid'
             showArrow
@@ -180,7 +191,11 @@ export default function HeroSection() {
             Book Now
           </CornerCutButton>
           <CornerCutButton
-            onClick={() => getLenisInstance().scrollTo('#pricing')}
+            onClick={() =>
+              playSectionTransition(() => {
+                getLenisInstance().scrollTo('#pricing', { immediate: true });
+              })
+            }
             color='green'
             variant='ghost'
             hoverEffect='pulse'

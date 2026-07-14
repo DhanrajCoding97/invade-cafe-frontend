@@ -8,6 +8,7 @@ import SmoothScroll from '@/components/SmoothScroll';
 import NavBar from './components/neonblade-ui/navbar';
 import { Toast } from 'radix-ui';
 import { Providers } from '@/providers/QueryProvider';
+import PageTransitionOverlay from '@/components/transitions/PageTransitionOverlay';
 const orbitron = Orbitron({
   subsets: ['latin'],
   variable: '--font-orbitron',
@@ -60,12 +61,17 @@ export default async function RootLayout({
               { label: 'Home', href: '#hero' },
               { label: 'Services', href: '#services' },
               { label: 'Pricing', href: '#pricing' },
+              { label: 'Gallery', href: '#gallery' },
               { label: 'Testimonials', href: '#testimonials' },
+              { label: 'Booking', href: '#booking' },
               { label: 'Contact', href: '#contact' },
             ]}
             authSlot={<AuthSlot />}
           />
-          <Providers>{children}</Providers>
+          <Providers>
+            <PageTransitionOverlay />
+            {children}
+          </Providers>
         </SmoothScroll>
         <Toaster />
       </body>

@@ -2,22 +2,23 @@
 import { getLenisInstance } from '@/lib/lenisInstance';
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import './navbar.css';
-import CornerCutButton from '../corner-cut-button';
+import { playSectionTransition } from '@/lib/PageTransition';
 
-/** Intercepts hash-link clicks and routes them through Lenis if available. */
-import { createClient } from '@/lib/supabase/client';
-
+/** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
 function scrollToSection(href?: string): boolean {
   if (!href || !href.startsWith('#')) return false;
-  const lenis = getLenisInstance();
-  if (lenis && typeof lenis.scrollTo === 'function') {
-    lenis.scrollTo(href);
-  } else {
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-  }
+
+  playSectionTransition(() => {
+    const lenis = getLenisInstance();
+    if (lenis && typeof lenis.scrollTo === 'function') {
+      lenis.scrollTo(href, { immediate: true }); // instant jump while covered
+    } else {
+      document.querySelector(href)?.scrollIntoView({ behavior: 'auto' });
+    }
+  });
+
   return true;
 }
-
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string */
@@ -675,7 +676,7 @@ export const NavBar: React.FC<NavBarProps> = ({
   return (
     <>
       <nav
-        className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-100 w-full ${className}`}
+        className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-50 w-full ${className}`}
         style={cssVars}
         aria-label='Navigation'
       >
