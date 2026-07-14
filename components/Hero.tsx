@@ -14,97 +14,12 @@ gsap.registerPlugin(ScrollTrigger);
 export default function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
-  // const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
 
-  // useLayoutEffect(() => {
-  //   //reduce grid lines for mobile
-  //   const checkMobile = () => setIsMobile(window.innerWidth < 640);
-  //   checkMobile(); // set correct value on mount
-  //   window.addEventListener('resize', checkMobile);
-  //   // return () => window.removeEventListener('resize', checkMobile);
-
-  //   // Get the global Lenis instance
-  //   const lenis = getLenisInstance();
-
-  //   // Recalculate trigger positions once layout has settled
-  //   const refresh = () => ScrollTrigger.refresh();
-  //   window.addEventListener('load', refresh);
-
-  //   // Also refresh shortly after mount, covers images/fonts that load async
-  //   const t = setTimeout(refresh, 300);
-
-  //   // GSAP animations as normal
-  //   const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
-
-  //   tl.from('.hero-badge', {
-  //     opacity: 0,
-  //     y: -20,
-  //     duration: 0.6,
-  //   })
-  //     .from(
-  //       '.hero-heading',
-  //       {
-  //         opacity: 0,
-  //         y: 40,
-  //         duration: 0.9,
-  //       },
-  //       '-=0.3',
-  //     )
-  //     .from(
-  //       '.hero-subtext',
-  //       {
-  //         opacity: 0,
-  //         y: 20,
-  //         duration: 0.7,
-  //       },
-  //       '-=0.5',
-  //     )
-  //     .from(
-  //       '.hero-cta',
-  //       {
-  //         opacity: 0,
-  //         y: 20,
-  //         duration: 0.6,
-  //         stagger: 0.15,
-  //       },
-  //       '-=0.4',
-  //     );
-
-  //   gsap.to('.glow-cyan', {
-  //     x: 80,
-  //     y: 60,
-  //     scale: 1.15,
-  //     duration: 10,
-  //     repeat: -1,
-  //     yoyo: true,
-  //     ease: 'sine.inOut',
-  //   });
-  //   gsap.to('.glow-fuchsia', {
-  //     x: -70,
-  //     y: -50,
-  //     scale: 1.2,
-  //     duration: 11,
-  //     repeat: -1,
-  //     yoyo: true,
-  //     ease: 'power2.in',
-  //     delay: 1.5, // offset so both blobs don't peak/trough in sync
-  //   });
-
-  //   // Cleanup
-  //   return () => {
-  //     window.removeEventListener('resize', checkMobile);
-  //     window.removeEventListener('load', refresh);
-  //     clearTimeout(t);
-  //     tl.kill();
-  //     ScrollTrigger.getAll().forEach((t) => t.kill());
-  //   };
-  // }, []);
   useLayoutEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener('resize', checkMobile);
 
-    const lenis = getLenisInstance();
     const refresh = () => ScrollTrigger.refresh();
     window.addEventListener('load', refresh);
     const t = setTimeout(refresh, 300);
@@ -114,16 +29,10 @@ export default function HeroSection() {
     });
 
     tl.fromTo(
-      '.hero-heading',
-      { autoAlpha: 0, y: 40 },
+      '.hero-subtext',
+      { autoAlpha: 0, y: 20 },
       { autoAlpha: 1, y: 0, duration: 0.6 },
     )
-      .fromTo(
-        '.hero-subtext',
-        { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.6 },
-        '-=0.2',
-      )
       .fromTo(
         '.hero-badge',
         { autoAlpha: 0, y: -20 },
@@ -249,7 +158,7 @@ export default function HeroSection() {
             }}
           />
 
-          <h1 className='hero-heading opacity-0 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+          <h1 className='hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
             Invade Gaming Cafe
             {/* <GlitchText customSpeed="3s" mode="active">
             </GlitchText> */}
