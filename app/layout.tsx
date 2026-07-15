@@ -1,11 +1,3 @@
-// const supabase = await createClient()
-
-// const {
-//   data: { user },
-// } = await supabase.auth.getUser()
-import { Toast } from 'radix-ui';
-import PageTransitionOverlay from '@/components/transitions/PageTransitionOverlay';
-
 import { Metadata } from 'next';
 import { Toaster } from '@/components/ui/sonner';
 import AuthSlot from '@/components/AuthSlot';

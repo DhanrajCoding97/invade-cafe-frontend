@@ -48,7 +48,7 @@ export default function BookingSection() {
         <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
           <div className='h-px w-8 bg-[#00d4ff]' />
           <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            LOCK IN. LEVEL UP.
+            LOCK IN. LEVEL UP
           </span>
         </div>
         {/* main title */}

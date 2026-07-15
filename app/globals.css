@@ -27,8 +27,16 @@
   }
 }
 
-.hero-heading {
+/* .hero-heading {
   animation: heroFadeUp 1s cubic-bezier(0.76, 0, 0.24, 1.4) forwards;
+} */
+
+.hero-heading .line {
+  background: linear-gradient(to right, #28f1ff, #fe11ff);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
 @keyframes border-rotate {

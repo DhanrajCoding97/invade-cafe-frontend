@@ -7,15 +7,12 @@ import { playSectionTransition } from '@/lib/PageTransition';
 /** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
 function scrollToSection(href?: string): boolean {
   if (!href || !href.startsWith('#')) return false;
-
-  playSectionTransition(() => {
-    const lenis = getLenisInstance();
-    if (lenis && typeof lenis.scrollTo === 'function') {
-      lenis.scrollTo(href, { offset: 40 }); // instant jump while covered
-    } else {
-      document.querySelector(href)?.scrollIntoView({ behavior: 'auto' });
-    }
-  });
+  const lenis = getLenisInstance();
+  if (lenis && typeof lenis.scrollTo === 'function') {
+    lenis.scrollTo(href, { offset: 20 });
+  } else {
+    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+  }
 
   return true;
 }
