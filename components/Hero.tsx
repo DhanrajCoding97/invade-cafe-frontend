@@ -31,18 +31,18 @@ export default function HeroSection() {
     tl.fromTo(
       '.hero-badge',
       { autoAlpha: 0, y: -20 },
-      { autoAlpha: 1, y: 0, duration: 0.9 },
+      { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.8, ease: 'power4.inOut' },
     )
       .fromTo(
         '.hero-cta-book-now',
         { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.4 },
+        { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
         '-=0.2',
       )
       .fromTo(
         '.hero-cta-pricing',
         { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.4 },
+        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
         '-=0.3',
       );
 
@@ -124,7 +124,7 @@ export default function HeroSection() {
         overlay
       />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
-        <div className='hero-badge '>
+        <div className='hero-badge invisible opacity-0'>
           <Badge
             responsive
             color='green'
@@ -151,18 +151,40 @@ export default function HeroSection() {
                 'radial-gradient(ellipse 100% 80% at center, rgba(0,0,0,0.65) 0%, transparent 75%)',
             }}
           />
-          <GsapTextAnimation animateOnScroll={false} delay={0}>
-            {/* <h1 className='hero-heading bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-              Invade Gaming Cafe
-            </h1> */}
-            <h1 className='hero-heading text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          {/* <h1 className='hero-heading text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            {['Invade', 'Gaming', 'Cafe'].map((word, i) => (
+              <span
+                key={word}
+                className='inline-block overflow-hidden align-top mr-[0.25em] last:mr-0'
+              >
+                <span
+                  className='inline-block animate-[lineReveal_0.7s_cubic-bezier(0.16,1,0.3,1)_forwards] bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
+                  style={{ animationDelay: `${i * 0.12}s` }}
+                >
+                  {word}
+                </span>
+              </span>
+            ))}
+          </h1> */}
+          {/* <GsapTextAnimation animateOnScroll={false} delay={0}>
+            <h1 className='invisible opacity-0 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Invade Gaming Cafe
             </h1>
+          </GsapTextAnimation> */}
+          <GsapTextAnimation animateOnScroll={false} delay={0}>
+            <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+              <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+                Invade Gaming Cafe
+              </span>
+            </h1>
           </GsapTextAnimation>
+          {/* <h1 className='hero-heading text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+              Invade Gaming Cafe
+            </h1> */}
           {/* <GlitchText customSpeed="3s" mode="active">
             </GlitchText> */}
           <GsapTextAnimation animateOnScroll={false} delay={0.4}>
-            <p className='hero-subtext  mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
+            <p className='hero-subtext invisible opacity-0  mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
               Laid-back hangout featuring PC and PlayStation games, plus racing
               simulators and VR options.
             </p>
@@ -170,7 +192,7 @@ export default function HeroSection() {
         </div>
         <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
-            className=' hero-cta-book-now'
+            className=' hero-cta-book-now invisible opacity-0'
             onClick={() =>
               playSectionTransition(() => {
                 getLenisInstance().scrollTo('#booking', {
@@ -187,7 +209,7 @@ export default function HeroSection() {
             Book Now
           </CornerCutButton>
           <CornerCutButton
-            className=' hero-cta-pricing'
+            className=' hero-cta-pricing invisible opacity-0'
             onClick={() =>
               playSectionTransition(() => {
                 getLenisInstance().scrollTo('#pricing', {

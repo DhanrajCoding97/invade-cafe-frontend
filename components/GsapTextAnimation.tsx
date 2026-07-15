@@ -7,20 +7,29 @@ import { useGSAP } from '@gsap/react';
 gsap.registerPlugin(SplitText, ScrollTrigger);
 
 type GsapTextAnimationProps = {
-  children: React.ReactElement<{ ref?: React.Ref<HTMLElement> }>;
+  children: React.ReactElement<{
+    ref?: React.Ref<HTMLElement>;
+    className?: string;
+  }>;
   animateOnScroll: boolean;
   delay: number;
+  triggerRef?: React.RefObject<HTMLElement | null>;
+  timeline?: gsap.core.Timeline; // NEW — when provided, this component adds itself here instead of creating its own trigger
+  position?: string | number; // NEW — GSAP timeline position param, e.g. '<', '-=0.3', 0.5
 };
 
 export default function GsapTextAnimation({
   children,
   animateOnScroll = true,
   delay = 0,
+  triggerRef,
+  timeline,
+  position,
 }: GsapTextAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const elementRef = useRef([]);
-  const splitRef = useRef([]);
-  const lines = useRef([]);
+  const elementRef = useRef<HTMLElement[]>([]);
+  const splitRef = useRef<SplitText[]>([]);
+  const lines = useRef<HTMLElement[]>([]);
 
   useGSAP(
     () => {
@@ -29,9 +38,9 @@ export default function GsapTextAnimation({
       elementRef.current = [];
       lines.current = [];
 
-      let elements = [];
+      let elements: HTMLElement[] = [];
       if (containerRef.current.hasAttribute('data-copy-wrapper')) {
-        elements = Array.from(containerRef.current.children);
+        elements = Array.from(containerRef.current.children) as HTMLElement[];
       } else {
         elements = [containerRef.current];
       }
@@ -51,56 +60,63 @@ export default function GsapTextAnimation({
         const textIndent = computedStyle.textIndent;
         if (textIndent && textIndent !== '0px') {
           if (split.lines.length > 0) {
-            split.lines[0].style.paddingLeft = textIndent;
+            (split.lines[0] as HTMLElement).style.paddingLeft = textIndent;
           }
           element.style.textIndent = '0';
         }
-        lines.current.push(...split.lines);
+        lines.current.push(...(split.lines as HTMLElement[]));
       });
 
       gsap.set(lines.current, { y: '100%' });
+      gsap.set(elements, { autoAlpha: 1 });
 
       const animationProps = {
         y: '0%',
         duration: 1,
         stagger: 0.1,
         ease: 'power4.out',
-        delay: delay,
       };
 
-      if (animateOnScroll) {
+      if (timeline) {
+        // Parent owns the ScrollTrigger — just slot our reveal into their sequence
+        timeline.to(lines.current, animationProps, position ?? '>');
+      } else if (animateOnScroll) {
         gsap.to(lines.current, {
           ...animationProps,
+          delay,
           scrollTrigger: {
-            trigger: containerRef.current,
+            trigger: triggerRef?.current ?? containerRef.current,
             start: 'top 70%',
             once: true,
           },
         });
       } else {
-        gsap.to(lines.current, animationProps);
+        gsap.to(lines.current, { ...animationProps, delay });
       }
 
       return () => {
-        splitRef.current.forEach((split) => {
-          if (split) {
-            split.revert();
-          }
-        });
+        splitRef.current.forEach((split) => split?.revert());
       };
     },
     {
       scope: containerRef,
-      dependencies: [animateOnScroll, delay],
+      dependencies: [animateOnScroll, delay, timeline, position],
     },
   );
 
+  const hiddenClass = 'invisible opacity-0';
+
   if (React.Children.count(children) === 1) {
-    return React.cloneElement(children, { ref: containerRef });
+    return React.cloneElement(children, {
+      ref: containerRef,
+      className: [children.props.className, hiddenClass]
+        .filter(Boolean)
+        .join(' '),
+    });
   }
 
   return (
-    <div ref={containerRef} data-copy-wrapper='true'>
+    <div ref={containerRef} data-copy-wrapper='true' className={hiddenClass}>
       {children}
     </div>
   );

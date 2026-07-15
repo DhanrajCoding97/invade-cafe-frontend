@@ -7,7 +7,10 @@ import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
-import { REVEAL } from '@/lib/animation-presets';
+import GsapTextAnimation from './GsapTextAnimation';
+
+gsap.registerPlugin(ScrollTrigger);
+
 function InfoCard({
   label,
   children,
@@ -74,56 +77,88 @@ function HoursRow({
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const eyebrowRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const descRef = useRef<HTMLParagraphElement>(null);
   const contactCardsRef = useRef<HTMLDivElement>(null);
   const mapsRef = useRef<HTMLDivElement>(null);
-
+  const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
   // gsap scrollTrigger animation
   useGSAP(
+    // () => {
+    //   gsap.from([eyebrowRef.current], {
+    //     opacity: 0,
+    //     ...REVEAL.header,
+    //     // y: 30,
+    //     // duration: 0.8,
+    //     // ease: "power2.out",
+    //     // stagger: 0.45,
+    //     scrollTrigger: {
+    //       trigger: sectionRef.current,
+    //       start: 'top 75%',
+    //       toggleActions: 'play none none none',
+    //     },
+    //   });
+
+    //   const cards = contactCardsRef.current?.children;
+    //   if (cards) {
+    //     gsap.from(cards, {
+    //       opacity: 0,
+    //       y: 50,
+    //       duration: 0.6,
+    //       delay: 0.4,
+    //       ease: 'sine.inOut',
+    //       stagger: 0.3,
+    //       scrollTrigger: {
+    //         trigger: contactCardsRef.current,
+    //         start: 'top 80%',
+    //         toggleActions: 'play none none none',
+    //       },
+    //     });
+    //   }
     () => {
-      gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
-        opacity: 0,
-        ...REVEAL.header,
-        // y: 30,
-        // duration: 0.8,
-        // ease: "power2.out",
-        // stagger: 0.45,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 75%',
-          toggleActions: 'play none none none',
-        },
-      });
+      if (!sectionRef.current) return;
+      const tl = tlRef.current;
+
+      // Non-text pieces get added directly, positioned relative to each other
+      tl.fromTo(
+        eyebrowRef.current,
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+        0, // starts at t=0 of the sequence
+      ).fromTo(
+        mapsRef.current,
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+      );
 
       const cards = contactCardsRef.current?.children;
       if (cards) {
-        gsap.from(cards, {
-          opacity: 0,
-          y: 50,
-          duration: 0.6,
-          delay: 0.4,
-          ease: 'sine.inOut',
-          stagger: 0.3,
-          scrollTrigger: {
-            trigger: contactCardsRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
-          },
+        gsap.set(cards, { autoAlpha: 0, y: 48 });
+        tl.to(cards, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.3,
+          ease: 'power4.inOut',
+          stagger: 0.2,
         });
       }
 
-      gsap.from(mapsRef.current, {
-        opacity: 0,
-        y: 50,
-        duration: 0.8,
-        delay: 0.4,
-        ease: 'sine.inOut',
-        scrollTrigger: {
-          trigger: mapsRef.current,
-          start: 'top 80%',
-          toggleActions: 'play none none none',
-        },
+      // gsap.from(mapsRef.current, {
+      //   opacity: 0,
+      //   y: 50,
+      //   duration: 0.8,
+      //   delay: 0.8,
+      //   ease: 'power4.inOut',
+      //   scrollTrigger: {
+      //     trigger: mapsRef.current,
+      //     start: 'top 80%',
+      //     toggleActions: 'play none none none',
+      //   },
+      // });
+      // Single ScrollTrigger drives the whole timeline
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 70%',
+        once: true,
+        onEnter: () => tl.play(),
       });
     },
     { scope: sectionRef },
@@ -137,26 +172,43 @@ export default function Contact() {
     >
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}
-        <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
-          <div className='h-px w-8 bg-[#00d4ff]' />
-          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            FIND US
-          </span>
+        <div className='my-4 flex items-center gap-4'>
+          <div ref={eyebrowRef} className='h-px w-8 bg-[#00d4ff]' />
+          <GsapTextAnimation
+            animateOnScroll={false} // irrelevant now — timeline prop takes over
+            delay={0}
+            timeline={tlRef.current}
+            position='<' // starts alongside the eyebrow line
+          >
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              FIND US
+            </span>
+          </GsapTextAnimation>
         </div>
         {/* main title */}
-        <h2
-          ref={titleRef}
-          className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
+        <GsapTextAnimation
+          animateOnScroll={false}
+          delay={0}
+          timeline={tlRef.current}
+          position='-=0.3' // starts slightly before the previous item finishes
         >
-          Visit Invade
-        </h2>
+          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Visit Invade
+            </span>
+          </h1>
+        </GsapTextAnimation>
         {/* description */}
-        <p
-          ref={descRef}
-          className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+        <GsapTextAnimation
+          animateOnScroll={false}
+          delay={0}
+          timeline={tlRef.current}
+          position='-=0.4' // starts slightly before the previous item finishes
         >
-          Our location, hours, and the easiest ways to reach us.
-        </p>
+          <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+            Our location, hours, and the easiest ways to reach us.
+          </p>
+        </GsapTextAnimation>
         {/* Two-column body */}
         <div className='mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
           {/* Info column */}

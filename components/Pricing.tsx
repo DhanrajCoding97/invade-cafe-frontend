@@ -8,6 +8,10 @@ import { PcIcon } from './svgs';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import GsapTextAnimation from './GsapTextAnimation';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function PricingSection() {
   const router = useRouter();
@@ -25,42 +29,48 @@ export default function PricingSection() {
 
   const sectionRef = useRef<HTMLElement>(null);
   const eyebrowRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
-  // gsap scrollTrigger animation
+  const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
+
   useGSAP(
     () => {
-      gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
-        opacity: 0,
-        y: 30,
-        duration: 0.4,
-        ease: 'power2.out',
-        stagger: 0.3,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 75%',
-          toggleActions: 'play none none none',
-        },
-      });
+      if (!sectionRef.current) return;
+      const tl = tlRef.current;
 
+      // Non-text pieces get added directly, positioned relative to each other
+      tl.fromTo(
+        eyebrowRef.current,
+        { autoAlpha: 0, y: 20 },
+        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+        0, // starts at t=0 of the sequence
+      );
+      // Cards, same shared timeline
       const cards = cardsRef.current?.children;
       if (cards) {
-        gsap.from(cards, {
-          opacity: 0,
-          y: 0,
-          duration: 0.4,
-          delay: 0.6,
-          ease: 'power2.inOut',
-          stagger: 0.33,
-          scrollTrigger: {
-            trigger: cardsRef.current,
-            start: 'top 80%',
-            toggleActions: 'play none none none',
+        gsap.set(cards, { autoAlpha: 0, y: 48 });
+        tl.to(
+          cards,
+          {
+            autoAlpha: 1,
+            y: 0,
+            delay: 0.8,
+            duration: 0.4,
+            ease: 'power4.out',
+            stagger: 0.3,
           },
-        });
+          '>+0.6',
+        );
       }
+
+      // Single ScrollTrigger drives the whole timeline
+      ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 70%',
+        once: true,
+        onEnter: () => tl.play(),
+      });
     },
     { scope: sectionRef },
   );
@@ -73,26 +83,56 @@ export default function PricingSection() {
     >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
-        <div ref={eyebrowRef} className='my-4 flex items-center gap-4'>
-          <div className='h-px w-8 bg-[#00d4ff]' />
-          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            WHAT IT COSTS
-          </span>
+        <div className='my-4 flex items-center gap-4'>
+          <div ref={eyebrowRef} className='h-px w-8 bg-[#00d4ff]' />
+          <GsapTextAnimation
+            animateOnScroll={false} // irrelevant now — timeline prop takes over
+            delay={0}
+            timeline={tlRef.current}
+            position='<' // starts alongside the eyebrow line
+          >
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              WHAT IT COSTS
+            </span>
+          </GsapTextAnimation>
         </div>
         {/* main title */}
-        <h2
-          ref={titleRef}
-          className='mb-2 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-left text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
+        {/* <GsapTextAnimation
+          animateOnScroll={false}
+          delay={0}
+          timeline={tlRef.current}
+          position='-=0.3' // starts slightly before the previous item finishes
         >
-          Pricing
-        </h2>
+          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'></span>
+          </h1>
+        </GsapTextAnimation> */}
+        <GsapTextAnimation
+          animateOnScroll={false}
+          delay={0}
+          timeline={tlRef.current}
+          position='-=0.3' // starts slightly before the previous item finishes
+        >
+          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Pricing
+            </span>
+          </h1>
+        </GsapTextAnimation>
         {/* description */}
-        <p
-          ref={descRef}
-          className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+        <GsapTextAnimation
+          animateOnScroll={false}
+          delay={0}
+          timeline={tlRef.current}
+          position='-=0.4' // starts slightly before the previous item finishes
         >
-          Simple rates, no hidden fees. Pick your setup and start playing.
-        </p>
+          <p
+            ref={descRef}
+            className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+          >
+            Simple rates, no hidden fees. Pick your setup and start playing.
+          </p>
+        </GsapTextAnimation>
         <div
           ref={cardsRef}
           className='mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4'
