@@ -259,4 +259,8 @@ html {
     font-size: 12px;
     flex: 1;
   }
+
+  .footer-subtext {
+    flex-direction: column;
+  }
 }

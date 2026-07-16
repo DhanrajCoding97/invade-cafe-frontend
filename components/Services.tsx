@@ -16,7 +16,6 @@ export default function ServicesSection() {
   const descRef = useRef<HTMLParagraphElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  // Created once, on first render — children can receive it as a prop immediately
   const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
 
   useGSAP(

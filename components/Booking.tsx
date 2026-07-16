@@ -1,13 +1,13 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useEffect } from 'react';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import GsapTextAnimation from './GsapTextAnimation';
 import { BookingFormSkeleton } from './skeletons/BookingSkeleton';
 gsap.registerPlugin(ScrollTrigger);
+
 const BookingForm = dynamic(() => import('./BookingForm'), {
   loading: () => <BookingFormSkeleton />,
 });
@@ -16,71 +16,45 @@ export default function BookingSection() {
   const sectionRef = useRef<HTMLElement>(null);
   const eyebrowRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
+  const enteredRef = useRef(false);
+  const formReadyRef = useRef(false);
+
+  function maybePlay() {
+    if (enteredRef.current && formReadyRef.current) {
+      tlRef.current.play();
+    }
+  }
 
   useGSAP(
     () => {
       if (!sectionRef.current) return;
       const tl = tlRef.current;
 
-      // Non-text pieces get added directly, positioned relative to each other
       tl.fromTo(
         eyebrowRef.current,
         { autoAlpha: 0, y: 20 },
         { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-        0, // starts at t=0 of the sequence
+        0,
       );
-      // Cards, same shared timeline
-      // const cards = cardsRef.current?.children;
-      // if (cards) {
-      //   gsap.set(cards, { autoAlpha: 0, y: 48 });
-      //   tl.to(
-      //     cards,
-      //     {
-      //       autoAlpha: 1,
-      //       y: 0,
-      //       delay: 0.3,
-      //       duration: 0.6,
-      //       ease: 'power4.out',
-      //       stagger: 0.3,
-      //     },
-      //     '>-0.1',
-      //   );
-      // }
 
-      // Single ScrollTrigger drives the whole timeline
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top 70%',
         once: true,
-        onEnter: () => tl.play(),
+        onEnter: () => {
+          enteredRef.current = true;
+          maybePlay(); // safe now — reads formReadyRef.current fresh every call
+        },
       });
     },
     { scope: sectionRef },
   );
-  // // gsap scrollTrigger animation
-  // useGSAP(
-  //   () => {
-  //     gsap.from([eyebrowRef.current, titleRef.current, descRef.current], {
-  //       opacity: 0,
-  //       y: 30,
-  //       delay: 1,
-  //       duration: 0.4,
-  //       ease: 'power2.out',
-  //       stagger: 0.3,
-  //       scrollTrigger: {
-  //         trigger: sectionRef.current,
-  //         start: 'top 75%',
-  //         toggleActions: 'play none none none',
-  //       },
-  //     });
-  //   },
-  //   { scope: sectionRef },
-  // );
 
-  useEffect(() => {
-    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
-    return () => cancelAnimationFrame(id);
-  }, []);
+  function handleFormReady() {
+    formReadyRef.current = true;
+    maybePlay(); // call directly, no effect/state indirection needed
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  }
 
   return (
     <section
@@ -127,7 +101,7 @@ export default function BookingSection() {
             Reserve From competitive PCs to VR and Sim Racing
           </p>
         </GsapTextAnimation>
-        <BookingForm timeline={tlRef.current} />
+        <BookingForm timeline={tlRef.current} onReady={handleFormReady} />
       </div>
     </section>
   );

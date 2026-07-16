@@ -86,24 +86,31 @@ export default function DateTimeStep() {
   });
 
   const today = isToday(date);
-  const currentHour = new Date().getHours();
+  const now = new Date();
+  const nowMinutes = now.getHours() * 60 + now.getMinutes();
+
+  const OPEN_MINUTES = OPEN_HOUR * 60;
+  const CLOSE_MINUTES = CLOSE_HOUR * 60;
+  const PLAY_NOW_BUFFER = 10; // minutes of operational slack before close
 
   const availableSlots = Array.from(
     { length: CLOSE_HOUR - OPEN_HOUR },
     (_, i) => OPEN_HOUR + i,
   ).filter((hour) => {
-    const fitsBeforeClose = hour + duration <= CLOSE_HOUR;
-    const notInPast = !today || hour > currentHour; // today: only future whole-hours
+    const slotStartMinutes = hour * 60;
+    const fitsBeforeClose = slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
+    const notInPast = !today || slotStartMinutes > nowMinutes;
     return fitsBeforeClose && notInPast;
   });
 
   const nowString = getCurrentTimeString();
-  const nowHour = new Date().getHours();
-  const cafeIsOpenNow = nowHour >= OPEN_HOUR && nowHour < CLOSE_HOUR; // <- missing check
+  const cafeIsOpenNow =
+    nowMinutes >= OPEN_MINUTES && nowMinutes < CLOSE_MINUTES;
 
-  const playNowFits = nowHour + duration <= CLOSE_HOUR;
+  const playNowFits =
+    nowMinutes + duration * 60 <= CLOSE_MINUTES - PLAY_NOW_BUFFER;
   const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
-  const canPlayNow = today && playNowFits && !playNowConflict;
+  const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
 
   return (
     <div className='space-y-6'>
@@ -171,59 +178,6 @@ export default function DateTimeStep() {
           </Field>
         )}
       />
-
-      {/* <Controller
-        name='startTime'
-        control={control}
-        render={({ field, fieldState }) => (
-          <Field data-invalid={fieldState.invalid}>
-            <FieldLabel>Start time</FieldLabel>
-
-            {!date && (
-              <p className='text-sm text-white/50'>Pick a date first</p>
-            )}
-            {date && isLoading && (
-              <p className='text-sm text-white/50'>Checking availability…</p>
-            )}
-
-            {date && !isLoading && (
-              <div className='grid grid-cols-3 sm:grid-cols-4 gap-2'>
-                {availableSlots.map((hour) => {
-                  const slot = `${hour.toString().padStart(2, '0')}:00`;
-                  const taken = hasConflict(hour, duration, bookings);
-                  const selected = field.value === slot;
-                  return (
-                    <button
-                      key={slot}
-                      type='button'
-                      disabled={taken}
-                      onClick={() => field.onChange(slot)}
-                      className={[
-                        'rounded-lg border px-3 py-2 text-sm transition-colors',
-                        selected
-                          ? 'border-cyan-400 bg-cyan-400/10 text-white'
-                          : 'border-white/10 text-white/70',
-                        taken
-                          ? 'cursor-not-allowed opacity-30 line-through'
-                          : 'hover:border-white/30',
-                      ].join(' ')}
-                    >
-                      {slot}
-                    </button>
-                  );
-                })}
-                {availableSlots.length === 0 && (
-                  <p className='col-span-4 text-sm text-white/50'>
-                    No slots left today for a {duration}-hour session.
-                  </p>
-                )}
-              </div>
-            )}
-
-            {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-          </Field>
-        )}
-      /> */}
       <Controller
         name='startTime'
         control={control}

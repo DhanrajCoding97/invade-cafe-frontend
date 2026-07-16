@@ -9,6 +9,7 @@ import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { FcGoogle } from 'react-icons/fc';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import { cn } from '@/lib/utils';
 
 async function fetchStationName(stationId: string): Promise<string> {
   const supabase = createClient();
@@ -25,12 +26,14 @@ interface SummaryStepProps {
   session: { id: string } | null;
   onGoogleLogin: () => void;
   onContinue: () => void; // advances to payment — only called when session exists
+  isSubmitting: boolean;
 }
 
 export default function SummaryStep({
   session,
   onGoogleLogin,
   onContinue,
+  isSubmitting,
 }: SummaryStepProps) {
   const { watch } = useFormContext<BookingFormValues>();
   const values = watch();
@@ -110,12 +113,23 @@ export default function SummaryStep({
         </CornerCutButton>
       ) : (
         <CornerCutButton
+          disabled={isSubmitting}
           onClick={onGoogleLogin}
           variant='ghost'
-          className='ml-auto'
+          className={cn(
+            'ml-auto ',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            isSubmitting && 'pointer-events-none',
+          )}
           size='sm'
         >
-          Continue with <FcGoogle size={20} />
+          {!isSubmitting ? (
+            <>
+              Continue with <FcGoogle size={20} />
+            </>
+          ) : (
+            <>Signin In..</>
+          )}
         </CornerCutButton>
       )}
     </div>

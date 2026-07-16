@@ -10,13 +10,13 @@ export function BookingFormSkeleton() {
         {Array.from({ length: 4 }).map((_, i) => (
           <Skeleton
             key={i}
-            className='min-h-40 flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-all border-cyan-400'
+            className='bg-transaprent min-h-40 flex flex-col items-center justify-center gap-2 rounded-xl border p-4 text-center transition-all border-cyan-400'
           />
         ))}
       </div>
 
       <div className='flex justify-end'>
-        <Skeleton className='h-9 w-24 rounded-lg bg-white/10' />
+        <Skeleton className='h-9 w-24 rounded-lg bg-transparent' />
       </div>
     </div>
   );

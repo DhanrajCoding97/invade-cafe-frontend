@@ -6,6 +6,8 @@ import PricingSection from '@/components/Pricing';
 import GallerySection from '@/components/Gallery';
 import Contact from '@/components/Contact';
 import BookingSection from '@/components/Booking';
+import Footer from '@/components/Footer';
+import { Separator } from '@/components/ui/separator';
 export default function Page() {
   return (
     <>
@@ -16,6 +18,8 @@ export default function Page() {
       <TestimonialSection />
       <BookingSection />
       <Contact />
+      <Separator />
+      <Footer />
     </>
   );
 }

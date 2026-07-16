@@ -60,9 +60,10 @@ const DEVICE_MAP: Record<string, BookingFormValues['device']> = {
 
 interface BookingFormProps {
   timeline?: gsap.core.Timeline;
+  onReady?: () => void;
 }
 
-export default function ({ timeline }: BookingFormProps) {
+export default function ({ timeline, onReady }: BookingFormProps) {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
@@ -75,6 +76,7 @@ export default function ({ timeline }: BookingFormProps) {
   const [session, setSession] = useState<{ id: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
+  const [bookingId, setBookingId] = useState<string | null>(null);
   const [cardVisible, setCardVisible] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
   const form = useForm<BookingFormValues>({
@@ -90,29 +92,8 @@ export default function ({ timeline }: BookingFormProps) {
   });
 
   const step = STEPS[stepIndex];
+
   //get session on mount
-
-  // useEffect(() => {
-  //   async function restore() {
-  //     const { data } = await supabase.auth.getSession();
-  //     if (data.session) setSession({ id: data.session.user.id });
-  //     const draft = loadBookingDraft();
-  //     if (draft) {
-  //       form.reset(draft.values);
-  //       setStepIndex(STEPS.indexOf(draft.step));
-  //       clearBookingDraft();
-  //     }
-
-  //     setIsRestoring(false);
-  //   }
-  //   restore();
-
-  //   const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-  //     setSession(sess ? { id: sess.user.id } : null);
-  //   });
-  //   return () => sub.subscription.unsubscribe();
-  // }, [supabase]);
-
   useEffect(() => {
     async function restore() {
       const { data } = await supabase.auth.getSession();
@@ -177,92 +158,26 @@ export default function ({ timeline }: BookingFormProps) {
   }
 
   async function handleGoogleLogin() {
-    saveBookingDraft(form.getValues(), 'summary');
-    await handleOAuthLogin('/#booking');
+    try {
+      saveBookingDraft(form.getValues(), 'summary');
+      setSubmitting(true);
+      await handleOAuthLogin('/#booking');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSubmitting(false);
+    }
   }
+
   const currentDevice = form.watch('device');
 
-  // gsap
-
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     gsap.set(cardRef.current, { autoAlpha: 0, y: 40 });
-
-  //     gsap
-  //       .to(cardRef.current, {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         delay: 1.2,
-  //         duration: 0.8,
-  //         ease: 'power4.out',
-  //         scrollTrigger: {
-  //           trigger: cardRef.current,
-  //           start: 'top 80%',
-  //           once: true,
-  //         },
-  //       })
-  //       .fromTo(
-  //         nextButtonRef.current,
-  //         { autoAlpha: 0, y: 20 },
-  //         {
-  //           autoAlpha: 1,
-  //           y: 0,
-  //           duration: 0.4,
-  //         },
-  //         '-=0.2', // starts 0.2s before the card finishes
-  //       );
-  //   },
-  //   { scope: cardRef },
-  // );
   const cardRef = useRef<HTMLDivElement>(null);
   const buttonContainerRef = useRef<HTMLDivElement>(null);
-  const cardTweenRef = useRef<gsap.core.Tween | null>(null);
-
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     const tl = gsap.timeline({
-  //       scrollTrigger: {
-  //         trigger: cardRef.current,
-  //         start: 'top 80%',
-  //         once: true,
-  //       },
-  //     });
-
-  //     tl.fromTo(
-  //       cardRef.current,
-  //       { autoAlpha: 0, y: 40 },
-  //       {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         delay: 1,
-  //         duration: 0.8,
-  //         ease: 'power4.out',
-  //       },
-  //     ).fromTo(
-  //       nextButtonRef.current,
-  //       { autoAlpha: 0, y: 20 },
-  //       {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         delay: 2,
-  //         duration: 0.4,
-  //         ease: 'power4.out',
-  //       },
-  //     );
-  //   },
-  //   { scope: cardRef },
-  // );
 
   useGSAP(
     () => {
       if (!cardRef.current) return;
-
       if (timeline) {
-        // slot into the shared sequence instead of creating an independent trigger
         timeline.fromTo(
           cardRef.current,
           { autoAlpha: 0, y: 40 },
@@ -273,9 +188,9 @@ export default function ({ timeline }: BookingFormProps) {
             ease: 'power4.out',
             onComplete: () => setCardVisible(true),
           },
-
-          '-=0.2', // starts slightly before description finishes, tune to taste
+          '-=0.2',
         );
+        onReady?.(); // <-- tell parent this tween is now registered
       } else {
         // fallback: independent scroll-triggered reveal if no shared timeline provided
         gsap.fromTo(
@@ -298,30 +213,6 @@ export default function ({ timeline }: BookingFormProps) {
     },
     { scope: cardRef },
   );
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current || !buttonContainerRef.current) return;
-
-  //     gsap.set(buttonContainerRef.current, { autoAlpha: 0, y: 20 });
-
-  //     cardTweenRef.current = gsap.fromTo(
-  //       cardRef.current,
-  //       { autoAlpha: 0, y: 40 },
-  //       {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         duration: 0.8,
-  //         ease: 'power4.out',
-  //         scrollTrigger: {
-  //           trigger: cardRef.current,
-  //           start: 'top 80%',
-  //           once: true,
-  //         },
-  //       },
-  //     );
-  //   },
-  //   { scope: cardRef },
-  // );
 
   function revealNextButton() {
     if (!buttonContainerRef.current) return;
@@ -360,7 +251,6 @@ export default function ({ timeline }: BookingFormProps) {
             <StepTransition stepKey={step} direction={direction}>
               {step === 'device' && (
                 <DeviceStep
-                  play={cardVisible}
                   onRevealComplete={
                     stepIndex === STEPS.indexOf('device')
                       ? revealNextButton
@@ -376,15 +266,19 @@ export default function ({ timeline }: BookingFormProps) {
                   session={session}
                   onGoogleLogin={handleGoogleLogin}
                   onContinue={goNext}
+                  isSubmitting={submitting}
                 />
               )}
               {step === 'payment' && (
                 <PaymentStep
-                // submitting={submitting}
-                // onPay={form.handleSubmit(handlePayment)}
+                  onPaymentSuccess={(id) => {
+                    setBookingId(id);
+                    setStepIndex((i) => i + 1); // advance to confirmation
+                    setDirection(1);
+                  }}
                 />
               )}
-              {step === 'confirmed' && <ConfirmedStep />}
+              {step === 'confirmed' && <ConfirmedStep bookingId={bookingId} />}
               {step !== 'confirmed' && (
                 <div
                   ref={buttonContainerRef}
