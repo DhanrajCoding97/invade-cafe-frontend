@@ -9,11 +9,15 @@
   inherits: false;
   initial-value: 0deg;
 }
+@keyframes border-rotate {
+  to {
+    --border-angle: 360deg;
+  }
+}
 
 @theme {
-  --breakpoint-xs: 30rem; /* 480px */
-
   --animate-rotate-border: border-rotate 8s linear infinite;
+  --breakpoint-xs: 30rem; /* 480px */
 }
 
 @keyframes heroFadeUp {
@@ -47,12 +51,6 @@
   color: transparent;
   -webkit-text-fill-color: transparent;
 } */
-
-@keyframes border-rotate {
-  to {
-    --border-angle: 360deg;
-  }
-}
 
 @theme inline {
   --font-sans: var(--font-orbitron);

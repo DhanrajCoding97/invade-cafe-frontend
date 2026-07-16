@@ -23,7 +23,10 @@ import {
   type BookingFormValues,
 } from '@/lib/schemas/BookingFormSchema';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
-
+import { StepTransition } from './steps/StepTransition';
+import { useRef } from 'react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 // order matters - index = step number
 export const STEPS = [
   'device',
@@ -68,6 +71,7 @@ export default function BookingForm() {
   const [session, setSession] = useState<{ id: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
+  const [direction, setDirection] = useState<1 | -1>(1);
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -153,6 +157,8 @@ export default function BookingForm() {
     // if (STEPS[next] === 'login' && session) next++;
 
     setStepIndex(next);
+    setDirection(1);
+    setStepIndex(next);
   }
 
   function goBack() {
@@ -160,6 +166,8 @@ export default function BookingForm() {
     const device = form.getValues('device');
     // if (STEPS[prev] === 'login' && session) prev--;
     if (STEPS[prev] === 'options' && !needsOptionsStep(device)) prev--;
+    setDirection(-1);
+
     setStepIndex(Math.max(prev, 0));
   }
 
@@ -167,11 +175,39 @@ export default function BookingForm() {
     saveBookingDraft(form.getValues(), 'summary');
     await handleOAuthLogin('/#booking');
   }
-
   const currentDevice = form.watch('device');
+
+  // gsap
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      if (!cardRef.current) return;
+
+      gsap.set(cardRef.current, { autoAlpha: 0, y: 40 });
+
+      gsap.to(cardRef.current, {
+        autoAlpha: 1,
+        y: 0,
+        delay: 1.2,
+        duration: 0.8,
+        ease: 'power4.out',
+        scrollTrigger: {
+          trigger: cardRef.current,
+          start: 'top 80%',
+          once: true,
+        },
+      });
+    },
+    { scope: cardRef },
+  );
+
   return (
-    <div className='mt-8 w-full rounded-lg animate-rotate-border bg-conic/[from_var(--border-angle)] from-black via-[#2FF0FF] to-black p-px'>
-      <div className='p-10 rounded-lg bg-linear-to-br from-gray-950 via-black to-gray-950'>
+    <div
+      ref={cardRef}
+      className='mt-8 w-full rounded-lg animate-rotate-border bg-conic/[from_var(--border-angle)] from-[#860f6c] via-[#2FF0FF] to-black p-px'
+    >
+      <div className='p-4 sm:p-6 lg:p-10 rounded-lg bg-[radial-gradient(ellipse_at_top_left,rgba(0,212,255,0.08),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(254,17,255,0.06),transparent_60%)] bg-[#05070A]'>
         <FormProvider {...form}>
           {deviceFromUrl && step !== 'device' && (
             <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-sm text-white/70'>
@@ -187,23 +223,11 @@ export default function BookingForm() {
                 change
               </button>
             </div>
-            // <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-sm text-white/70'>
-            //   {deviceFromUrl.toUpperCase()}
-            //   {playersParam &&
-            //     ` · ${playersParam} player${playersParam !== '1' ? 's' : ''}`}
-            //   <button
-            //     type='button'
-            //     onClick={() => setStepIndex(STEPS.indexOf('device'))}
-            //     className='text-cyan-400'
-            //   >
-            //     change
-            //   </button>
-            // </div>
           )}
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
-            <>
+            <StepTransition stepKey={step} direction={direction}>
               {step === 'device' && <DeviceStep />}
               {step === 'options' && <OptionsStep />}
               {step === 'station' && <StationStep />}
@@ -244,7 +268,7 @@ export default function BookingForm() {
                   )}
                 </div>
               )}
-            </>
+            </StepTransition>
           )}
         </FormProvider>
       </div>

@@ -139,6 +139,7 @@ import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { createClient } from '@/lib/supabase/client';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { getDisplayRate } from '@/lib/pricing';
+import StationStepSkeleton from '@/components/skeletons/StationStepSkeleton';
 
 interface Station {
   id: string;
@@ -185,7 +186,8 @@ export default function StationStep() {
   });
 
   if (isLoading)
-    return <p className='text-sm text-white/50'>Loading stations…</p>;
+    // return <p className='text-sm text-white/50'>Loading stations…</p>;
+    return <StationStepSkeleton />;
   if (error)
     return <p className='text-sm text-red-400'>Couldn't load stations</p>;
 

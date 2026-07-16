@@ -122,11 +122,12 @@ export default function Contact() {
         eyebrowRef.current,
         { autoAlpha: 0, y: 20 },
         { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-        0, // starts at t=0 of the sequence
+        0,
       ).fromTo(
         mapsRef.current,
         { autoAlpha: 0, y: 20 },
         { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+        '-=0.5',
       );
 
       const cards = contactCardsRef.current?.children;
