@@ -58,7 +58,11 @@ const DEVICE_MAP: Record<string, BookingFormValues['device']> = {
   racing: 'racing',
 };
 
-export default function BookingForm() {
+interface BookingFormProps {
+  timeline?: gsap.core.Timeline;
+}
+
+export default function ({ timeline }: BookingFormProps) {
   const searchParams = useSearchParams();
   const supabase = createClient();
 
@@ -71,6 +75,7 @@ export default function BookingForm() {
   const [session, setSession] = useState<{ id: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [isRestoring, setIsRestoring] = useState(true);
+  const [cardVisible, setCardVisible] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
@@ -178,30 +183,155 @@ export default function BookingForm() {
   const currentDevice = form.watch('device');
 
   // gsap
+
+  // useGSAP(
+  //   () => {
+  //     if (!cardRef.current) return;
+
+  //     gsap.set(cardRef.current, { autoAlpha: 0, y: 40 });
+
+  //     gsap
+  //       .to(cardRef.current, {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         delay: 1.2,
+  //         duration: 0.8,
+  //         ease: 'power4.out',
+  //         scrollTrigger: {
+  //           trigger: cardRef.current,
+  //           start: 'top 80%',
+  //           once: true,
+  //         },
+  //       })
+  //       .fromTo(
+  //         nextButtonRef.current,
+  //         { autoAlpha: 0, y: 20 },
+  //         {
+  //           autoAlpha: 1,
+  //           y: 0,
+  //           duration: 0.4,
+  //         },
+  //         '-=0.2', // starts 0.2s before the card finishes
+  //       );
+  //   },
+  //   { scope: cardRef },
+  // );
   const cardRef = useRef<HTMLDivElement>(null);
+  const buttonContainerRef = useRef<HTMLDivElement>(null);
+  const cardTweenRef = useRef<gsap.core.Tween | null>(null);
+
+  // useGSAP(
+  //   () => {
+  //     if (!cardRef.current) return;
+
+  //     const tl = gsap.timeline({
+  //       scrollTrigger: {
+  //         trigger: cardRef.current,
+  //         start: 'top 80%',
+  //         once: true,
+  //       },
+  //     });
+
+  //     tl.fromTo(
+  //       cardRef.current,
+  //       { autoAlpha: 0, y: 40 },
+  //       {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         delay: 1,
+  //         duration: 0.8,
+  //         ease: 'power4.out',
+  //       },
+  //     ).fromTo(
+  //       nextButtonRef.current,
+  //       { autoAlpha: 0, y: 20 },
+  //       {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         delay: 2,
+  //         duration: 0.4,
+  //         ease: 'power4.out',
+  //       },
+  //     );
+  //   },
+  //   { scope: cardRef },
+  // );
 
   useGSAP(
     () => {
       if (!cardRef.current) return;
 
-      gsap.set(cardRef.current, { autoAlpha: 0, y: 40 });
+      if (timeline) {
+        // slot into the shared sequence instead of creating an independent trigger
+        timeline.fromTo(
+          cardRef.current,
+          { autoAlpha: 0, y: 40 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power4.out',
+            onComplete: () => setCardVisible(true),
+          },
 
-      gsap.to(cardRef.current, {
-        autoAlpha: 1,
-        y: 0,
-        delay: 1.2,
-        duration: 0.8,
-        ease: 'power4.out',
-        scrollTrigger: {
-          trigger: cardRef.current,
-          start: 'top 80%',
-          once: true,
-        },
-      });
+          '-=0.2', // starts slightly before description finishes, tune to taste
+        );
+      } else {
+        // fallback: independent scroll-triggered reveal if no shared timeline provided
+        gsap.fromTo(
+          cardRef.current,
+          { autoAlpha: 0, y: 40 },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power4.out',
+            onComplete: () => setCardVisible(false),
+            scrollTrigger: {
+              trigger: cardRef.current,
+              start: 'top 80%',
+              once: true,
+            },
+          },
+        );
+      }
     },
     { scope: cardRef },
   );
+  // useGSAP(
+  //   () => {
+  //     if (!cardRef.current || !buttonContainerRef.current) return;
 
+  //     gsap.set(buttonContainerRef.current, { autoAlpha: 0, y: 20 });
+
+  //     cardTweenRef.current = gsap.fromTo(
+  //       cardRef.current,
+  //       { autoAlpha: 0, y: 40 },
+  //       {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         duration: 0.8,
+  //         ease: 'power4.out',
+  //         scrollTrigger: {
+  //           trigger: cardRef.current,
+  //           start: 'top 80%',
+  //           once: true,
+  //         },
+  //       },
+  //     );
+  //   },
+  //   { scope: cardRef },
+  // );
+
+  function revealNextButton() {
+    if (!buttonContainerRef.current) return;
+    gsap.to(buttonContainerRef.current, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.4,
+      ease: 'power4.out',
+    });
+  }
   return (
     <div
       ref={cardRef}
@@ -228,7 +358,16 @@ export default function BookingForm() {
             <BookingFormSkeleton />
           ) : (
             <StepTransition stepKey={step} direction={direction}>
-              {step === 'device' && <DeviceStep />}
+              {step === 'device' && (
+                <DeviceStep
+                  play={cardVisible}
+                  onRevealComplete={
+                    stepIndex === STEPS.indexOf('device')
+                      ? revealNextButton
+                      : undefined
+                  }
+                />
+              )}
               {step === 'options' && <OptionsStep />}
               {step === 'station' && <StationStep />}
               {step === 'datetime' && <DateTimeStep />}
@@ -247,7 +386,10 @@ export default function BookingForm() {
               )}
               {step === 'confirmed' && <ConfirmedStep />}
               {step !== 'confirmed' && (
-                <div className='mt-6 flex justify-between'>
+                <div
+                  ref={buttonContainerRef}
+                  className='mt-6 flex justify-between'
+                >
                   {stepIndex > 0 && (
                     <button
                       type='button'

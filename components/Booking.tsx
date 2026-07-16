@@ -1,7 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { Suspense } from 'react';
-// import BookingForm from './BookingForm';
+import { useEffect } from 'react';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -78,6 +77,11 @@ export default function BookingSection() {
   //   { scope: sectionRef },
   // );
 
+  useEffect(() => {
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh());
+    return () => cancelAnimationFrame(id);
+  }, []);
+
   return (
     <section
       id='booking'
@@ -123,7 +127,7 @@ export default function BookingSection() {
             Reserve From competitive PCs to VR and Sim Racing
           </p>
         </GsapTextAnimation>
-        <BookingForm />
+        <BookingForm timeline={tlRef.current} />
       </div>
     </section>
   );

@@ -24,7 +24,15 @@ const DEVICES = [
   },
 ] as const;
 
-export default function DeviceStep() {
+interface DeviceStepProps {
+  onRevealComplete?: () => void;
+  play: boolean;
+}
+
+export default function DeviceStep({
+  onRevealComplete,
+  play,
+}: DeviceStepProps) {
   const { control } = useFormContext();
   const gridRef = useRef<HTMLDivElement>(null);
 
@@ -32,19 +40,65 @@ export default function DeviceStep() {
     () => {
       if (!gridRef.current) return;
       const cards = gridRef.current.children;
+      gsap.set(cards, { autoAlpha: 0, y: 24 });
+    },
+    { scope: gridRef, dependencies: [] }, // set hidden state once, on mount only
+  );
 
-      gsap.set(cards, { autoAlpha: 0, y: 48 });
+  useGSAP(
+    () => {
+      if (!gridRef.current || !play) return;
+      const cards = gridRef.current.children;
+
       gsap.to(cards, {
         autoAlpha: 1,
         y: 0,
-        duration: 0.7,
-        ease: 'power4.inOut',
-        stagger: 0.5,
-        delay: 1.2, // small buffer so it doesn't collide with the card's own reveal tail-end
+        duration: 0.5,
+        ease: 'power4.out',
+        stagger: 0.08,
+        delay: 0.1,
+        onComplete: () => onRevealComplete?.(),
       });
     },
-    { scope: gridRef },
+    { scope: gridRef, dependencies: [play] }, // only fires once `play` flips true
   );
+
+  // useGSAP(
+  //   () => {
+  //     if (!gridRef.current) return;
+  //     const cards = gridRef.current.children;
+
+  //     gsap.set(cards, { autoAlpha: 0, y: 24 });
+  //     gsap.to(cards, {
+  //       autoAlpha: 1,
+  //       y: 0,
+  //       duration: 0.5,
+  //       ease: 'power4.out',
+  //       stagger: 0.08,
+  //       delay: 0.1,
+  //       onComplete: () => onRevealComplete?.(),
+  //     });
+  //   },
+  //   { scope: gridRef },
+  // );
+
+  // useGSAP(
+  //   () => {
+  //     if (!gridRef.current) return;
+  //     const cards = gridRef.current.children;
+
+  //     gsap.set(cards, { autoAlpha: 0, y: 48 });
+  //     gsap.to(cards, {
+  //       autoAlpha: 1,
+  //       y: 0,
+  //       duration: 0.7,
+  //       ease: 'power4.inOut',
+  //       stagger: 0.5,
+  //       delay: 1.2, // small buffer so it doesn't collide with the card's own reveal tail-end
+  //     });
+  //   },
+  //   { scope: gridRef },
+  // );
   return (
     <div>
       <Controller
