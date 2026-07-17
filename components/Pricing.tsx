@@ -55,7 +55,6 @@ export default function PricingSection() {
           {
             autoAlpha: 1,
             y: 0,
-            delay: 0.8,
             duration: 0.4,
             ease: 'power4.out',
             stagger: 0.3,
