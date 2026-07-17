@@ -32,6 +32,49 @@ export default function PricingSection() {
   const descRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
 
+  // const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
+
+  // useGSAP(
+  //   () => {
+  //     if (!sectionRef.current) return;
+  //     const tl = tlRef.current;
+
+  //     tl.fromTo(
+  //       eyebrowRef.current,
+  //       { autoAlpha: 0, y: 20 },
+  //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //       0, // starts at t=0 of the sequence
+  //     );
+  //     // Cards, same shared timeline
+  //     const cards = cardsRef.current?.children;
+  //     if (cards) {
+  //       gsap.set(cards, { autoAlpha: 0, y: 48 });
+  //       tl.to(
+  //         cards,
+  //         {
+  //           autoAlpha: 1,
+  //           y: 0,
+  //           delay: 0.8,
+  //           duration: 0.4,
+  //           ease: 'power4.out',
+  //           stagger: 0.3,
+  //         },
+  //         '>+0.6',
+  //       );
+  //     }
+
+  //     // Single ScrollTrigger drives the whole timeline
+  //     ScrollTrigger.create({
+  //       trigger: sectionRef.current,
+  //       start: 'top 70%',
+  //       once: true,
+  //       onEnter: () => tl.play(),
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
+
+  // pricing section
   const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
 
   useGSAP(
@@ -39,14 +82,14 @@ export default function PricingSection() {
       if (!sectionRef.current) return;
       const tl = tlRef.current;
 
-      // Non-text pieces get added directly, positioned relative to each other
       tl.fromTo(
         eyebrowRef.current,
         { autoAlpha: 0, y: 20 },
         { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-        0, // starts at t=0 of the sequence
+        0,
       );
-      // Cards, same shared timeline
+
+      // Cards, same shared timeline — now positioned off the description's label
       const cards = cardsRef.current?.children;
       if (cards) {
         gsap.set(cards, { autoAlpha: 0, y: 48 });
@@ -55,16 +98,14 @@ export default function PricingSection() {
           {
             autoAlpha: 1,
             y: 0,
-            delay: 0.8,
-            duration: 0.4,
+            duration: 0.3,
             ease: 'power4.out',
-            stagger: 0.3,
+            stagger: 0.2,
           },
-          '>+0.6',
+          'descDone+=0.2', // starts 0.2s after description's reveal actually finishes
         );
       }
 
-      // Single ScrollTrigger drives the whole timeline
       ScrollTrigger.create({
         trigger: sectionRef.current,
         start: 'top 70%',
@@ -125,6 +166,7 @@ export default function PricingSection() {
           delay={0}
           timeline={tlRef.current}
           position='-=0.4' // starts slightly before the previous item finishes
+          completeLabel='descDone'
         >
           <p
             ref={descRef}

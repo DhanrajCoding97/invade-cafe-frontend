@@ -14,8 +14,9 @@ type GsapTextAnimationProps = {
   animateOnScroll: boolean;
   delay: number;
   triggerRef?: React.RefObject<HTMLElement | null>;
-  timeline?: gsap.core.Timeline; // NEW — when provided, this component adds itself here instead of creating its own trigger
-  position?: string | number; // NEW — GSAP timeline position param, e.g. '<', '-=0.3', 0.5
+  timeline?: gsap.core.Timeline; // when provided, this component adds itself here instead of creating its own trigger
+  position?: string | number; // GSAP timeline position param, e.g. '<', '-=0.3', 0.5
+  completeLabel?: string;
 };
 
 export default function GsapTextAnimation({
@@ -25,6 +26,7 @@ export default function GsapTextAnimation({
   triggerRef,
   timeline,
   position,
+  completeLabel,
 }: GsapTextAnimationProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const elementRef = useRef<HTMLElement[]>([]);
@@ -79,7 +81,15 @@ export default function GsapTextAnimation({
 
       if (timeline) {
         // Parent owns the ScrollTrigger — just slot our reveal into their sequence
-        timeline.to(lines.current, animationProps, position ?? '>');
+        const tween = timeline.to(
+          lines.current,
+          animationProps,
+          position ?? '>',
+        );
+
+        if (completeLabel) {
+          timeline.addLabel(completeLabel, tween.endTime(false));
+        }
       } else if (animateOnScroll) {
         gsap.to(lines.current, {
           ...animationProps,
