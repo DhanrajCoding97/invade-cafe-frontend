@@ -40,6 +40,7 @@ export function getLenisInstance() {
     lenis = new Lenis({
       duration: 1.2,
       smoothWheel: true,
+      syncTouch: true,
     });
 
     lenis.on('scroll', () => ScrollTrigger.update());
