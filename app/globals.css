@@ -263,4 +263,8 @@ html {
   .footer-subtext {
     flex-direction: column;
   }
+
+  .live-session-grid {
+    grid-template-columns: 1fr;
+  }
 }
