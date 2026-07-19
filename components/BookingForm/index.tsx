@@ -27,6 +27,7 @@ import { StepTransition } from './steps/StepTransition';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { useQueryClient } from '@tanstack/react-query';
 // order matters - index = step number
 export const STEPS = [
   'device',
@@ -64,6 +65,7 @@ interface BookingFormProps {
 }
 
 export default function ({ timeline, onReady }: BookingFormProps) {
+  const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const supabase = createClient();
 
@@ -79,6 +81,8 @@ export default function ({ timeline, onReady }: BookingFormProps) {
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [cardVisible, setCardVisible] = useState(false);
   const [direction, setDirection] = useState<1 | -1>(1);
+  const [conflictMessage, setConflictMessage] = useState<string | null>(null);
+
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -260,6 +264,11 @@ export default function ({ timeline, onReady }: BookingFormProps) {
               )}
               {step === 'options' && <OptionsStep />}
               {step === 'station' && <StationStep />}
+              {step === 'datetime' && conflictMessage && (
+                <div className='mb-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-300'>
+                  {conflictMessage}
+                </div>
+              )}
               {step === 'datetime' && <DateTimeStep />}
               {step === 'summary' && (
                 <SummaryStep
@@ -275,6 +284,16 @@ export default function ({ timeline, onReady }: BookingFormProps) {
                     setBookingId(id);
                     setStepIndex((i) => i + 1); // advance to confirmation
                     setDirection(1);
+                  }}
+                  onSlotConflict={(message) => {
+                    setDirection(-1);
+                    setStepIndex(STEPS.indexOf('datetime'));
+                    form.setValue('startTime', '');
+                    setConflictMessage(message);
+                    queryClient.invalidateQueries({
+                      queryKey: ['bookings', form.getValues('stationId')],
+                    });
+                    queryClient.invalidateQueries({ queryKey: ['stations'] });
                   }}
                 />
               )}

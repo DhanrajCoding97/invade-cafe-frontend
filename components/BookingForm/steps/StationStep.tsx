@@ -134,6 +134,7 @@ import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 //   );
 // }
 
+//booking-form/station-step
 interface Station {
   id: string;
   name: string;
@@ -169,7 +170,7 @@ async function fetchStations(
     .from('bookings')
     .select('station_id, session_started_at, duration_hours, extended_until')
     .in('station_id', stationIds)
-    .eq('status', 'confirmed')
+    .in('status', ['pending', 'confirmed'])
     .not('session_started_at', 'is', null)
     .is('session_ended_at', null);
 
