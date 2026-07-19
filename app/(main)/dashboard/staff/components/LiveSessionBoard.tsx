@@ -4,7 +4,8 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { startSession, endSession, extendSession } from '../actions';
-
+import { toast } from 'sonner';
+// app/dashboard/staff/LiveSessionBoard.tsx
 type Booking = {
   id: string;
   station_id: string;
@@ -100,7 +101,9 @@ function StationCard({
                   onClick={async () => {
                     const res = await extendSession(booking.id, station.id, 30);
                     if (!res.ok)
-                      alert('Station is booked right after — cannot extend.');
+                      toast.message(
+                        'Station is booked right after — cannot extend.',
+                      );
                   }}
                   className='text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium'
                 >

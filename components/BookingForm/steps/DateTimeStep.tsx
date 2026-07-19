@@ -16,6 +16,7 @@ import { format } from 'date-fns';
 import { createClient } from '@/lib/supabase/client';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import Link from 'next/link';
+import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 const OPEN_HOUR = 10; // 10:00 AM
 const CLOSE_HOUR = 23; // 11:00 PM
 const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
@@ -23,6 +24,7 @@ const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
 interface ExistingBooking {
   start_time: string;
   duration_hours: number;
+  extended_until: string | null;
 }
 
 async function fetchBookingsForDate(
@@ -32,7 +34,7 @@ async function fetchBookingsForDate(
   const supabase = createClient();
   const { data, error } = await supabase
     .from('bookings')
-    .select('start_time, duration_hours')
+    .select('start_time, duration_hours,extended_until')
     .eq('station_id', stationId)
     .eq('date', date)
     .in('status', ['pending', 'confirmed']);
@@ -54,9 +56,28 @@ function getCurrentTimeString(): string {
 
 // / Conflict check now needs minute precision, not just hour precision,
 // since "Play Now" can start at e.g. 17:40
+// function hasConflictMinutes(
+//   startTime: string,
+//   durationHours: number,
+//   date: string,
+//   bookings: ExistingBooking[],
+// ): boolean {
+//   const [sh, sm] = startTime.split(':').map(Number);
+//   const startMinutes = sh * 60 + sm;
+//   const endMinutes = startMinutes + durationHours * 60;
+
+//   return bookings.some((b) => {
+//     const [bh, bm] = b.start_time.split(':').map(Number);
+//     const bStartMinutes = bh * 60 + bm;
+//     const bEndMinutes = bStartMinutes + b.duration_hours * 60;
+//     return startMinutes < bEndMinutes && endMinutes > bStartMinutes;
+//   });
+// }
+
 function hasConflictMinutes(
   startTime: string,
   durationHours: number,
+  date: string, // now needed to resolve extended_until against a real timestamp
   bookings: ExistingBooking[],
 ): boolean {
   const [sh, sm] = startTime.split(':').map(Number);
@@ -66,12 +87,23 @@ function hasConflictMinutes(
   return bookings.some((b) => {
     const [bh, bm] = b.start_time.split(':').map(Number);
     const bStartMinutes = bh * 60 + bm;
-    const bEndMinutes = bStartMinutes + b.duration_hours * 60;
+
+    let bEndMinutes = bStartMinutes + Number(b.duration_hours) * 60;
+
+    if (b.extended_until) {
+      const bStartDate = new Date(`${date}T${b.start_time}`);
+      const extendedDate = new Date(b.extended_until);
+      const extendedMinutesFromStart =
+        (extendedDate.getTime() - bStartDate.getTime()) / 60_000;
+      bEndMinutes = bStartMinutes + extendedMinutesFromStart;
+    }
+
     return startMinutes < bEndMinutes && endMinutes > bStartMinutes;
   });
 }
 
 export default function DateTimeStep() {
+  useRealtimeBookingSync();
   const { control, watch, setValue } = useFormContext<BookingFormValues>();
   const stationId = watch('stationId');
   const date = watch('date');
@@ -109,7 +141,14 @@ export default function DateTimeStep() {
 
   const playNowFits =
     nowMinutes + duration * 60 <= CLOSE_MINUTES - PLAY_NOW_BUFFER;
-  const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
+  // const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
+  const playNowConflict = hasConflictMinutes(
+    nowString,
+    duration,
+    dateKey!,
+    bookings,
+  );
+
   const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
 
   return (
@@ -227,7 +266,14 @@ export default function DateTimeStep() {
                 <div className='grid start-time-grid grid-cols-4 gap-2'>
                   {availableSlots.map((hour) => {
                     const slot = `${hour.toString().padStart(2, '0')}:00`;
-                    const taken = hasConflictMinutes(slot, duration, bookings);
+                    // const taken = hasConflictMinutes(slot, duration, bookings);
+                    const taken = hasConflictMinutes(
+                      slot,
+                      duration,
+                      dateKey!,
+                      bookings,
+                    );
+
                     const selected = field.value === slot;
                     return (
                       <button
