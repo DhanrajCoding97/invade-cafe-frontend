@@ -17,6 +17,28 @@ import { createClient } from '@/lib/supabase/client';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import Link from 'next/link';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
+
+// / Conflict check now needs minute precision, not just hour precision,
+// since "Play Now" can start at e.g. 17:40
+// function hasConflictMinutes(
+//   startTime: string,
+//   durationHours: number,
+//   date: string,
+//   bookings: ExistingBooking[],
+// ): boolean {
+//   const [sh, sm] = startTime.split(':').map(Number);
+//   const startMinutes = sh * 60 + sm;
+//   const endMinutes = startMinutes + durationHours * 60;
+
+//   return bookings.some((b) => {
+//     const [bh, bm] = b.start_time.split(':').map(Number);
+//     const bStartMinutes = bh * 60 + bm;
+//     const bEndMinutes = bStartMinutes + b.duration_hours * 60;
+//     return startMinutes < bEndMinutes && endMinutes > bStartMinutes;
+//   });
+// }
+
+//date-time step
 const OPEN_HOUR = 10; // 10:00 AM
 const CLOSE_HOUR = 23; // 11:00 PM
 const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
@@ -53,26 +75,6 @@ function getCurrentTimeString(): string {
   const now = new Date();
   return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
 }
-
-// / Conflict check now needs minute precision, not just hour precision,
-// since "Play Now" can start at e.g. 17:40
-// function hasConflictMinutes(
-//   startTime: string,
-//   durationHours: number,
-//   date: string,
-//   bookings: ExistingBooking[],
-// ): boolean {
-//   const [sh, sm] = startTime.split(':').map(Number);
-//   const startMinutes = sh * 60 + sm;
-//   const endMinutes = startMinutes + durationHours * 60;
-
-//   return bookings.some((b) => {
-//     const [bh, bm] = b.start_time.split(':').map(Number);
-//     const bStartMinutes = bh * 60 + bm;
-//     const bEndMinutes = bStartMinutes + b.duration_hours * 60;
-//     return startMinutes < bEndMinutes && endMinutes > bStartMinutes;
-//   });
-// }
 
 function hasConflictMinutes(
   startTime: string,

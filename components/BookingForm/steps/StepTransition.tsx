@@ -113,14 +113,22 @@ export function StepTransition({
   return (
     <div
       ref={containerRef}
-      className='relative min-h-[240px] sm:min-h-[280px] lg:min-h-[320px]'
+      className='relative min-h-[240px] sm:min-h-[280px] lg:min-h-[320px] flex flex-col'
     >
       {renderState.outgoing && (
-        <div ref={outgoingRef} key={renderState.outgoing.key}>
+        <div
+          className='h-full flex-1 flex flex-col gap-4'
+          ref={outgoingRef}
+          key={renderState.outgoing.key}
+        >
           {renderState.outgoing.node}
         </div>
       )}
-      <div ref={currentRef} key={renderState.current.key}>
+      <div
+        className='h-full flex-1 flex flex-col gap-4'
+        ref={currentRef}
+        key={renderState.current.key}
+      >
         {renderState.current.node}
       </div>
     </div>

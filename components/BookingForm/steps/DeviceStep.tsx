@@ -24,36 +24,117 @@ const DEVICES = [
   },
 ] as const;
 
-interface DeviceStepProps {
+type DeviceStepProps = {
+  hasSharedTimeline: boolean;
+  onCardsReady?: (cards: HTMLElement[]) => void;
   onRevealComplete?: () => void;
-  // play: boolean;
-}
-
+};
 export default function DeviceStep({
+  hasSharedTimeline,
+  onCardsReady,
   onRevealComplete,
-  // play,
 }: DeviceStepProps) {
   const { control } = useFormContext();
+  // const gridRef = useRef<HTMLDivElement>(null);
   const gridRef = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
       if (!gridRef.current) return;
-      const cards = gridRef.current.children;
+      const cards = Array.from(gridRef.current.children) as HTMLElement[];
 
-      gsap.set(cards, { autoAlpha: 0, y: 24 });
-      gsap.to(cards, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.5,
-        ease: 'power4.out',
-        stagger: 0.08,
-        delay: 0.1,
-        onComplete: () => onRevealComplete?.(),
-      });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[DeviceStep] cards found:', cards.length);
+      }
+
+      if (hasSharedTimeline) {
+        // Landing sync path: hide now, parent (BookingForm) reveals via the
+        // shared timeline once it folds these into `tl`.
+        gsap.set(cards, { autoAlpha: 0, y: 24 });
+        onCardsReady?.(cards);
+      } else {
+        // Revisit path: StepTransition's slide is the only motion here —
+        // no separate reveal, just land in final state immediately.
+        gsap.set(cards, { autoAlpha: 1, y: 0 });
+        onRevealComplete?.();
+      }
     },
-    { scope: gridRef }, // no dependency array needed — runs fresh every time this component mounts
+    { scope: gridRef, dependencies: [hasSharedTimeline] },
   );
+
+  // useGSAP(
+  //   () => {
+  //     if (!gridRef.current) return;
+  //     const cards = Array.from(gridRef.current.children) as HTMLElement[];
+  //     gsap.set(cards, { autoAlpha: 0, y: 24 });
+
+  //     if (process.env.NODE_ENV !== 'production') {
+  //       console.log('[DeviceStep] cards found:', cards.length);
+  //     }
+
+  //     // Always report cards up — parent decides whether/when to use them.
+  //     onCardsReady?.(cards);
+
+  //     if (!hasSharedTimeline) {
+  //       gsap.to(cards, {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         duration: 0.5,
+  //         ease: 'power4.out',
+  //         stagger: 0.2,
+  //         onComplete: () => onRevealComplete?.(),
+  //       });
+  //     }
+  //   },
+  //   { scope: gridRef, dependencies: [hasSharedTimeline] },
+  // );
+
+  // useGSAP(
+  //   () => {
+  //     if (!gridRef.current) return;
+  //     const cards = Array.from(gridRef.current.children) as HTMLElement[];
+
+  //     gsap.set(cards, { autoAlpha: 0, y: 24 });
+
+  //     if (mode === 'controlled') {
+  //       // Don't animate — hand cards to the parent, which folds them into
+  //       // the shared landing timeline right after the form card reveals.
+  //       onCardsReady?.(cards);
+  //     } else {
+  //       // Standalone: this is a step re-visit (back navigation), not a
+  //       // scroll entrance — just reveal immediately, no ScrollTrigger.
+  //       gsap.to(cards, {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         duration: 0.5,
+  //         ease: 'power4.out',
+  //         stagger: 0.08,
+  //         delay: 0.05,
+  //         onComplete: () => onRevealComplete?.(),
+  //       });
+  //     }
+  //   },
+  //   { scope: gridRef, dependencies: [mode] },
+  // );
+
+  // useGSAP(
+  //   () => {
+  //     if (!gridRef.current) return;
+  //     const cards = gridRef.current.children;
+
+  //     gsap.set(cards, { autoAlpha: 0, y: 24 });
+  //     gsap.to(cards, {
+  //       autoAlpha: 1,
+  //       y: 0,
+  //       duration: 0.5,
+  //       ease: 'power4.out',
+  //       stagger: 0.08,
+  //       delay: 0.1,
+  //       onComplete: () => onRevealComplete?.(),
+  //     });
+  //   },
+  //   { scope: gridRef },
+  // );
 
   // useGSAP(
   //   () => {

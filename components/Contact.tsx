@@ -10,6 +10,7 @@ import { useGSAP } from '@gsap/react';
 import GsapTextAnimation from './GsapTextAnimation';
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 function InfoCard({
   label,
@@ -27,35 +28,6 @@ function InfoCard({
     </div>
   );
 }
-
-// export function ContactLink({
-//   icon,
-//   href,
-//   children,
-//   accent = '#00d4ff',
-// }: {
-//   icon: React.ReactNode;
-//   href: string;
-//   children: React.ReactNode;
-//   accent?: string;
-// }) {
-//   return (
-//     <Link
-//       href={href}
-//       target='_blank'
-//       rel='noopener noreferrer'
-//       className='group flex items-center gap-3 text-xs sm:text-sm text-[#bcbcbc] transition-colors hover:text-[#00D4FF]'
-//     >
-//       <span
-//         className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110'
-//         style={{ background: `${accent}1a`, color: accent }}
-//       >
-//         {icon}
-//       </span>
-//       {children}
-//     </Link>
-//   );
-// }
 
 function HoursRow({
   day,
@@ -76,94 +48,176 @@ function HoursRow({
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const eyebrowLineRef = useRef<HTMLDivElement>(null);
   const contactCardsRef = useRef<HTMLDivElement>(null);
   const mapsRef = useRef<HTMLDivElement>(null);
   const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
   // gsap scrollTrigger animation
-  useGSAP(
-    // () => {
-    //   gsap.from([eyebrowRef.current], {
-    //     opacity: 0,
-    //     ...REVEAL.header,
-    //     // y: 30,
-    //     // duration: 0.8,
-    //     // ease: "power2.out",
-    //     // stagger: 0.45,
-    //     scrollTrigger: {
-    //       trigger: sectionRef.current,
-    //       start: 'top 75%',
-    //       toggleActions: 'play none none none',
-    //     },
-    //   });
+  const linesRef = useRef<{
+    eyebrowText?: HTMLElement[];
+    heading?: HTMLElement[];
+    desc?: HTMLElement[];
+  }>({});
 
-    //   const cards = contactCardsRef.current?.children;
-    //   if (cards) {
-    //     gsap.from(cards, {
-    //       opacity: 0,
-    //       y: 50,
-    //       duration: 0.6,
-    //       delay: 0.4,
-    //       ease: 'sine.inOut',
-    //       stagger: 0.3,
-    //       scrollTrigger: {
-    //         trigger: contactCardsRef.current,
-    //         start: 'top 80%',
-    //         toggleActions: 'play none none none',
-    //       },
-    //     });
-    //   }
+  useGSAP(
     () => {
       if (!sectionRef.current) return;
       const tl = tlRef.current;
+      const lines = linesRef.current;
 
-      // Non-text pieces get added directly, positioned relative to each other
-      tl.fromTo(
-        eyebrowRef.current,
-        { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-        0,
-      ).fromTo(
-        mapsRef.current,
-        { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
-        '-=0.5',
-      );
+      // Wait for fonts so SplitText line breaks (and thus trigger start
+      // positions) are computed against final layout — matters most on
+      // mobile where font swap shifts height proportionally more.
+      document.fonts.ready.then(() => {
+        tl.clear();
 
-      const cards = contactCardsRef.current?.children;
-      if (cards) {
-        gsap.set(cards, { autoAlpha: 0, y: 48 });
-        tl.to(cards, {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.3,
-          ease: 'power4.inOut',
-          stagger: 0.2,
+        tl.addLabel('eyebrowStart', 0)
+          .fromTo(
+            eyebrowLineRef.current,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+            'eyebrowStart',
+          )
+          .to(
+            lines.eyebrowText ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'eyebrowStart',
+          )
+
+          .addLabel('headingStart', '-=0.3')
+          .to(
+            lines.heading ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'headingStart',
+          )
+
+          .addLabel('descStart', '-=0.4')
+          .to(
+            lines.desc ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'descStart',
+          );
+
+        // .addLabel('badgeStart', '-=0.3')
+        // .fromTo(
+        //   badgeRef.current,
+        //   { autoAlpha: 0, y: 20 },
+        //   { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+        //   'badgeStart',
+        // );
+
+        // const cards = cardsRef.current?.children;
+        // if (cards) {
+        //   gsap.set(cards, { autoAlpha: 0, y: 48 });
+        //   tl.addLabel('cardsStart', '-=0.1').to(
+        //     cards,
+        //     {
+        //       autoAlpha: 1,
+        //       y: 0,
+        //       duration: 0.6,
+        //       ease: 'power4.out',
+        //       stagger: 0.3,
+        //     },
+        //     'cardsStart',
+        //   );
+        // }
+
+        const cards = contactCardsRef.current?.children;
+        if (cards) {
+          gsap.set(cards, { autoAlpha: 0, y: 48 });
+          tl.addLabel('cardsStart', '-=0.1').to(
+            cards,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power4.out',
+              stagger: 0.3,
+            },
+            'cardsStart',
+          );
+        }
+
+        // Single ScrollTrigger drives the whole sequence
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top 70%',
+          once: true,
+          onEnter: () => tl.play(),
         });
-      }
-
-      // gsap.from(mapsRef.current, {
-      //   opacity: 0,
-      //   y: 50,
-      //   duration: 0.8,
-      //   delay: 0.8,
-      //   ease: 'power4.inOut',
-      //   scrollTrigger: {
-      //     trigger: mapsRef.current,
-      //     start: 'top 80%',
-      //     toggleActions: 'play none none none',
-      //   },
-      // });
-      // Single ScrollTrigger drives the whole timeline
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: 'top 70%',
-        once: true,
-        onEnter: () => tl.play(),
       });
     },
     { scope: sectionRef },
   );
+  // useGSAP(
+  // () => {
+  //   gsap.from([eyebrowRef.current], {
+  //     opacity: 0,
+  //     ...REVEAL.header,
+  //     // y: 30,
+  //     // duration: 0.8,
+  //     // ease: "power2.out",
+  //     // stagger: 0.45,
+  //     scrollTrigger: {
+  //       trigger: sectionRef.current,
+  //       start: 'top 75%',
+  //       toggleActions: 'play none none none',
+  //     },
+  //   });
+
+  //   const cards = contactCardsRef.current?.children;
+  //   if (cards) {
+  //     gsap.from(cards, {
+  //       opacity: 0,
+  //       y: 50,
+  //       duration: 0.6,
+  //       delay: 0.4,
+  //       ease: 'sine.inOut',
+  //       stagger: 0.3,
+  //       scrollTrigger: {
+  //         trigger: contactCardsRef.current,
+  //         start: 'top 80%',
+  //         toggleActions: 'play none none none',
+  //       },
+  //     });
+  //   }
+  //   () => {
+  //     if (!sectionRef.current) return;
+  //     const tl = tlRef.current;
+
+  //     // Non-text pieces get added directly, positioned relative to each other
+  //     tl.fromTo(
+  //       eyebrowRef.current,
+  //       { autoAlpha: 0, y: 20 },
+  //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //       0,
+  //     ).fromTo(
+  //       mapsRef.current,
+  //       { autoAlpha: 0, y: 20 },
+  //       { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+  //       '-=0.5',
+  //     );
+
+  //     const cards = contactCardsRef.current?.children;
+  //     if (cards) {
+  //       gsap.set(cards, { autoAlpha: 0, y: 48 });
+  //       tl.to(cards, {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         duration: 0.3,
+  //         ease: 'power4.inOut',
+  //         stagger: 0.2,
+  //       });
+  //     }
+  //     ScrollTrigger.create({
+  //       trigger: sectionRef.current,
+  //       start: 'top 70%',
+  //       once: true,
+  //       onEnter: () => tl.play(),
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
 
   return (
     <section
@@ -174,12 +228,12 @@ export default function Contact() {
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <div ref={eyebrowRef} className='h-px w-8 bg-[#00d4ff]' />
+          <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
           <GsapTextAnimation
-            animateOnScroll={false} // irrelevant now — timeline prop takes over
-            delay={0}
-            timeline={tlRef.current}
-            position='<' // starts alongside the eyebrow line
+            mode='controlled'
+            onLinesReady={(lines) => {
+              linesRef.current.eyebrowText = lines;
+            }}
           >
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               FIND US
@@ -188,10 +242,10 @@ export default function Contact() {
         </div>
         {/* main title */}
         <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.3' // starts slightly before the previous item finishes
+          mode='controlled'
+          onLinesReady={(lines) => {
+            linesRef.current.heading = lines;
+          }}
         >
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
@@ -201,10 +255,10 @@ export default function Contact() {
         </GsapTextAnimation>
         {/* description */}
         <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.4' // starts slightly before the previous item finishes
+          mode='controlled'
+          onLinesReady={(lines) => {
+            linesRef.current.desc = lines;
+          }}
         >
           <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Our location, hours, and the easiest ways to reach us.
@@ -225,7 +279,7 @@ export default function Contact() {
                   href='https://wa.me/918291158779'
                   accent='#25D366'
                 >
-                  WhatsApp us
+                  <span>WhatsApp us</span>
                 </ContactLink>
                 <ContactLink
                   icon={<InstagramIcon height={16} width={16} />}

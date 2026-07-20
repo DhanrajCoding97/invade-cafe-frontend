@@ -1,5 +1,5 @@
 'use client';
-import { type services } from '@/types';
+import { services } from '@/types';
 import NeonGlowCornerCutCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card';
 import { useRef } from 'react';
 import gsap from 'gsap';

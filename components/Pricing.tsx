@@ -12,6 +12,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import GsapTextAnimation from './GsapTextAnimation';
 
 gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function PricingSection() {
   const router = useRouter();
@@ -28,24 +29,31 @@ export default function PricingSection() {
   };
 
   const sectionRef = useRef<HTMLElement>(null);
-  const eyebrowRef = useRef<HTMLDivElement>(null);
+  const eyebrowLineRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
+  const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
 
-  // const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
+  const linesRef = useRef<{
+    eyebrowText?: HTMLElement[];
+    heading?: HTMLElement[];
+    desc?: HTMLElement[];
+  }>({});
 
   // useGSAP(
   //   () => {
   //     if (!sectionRef.current) return;
   //     const tl = tlRef.current;
+  //     const lines = linesRef.current;
 
   //     tl.fromTo(
   //       eyebrowRef.current,
   //       { autoAlpha: 0, y: 20 },
   //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //       0, // starts at t=0 of the sequence
+  //       0,
   //     );
-  //     // Cards, same shared timeline
+
+  //     // Cards, same shared timeline — now positioned off the description's label
   //     const cards = cardsRef.current?.children;
   //     if (cards) {
   //       gsap.set(cards, { autoAlpha: 0, y: 48 });
@@ -54,16 +62,14 @@ export default function PricingSection() {
   //         {
   //           autoAlpha: 1,
   //           y: 0,
-  //           delay: 0.8,
-  //           duration: 0.4,
+  //           duration: 0.3,
   //           ease: 'power4.out',
-  //           stagger: 0.3,
+  //           stagger: 0.2,
   //         },
-  //         '>+0.6',
+  //         'descDone+=0.2', // starts 0.2s after description's reveal actually finishes
   //       );
   //     }
 
-  //     // Single ScrollTrigger drives the whole timeline
   //     ScrollTrigger.create({
   //       trigger: sectionRef.current,
   //       start: 'top 70%',
@@ -74,48 +80,80 @@ export default function PricingSection() {
   //   { scope: sectionRef },
   // );
 
-  // pricing section
-  const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
-
   useGSAP(
     () => {
       if (!sectionRef.current) return;
       const tl = tlRef.current;
+      const lines = linesRef.current;
 
-      tl.fromTo(
-        eyebrowRef.current,
-        { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-        0,
-      );
+      // Wait for fonts so SplitText line breaks (and thus trigger start
+      // positions) are computed against final layout — matters most on
+      // mobile where font swap shifts height proportionally more.
+      document.fonts.ready.then(() => {
+        tl.clear();
 
-      // Cards, same shared timeline — now positioned off the description's label
-      const cards = cardsRef.current?.children;
-      if (cards) {
-        gsap.set(cards, { autoAlpha: 0, y: 48 });
-        tl.to(
-          cards,
-          {
-            autoAlpha: 1,
-            y: 0,
-            duration: 0.3,
-            ease: 'power4.out',
-            stagger: 0.2,
-          },
-          'descDone+=0.2', // starts 0.2s after description's reveal actually finishes
-        );
-      }
+        tl.addLabel('eyebrowStart', 0)
+          .fromTo(
+            eyebrowLineRef.current,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+            'eyebrowStart',
+          )
+          .to(
+            lines.eyebrowText ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'eyebrowStart',
+          )
 
-      ScrollTrigger.create({
-        trigger: sectionRef.current,
-        start: 'top 70%',
-        once: true,
-        onEnter: () => tl.play(),
+          .addLabel('headingStart', '-=0.3')
+          .to(
+            lines.heading ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'headingStart',
+          )
+
+          .addLabel('descStart', '-=0.4')
+          .to(
+            lines.desc ?? [],
+            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+            'descStart',
+          );
+
+        // .addLabel('badgeStart', '-=0.3')
+        // .fromTo(
+        //   badgeRef.current,
+        //   { autoAlpha: 0, y: 20 },
+        //   { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+        //   'badgeStart',
+        // );
+
+        const cards = cardsRef.current?.children;
+        if (cards) {
+          gsap.set(cards, { autoAlpha: 0, y: 48 });
+          tl.addLabel('cardsStart', '-=0.1').to(
+            cards,
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.6,
+              ease: 'power4.out',
+              stagger: 0.3,
+            },
+            'cardsStart',
+          );
+        }
+
+        // Single ScrollTrigger drives the whole sequence
+        ScrollTrigger.create({
+          trigger: sectionRef.current,
+          start: 'top 70%',
+          once: true,
+          onEnter: () => tl.play(),
+        });
       });
     },
     { scope: sectionRef },
   );
-
   return (
     <section
       id='pricing'
@@ -125,12 +163,12 @@ export default function PricingSection() {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <div ref={eyebrowRef} className='h-px w-8 bg-[#00d4ff]' />
+          <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
           <GsapTextAnimation
-            animateOnScroll={false} // irrelevant now — timeline prop takes over
-            delay={0}
-            timeline={tlRef.current}
-            position='<' // starts alongside the eyebrow line
+            mode='controlled'
+            onLinesReady={(lines) => {
+              linesRef.current.eyebrowText = lines;
+            }}
           >
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT IT COSTS
@@ -138,21 +176,11 @@ export default function PricingSection() {
           </GsapTextAnimation>
         </div>
         {/* main title */}
-        {/* <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.3' // starts slightly before the previous item finishes
-        >
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'></span>
-          </h1>
-        </GsapTextAnimation> */}
         <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.3' // starts slightly before the previous item finishes
+          mode='controlled'
+          onLinesReady={(lines) => {
+            linesRef.current.heading = lines;
+          }}
         >
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
@@ -162,11 +190,10 @@ export default function PricingSection() {
         </GsapTextAnimation>
         {/* description */}
         <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.4' // starts slightly before the previous item finishes
-          completeLabel='descDone'
+          mode='controlled'
+          onLinesReady={(lines) => {
+            linesRef.current.desc = lines;
+          }}
         >
           <p
             ref={descRef}

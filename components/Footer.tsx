@@ -373,12 +373,7 @@ export default function Footer() {
 
         {/* Explore */}
         <div className='flex flex-col gap-3 lg:col-span-2'>
-          <GsapTextAnimation
-            timeline={tlRef.current}
-            position='seq'
-            animateOnScroll={false}
-            delay={0}
-          >
+          <GsapTextAnimation>
             <h3 className='text-sm uppercase tracking-[0.2em] text-fuchsia-400 font-semibold mb-1'>
               Explore
             </h3>
@@ -386,10 +381,10 @@ export default function Footer() {
           {navLinks.map(({ label, href }, i) => (
             <GsapTextAnimation
               key={label}
-              timeline={tlRef.current}
-              position={`seq+=${0.08 * (i + 1)}`}
-              animateOnScroll={false}
-              delay={0}
+              // timeline={tlRef.current}
+              // position={`seq+=${0.08 * (i + 1)}`}
+              // animateOnScroll={false}
+              // delay={0}
             >
               <Link
                 href={`/#${label}`}
@@ -404,12 +399,7 @@ export default function Footer() {
 
         {/* Get In Touch */}
         <div className='flex flex-col gap-3 lg:col-span-3'>
-          <GsapTextAnimation
-            timeline={tlRef.current}
-            position='seq+=0.05'
-            animateOnScroll={false}
-            delay={0}
-          >
+          <GsapTextAnimation>
             <h3 className='text-sm uppercase tracking-[0.2em] text-fuchsia-400 font-semibold mb-1'>
               Get In Touch
             </h3>
@@ -457,23 +447,13 @@ export default function Footer() {
 
         {/* Visit Us */}
         <div className='flex flex-col gap-3 lg:col-span-3'>
-          <GsapTextAnimation
-            timeline={tlRef.current}
-            position='seq+=0.1'
-            animateOnScroll={false}
-            delay={0}
-          >
+          <GsapTextAnimation>
             <h3 className='text-sm uppercase tracking-[0.2em] text-fuchsia-400 font-semibold mb-1'>
               Visit us
             </h3>
           </GsapTextAnimation>
 
-          <GsapTextAnimation
-            timeline={tlRef.current}
-            position='seq+=0.15'
-            animateOnScroll={false}
-            delay={0}
-          >
+          <GsapTextAnimation>
             <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
               Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
               opposite Juinagar Railway Station, Sector 11,
@@ -482,12 +462,7 @@ export default function Footer() {
             </p>
           </GsapTextAnimation>
 
-          <GsapTextAnimation
-            timeline={tlRef.current}
-            position='seq+=0.35'
-            animateOnScroll={false}
-            delay={0}
-          >
+          <GsapTextAnimation>
             <p className='text-sm text-neutral-400'>
               Mon – Sun &nbsp;|&nbsp; 10:00 AM – 11:00 PM
             </p>
@@ -498,12 +473,7 @@ export default function Footer() {
       <Separator />
 
       <div className='flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-neutral-500'>
-        <GsapTextAnimation
-          timeline={tlRef.current}
-          position='seq+=0.4'
-          animateOnScroll={false}
-          delay={0}
-        >
+        <GsapTextAnimation>
           <p className='flex items-center gap-1 footer-subtext'>
             © {new Date().getFullYear()} Invade Gaming Cafe.
             <span>All rights reserved.</span>
@@ -512,13 +482,7 @@ export default function Footer() {
 
         <div className='flex items-center gap-4'>
           {legalLinks.map(({ label, href }, i) => (
-            <GsapTextAnimation
-              key={label}
-              timeline={tlRef.current}
-              position={`seq+=${0.42 + i * 0.05}`}
-              animateOnScroll={false}
-              delay={0}
-            >
+            <GsapTextAnimation key={label}>
               <span className='flex items-center gap-4'>
                 <Link
                   href={href}

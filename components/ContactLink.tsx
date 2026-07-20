@@ -84,12 +84,7 @@ export const ContactLink = React.forwardRef<
         {icon}
       </span>
 
-      <GsapTextAnimation
-        animateOnScroll={false}
-        delay={0}
-        timeline={timeline}
-        position={position}
-      >
+      <GsapTextAnimation>
         <span>{children}</span>
       </GsapTextAnimation>
     </Link>

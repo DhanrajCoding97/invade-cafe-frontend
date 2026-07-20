@@ -19,7 +19,7 @@ export default function Page() {
       <BookingSection />
       <Contact />
       <Separator />
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

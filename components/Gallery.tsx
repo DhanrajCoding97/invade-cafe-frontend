@@ -47,24 +47,14 @@ export default function GallerySection() {
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
           <div ref={eyebrowRef} className='h-px w-8 bg-[#00d4ff]' />
-          <GsapTextAnimation
-            animateOnScroll={false} // irrelevant now — timeline prop takes over
-            delay={0}
-            timeline={tlRef.current}
-            position='<' // starts alongside the eyebrow line
-          >
+          <GsapTextAnimation>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               INSIDE THE CAFE
             </span>
           </GsapTextAnimation>
         </div>
         {/* main title */}
-        <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.3' // starts slightly before the previous item finishes
-        >
+        <GsapTextAnimation>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Gallery
@@ -72,12 +62,7 @@ export default function GallerySection() {
           </h1>
         </GsapTextAnimation>
         {/* description */}
-        <GsapTextAnimation
-          animateOnScroll={false}
-          delay={0}
-          timeline={tlRef.current}
-          position='-=0.4' // starts slightly before the previous item finishes
-        >
+        <GsapTextAnimation>
           <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Explore the atmosphere, gaming setups, racing simulators, VR
             stations, and unforgettable moments from our café.
