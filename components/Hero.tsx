@@ -171,7 +171,7 @@ export default function HeroSection() {
               Invade Gaming Cafe
             </h1>
           </GsapTextAnimation> */}
-          <GsapTextAnimation animateOnScroll={false} delay={0}>
+          <GsapTextAnimation delay={0}>
             <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
               <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
                 Invade Gaming Cafe
@@ -183,7 +183,7 @@ export default function HeroSection() {
             </h1> */}
           {/* <GlitchText customSpeed="3s" mode="active">
             </GlitchText> */}
-          <GsapTextAnimation animateOnScroll={false} delay={0.4}>
+          <GsapTextAnimation delay={0.4}>
             <p className='hero-subtext invisible opacity-0  mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
               Laid-back hangout featuring PC and PlayStation games, plus racing
               simulators and VR options.
