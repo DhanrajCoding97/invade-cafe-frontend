@@ -6,13 +6,6 @@ import { getDisplayRate } from '@/lib/pricing';
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
-console.log(process.env);
-
-console.log({
-  keyId,
-  hasSecret: !!keySecret,
-});
-
 if (!keyId || !keySecret) {
   NextResponse.json(
     { error: 'Missing Razorpay environment variables' },

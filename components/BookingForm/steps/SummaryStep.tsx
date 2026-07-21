@@ -51,7 +51,6 @@ export default function SummaryStep({
     fallbackRate: 0, // resolved server-side/at payment too — display-only here
   });
   const total = calculateTotal(rate, values.duration);
-  console.log('total from summary', total);
   const rows = [
     { label: 'Device', value: values.device?.toUpperCase() },
     { label: 'Station', value: isLoading ? '…' : stationName },

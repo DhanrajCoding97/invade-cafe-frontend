@@ -1,10 +1,10 @@
 import { Metadata } from 'next';
 import { Toaster } from '@/components/ui/sonner';
-import AuthSlot from '@/components/AuthSlot';
+import AuthSlot from '@/components/auth/AuthSlot';
 import { Orbitron } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
-import SmoothScroll from '@/components/SmoothScroll';
+import SmoothScroll from '@/components/transitions/SmoothScroll';
 import NavBar from './components/neonblade-ui/navbar';
 import { Providers } from '@/providers/QueryProvider';
 const orbitron = Orbitron({

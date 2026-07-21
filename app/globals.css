@@ -268,3 +268,14 @@ html {
     grid-template-columns: 1fr;
   }
 }
+
+/* The container wrapping all slides */
+.embla__viewport {
+  cursor: grab;
+  overflow: hidden;
+}
+
+/* While the user is actively dragging/swiping */
+.embla__viewport:active {
+  cursor: grabbing;
+}

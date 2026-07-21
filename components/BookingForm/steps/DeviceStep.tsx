@@ -37,10 +37,6 @@ export default function DeviceStep({
       if (!gridRef.current) return;
       const cards = Array.from(gridRef.current.children) as HTMLElement[];
 
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[DeviceStep] cards found:', cards.length);
-      }
-
       if (hasSharedTimeline) {
         // Landing sync path: hide now, parent (BookingForm) reveals via the
         // shared timeline once it folds these into `tl`.

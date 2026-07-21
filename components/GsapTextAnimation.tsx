@@ -14,7 +14,6 @@ type GsapTextAnimationProps = {
   }>;
   // 'standalone' = this component owns its own ScrollTrigger (safe for isolated text blocks)
   // 'controlled' = a parent timeline owns the ScrollTrigger; this component just splits
-  //                lines and hands them back via onLinesReady
   mode?: 'standalone' | 'controlled';
   delay?: number;
   triggerRef?: React.RefObject<HTMLElement | null>;

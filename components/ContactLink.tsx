@@ -73,13 +73,3 @@ export const ContactLink = React.forwardRef<
     </Link>
   );
 });
-
-{
-  /* <span
-        ref={iconRef}
-        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110'
-        style={{ background: `${accent}1a`, color: accent }}
-      >
-        {icon}
-      </span> */
-}

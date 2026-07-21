@@ -11,8 +11,6 @@ export async function startSession(bookingId: string) {
     .update({ session_started_at: new Date().toISOString() })
     .eq('id', bookingId);
 
-  console.log({ data, error });
-
   if (error) throw new Error(error.message);
   revalidatePath('/dashboard/staff');
 }
@@ -21,8 +19,6 @@ export async function getRpc() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('get_my_role');
-
-  console.log({ data, error });
 }
 
 export async function endSession(bookingId: string) {
