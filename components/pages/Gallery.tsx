@@ -13,7 +13,7 @@ const CarouselSlides: Slide[] = [
   { type: 'video', src: '/videos/cafe-video-4.webm' },
   { type: 'image', src: '/cafe-image-5.webp', alt: 'PS5 lounge setup' },
   { type: 'image', src: '/cafe-image-6.webp', alt: 'Racing sim rig' },
-  { type: 'video', src: '/videos/cafe-video-4.webm' },
+  { type: 'video', src: '/videos/cafe-video-1.webm' },
   { type: 'image', src: '/gallery5.webp', alt: 'Racing sim rig' },
   { type: 'image', src: '/gallery6.webp', alt: 'Racing sim rig' },
 ];
