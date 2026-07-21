@@ -1,6 +1,5 @@
 'use client';
 import React from 'react';
-import Link from 'next/link';
 import { WhatsappIcon, PhoneIcon, MailIcon, InstagramIcon } from './svgs';
 import { ContactLink } from './ContactLink';
 import { useRef } from 'react';
@@ -15,15 +14,19 @@ ScrollTrigger.config({ ignoreMobileResize: true });
 function InfoCard({
   label,
   children,
+  onLabelLinesReady,
 }: {
   label: string;
   children: React.ReactNode;
+  onLabelLinesReady?: (lines: HTMLElement[]) => void;
 }) {
   return (
     <div className='space-y-2 rounded-xl border border-white/10 bg-[#0a0a0a] p-5 transition-colors hover:border-[#00d4ff]/30'>
-      <p className='text-[12px] tracking-wide text-[#00D4FF] uppercase sm:text-base'>
-        {label}
-      </p>
+      <GsapTextAnimation mode='controlled' onLinesReady={onLabelLinesReady}>
+        <p className='text-[12px] tracking-wide text-[#00D4FF] uppercase sm:text-base'>
+          {label}
+        </p>
+      </GsapTextAnimation>
       {children}
     </div>
   );
@@ -32,25 +35,57 @@ function InfoCard({
 function HoursRow({
   day,
   time,
-  last = false,
+  onReveal,
 }: {
   day: string;
   time: string;
-  last?: boolean;
+  onReveal?: (lines: HTMLElement[]) => void;
 }) {
+  const dayLinesRef = useRef<HTMLElement[] | null>(null);
+  const timeLinesRef = useRef<HTMLElement[] | null>(null);
+  const reportedRef = useRef(false);
+
+  function maybeReport() {
+    if (reportedRef.current || !dayLinesRef.current || !timeLinesRef.current)
+      return;
+    reportedRef.current = true;
+    onReveal?.([...dayLinesRef.current, ...timeLinesRef.current]);
+  }
+
   return (
     <div className='flex items-center justify-between py-1.5 text-sm'>
-      <span className='text-[#bbb]'>{day}</span>
-      <span className='font-medium text-white'>{time}</span>
+      <GsapTextAnimation
+        mode='controlled'
+        onLinesReady={(lines) => {
+          dayLinesRef.current = lines;
+          maybeReport();
+        }}
+      >
+        <span className='text-[#bbb]'>{day}</span>
+      </GsapTextAnimation>
+      <GsapTextAnimation
+        mode='controlled'
+        onLinesReady={(lines) => {
+          timeLinesRef.current = lines;
+          maybeReport();
+        }}
+      >
+        <span className='font-medium text-white'>{time}</span>
+      </GsapTextAnimation>
     </div>
   );
 }
+
+type RevealItem = { icon?: HTMLElement; lines?: HTMLElement[] };
 
 export default function Contact() {
   const sectionRef = useRef<HTMLElement>(null);
   const eyebrowLineRef = useRef<HTMLDivElement>(null);
   const contactCardsRef = useRef<HTMLDivElement>(null);
   const mapsRef = useRef<HTMLDivElement>(null);
+  const cardLabelLinesRef = useRef<(HTMLElement[] | undefined)[]>([]);
+  const cardItemsRef = useRef<RevealItem[][]>([[], [], []]); // one array per card
+
   const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
   // gsap scrollTrigger animation
   const linesRef = useRef<{
@@ -65,9 +100,6 @@ export default function Contact() {
       const tl = tlRef.current;
       const lines = linesRef.current;
 
-      // Wait for fonts so SplitText line breaks (and thus trigger start
-      // positions) are computed against final layout — matters most on
-      // mobile where font swap shifts height proportionally more.
       document.fonts.ready.then(() => {
         tl.clear();
 
@@ -83,48 +115,32 @@ export default function Contact() {
             { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
             'eyebrowStart',
           )
-
           .addLabel('headingStart', '-=0.3')
           .to(
             lines.heading ?? [],
             { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
             'headingStart',
           )
-
           .addLabel('descStart', '-=0.4')
           .to(
             lines.desc ?? [],
             { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
             'descStart',
+          )
+          .fromTo(
+            mapsRef.current,
+            { autoAlpha: 0, y: 20 },
+            { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+            '-=0.5',
           );
-
-        // .addLabel('badgeStart', '-=0.3')
-        // .fromTo(
-        //   badgeRef.current,
-        //   { autoAlpha: 0, y: 20 },
-        //   { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
-        //   'badgeStart',
-        // );
-
-        // const cards = cardsRef.current?.children;
-        // if (cards) {
-        //   gsap.set(cards, { autoAlpha: 0, y: 48 });
-        //   tl.addLabel('cardsStart', '-=0.1').to(
-        //     cards,
-        //     {
-        //       autoAlpha: 1,
-        //       y: 0,
-        //       duration: 0.6,
-        //       ease: 'power4.out',
-        //       stagger: 0.3,
-        //     },
-        //     'cardsStart',
-        //   );
-        // }
 
         const cards = contactCardsRef.current?.children;
         if (cards) {
           gsap.set(cards, { autoAlpha: 0, y: 48 });
+
+          const CARD_STAGGER = 0.3;
+          const ITEM_STAGGER = 0.12;
+
           tl.addLabel('cardsStart', '-=0.1').to(
             cards,
             {
@@ -132,13 +148,52 @@ export default function Contact() {
               y: 0,
               duration: 0.6,
               ease: 'power4.out',
-              stagger: 0.3,
+              stagger: CARD_STAGGER,
             },
             'cardsStart',
           );
+
+          cardLabelLinesRef.current.forEach((cardLines, cardIdx) => {
+            if (!cardLines?.length) return;
+            const cardLabel = `card${cardIdx}Start`;
+
+            tl.addLabel(
+              cardLabel,
+              `cardsStart+=${cardIdx * CARD_STAGGER + 0.1}`,
+            ).to(
+              cardLines,
+              { y: '0%', duration: 0.6, stagger: 0.08, ease: 'power4.out' },
+              cardLabel,
+            );
+
+            (cardItemsRef.current[cardIdx] ?? []).forEach((item, itemIdx) => {
+              if (!item) return;
+              const pos = `${cardLabel}+=${0.2 + itemIdx * ITEM_STAGGER}`;
+
+              if (item.icon) {
+                tl.to(
+                  item.icon,
+                  {
+                    autoAlpha: 1,
+                    y: 0,
+                    scale: 1,
+                    duration: 0.5,
+                    ease: 'power4.out',
+                  },
+                  pos,
+                );
+              }
+              if (item.lines?.length) {
+                tl.to(
+                  item.lines,
+                  { y: '0%', duration: 0.6, stagger: 0.06, ease: 'power4.out' },
+                  pos,
+                );
+              }
+            });
+          });
         }
 
-        // Single ScrollTrigger drives the whole sequence
         ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top 70%',
@@ -149,75 +204,6 @@ export default function Contact() {
     },
     { scope: sectionRef },
   );
-  // useGSAP(
-  // () => {
-  //   gsap.from([eyebrowRef.current], {
-  //     opacity: 0,
-  //     ...REVEAL.header,
-  //     // y: 30,
-  //     // duration: 0.8,
-  //     // ease: "power2.out",
-  //     // stagger: 0.45,
-  //     scrollTrigger: {
-  //       trigger: sectionRef.current,
-  //       start: 'top 75%',
-  //       toggleActions: 'play none none none',
-  //     },
-  //   });
-
-  //   const cards = contactCardsRef.current?.children;
-  //   if (cards) {
-  //     gsap.from(cards, {
-  //       opacity: 0,
-  //       y: 50,
-  //       duration: 0.6,
-  //       delay: 0.4,
-  //       ease: 'sine.inOut',
-  //       stagger: 0.3,
-  //       scrollTrigger: {
-  //         trigger: contactCardsRef.current,
-  //         start: 'top 80%',
-  //         toggleActions: 'play none none none',
-  //       },
-  //     });
-  //   }
-  //   () => {
-  //     if (!sectionRef.current) return;
-  //     const tl = tlRef.current;
-
-  //     // Non-text pieces get added directly, positioned relative to each other
-  //     tl.fromTo(
-  //       eyebrowRef.current,
-  //       { autoAlpha: 0, y: 20 },
-  //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //       0,
-  //     ).fromTo(
-  //       mapsRef.current,
-  //       { autoAlpha: 0, y: 20 },
-  //       { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
-  //       '-=0.5',
-  //     );
-
-  //     const cards = contactCardsRef.current?.children;
-  //     if (cards) {
-  //       gsap.set(cards, { autoAlpha: 0, y: 48 });
-  //       tl.to(cards, {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         duration: 0.3,
-  //         ease: 'power4.inOut',
-  //         stagger: 0.2,
-  //       });
-  //     }
-  //     ScrollTrigger.create({
-  //       trigger: sectionRef.current,
-  //       start: 'top 70%',
-  //       once: true,
-  //       onEnter: () => tl.play(),
-  //     });
-  //   },
-  //   { scope: sectionRef },
-  // );
 
   return (
     <section
@@ -272,12 +258,20 @@ export default function Contact() {
             className='order-2 flex flex-col gap-4 md:order-1'
           >
             {/* social links card */}
-            <InfoCard label='Get in touch'>
+            <InfoCard
+              label='Get in touch'
+              onLabelLinesReady={(lines) => {
+                cardLabelLinesRef.current[0] = lines;
+              }}
+            >
               <div className='flex flex-col gap-2.5'>
                 <ContactLink
                   icon={<WhatsappIcon height={16} width={16} />}
                   href='https://wa.me/918291158779'
                   accent='#25D366'
+                  onReveal={(data) => {
+                    cardItemsRef.current[0][0] = data;
+                  }}
                 >
                   <span>WhatsApp us</span>
                 </ContactLink>
@@ -285,6 +279,9 @@ export default function Contact() {
                   icon={<InstagramIcon height={16} width={16} />}
                   href='https://instagram.com/invadegamingcafe'
                   accent='#E1306C'
+                  onReveal={(data) => {
+                    cardItemsRef.current[0][1] = data;
+                  }}
                 >
                   @invadegamingcafe
                 </ContactLink>
@@ -292,6 +289,9 @@ export default function Contact() {
                   icon={<PhoneIcon height={16} width={16} />}
                   href='tel:+918291158779'
                   accent='#00d4ff'
+                  onReveal={(data) => {
+                    cardItemsRef.current[0][2] = data;
+                  }}
                 >
                   +91 82911 58779
                 </ContactLink>
@@ -299,23 +299,49 @@ export default function Contact() {
                   icon={<MailIcon height={16} width={16} />}
                   href='mailto:hello@invadecafe.com'
                   accent='#FDD267'
+                  onReveal={(data) => {
+                    cardItemsRef.current[0][3] = data;
+                  }}
                 >
                   hello@invadecafe.com
                 </ContactLink>
               </div>
             </InfoCard>
             {/* address */}
-            <InfoCard label='Address'>
-              <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
-                Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
-                opposite Juinagar Railway Station, Sector 11,
-                <br />
-                Sanpada, Navi Mumbai, Maharashtra 400705
-              </p>
+            <InfoCard
+              label='Address'
+              onLabelLinesReady={(lines) => {
+                cardLabelLinesRef.current[1] = lines;
+              }}
+            >
+              <GsapTextAnimation
+                mode='controlled'
+                onLinesReady={(lines) => {
+                  cardItemsRef.current[1][0] = { lines };
+                }}
+              >
+                <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
+                  Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
+                  opposite Juinagar Railway Station, Sector 11,
+                  <br />
+                  Sanpada, Navi Mumbai, Maharashtra 400705
+                </p>
+              </GsapTextAnimation>
             </InfoCard>
             {/* hours card */}
-            <InfoCard label='Hours'>
-              <HoursRow day='Mon – Sun' time='10 AM – 11 PM' />
+            <InfoCard
+              label='Hours'
+              onLabelLinesReady={(lines) => {
+                cardLabelLinesRef.current[2] = lines;
+              }}
+            >
+              <HoursRow
+                day='Mon – Sun'
+                time='10 AM – 11 PM'
+                onReveal={(lines) => {
+                  cardItemsRef.current[2][0] = { lines };
+                }}
+              />
             </InfoCard>
           </div>
           {/* Map */}

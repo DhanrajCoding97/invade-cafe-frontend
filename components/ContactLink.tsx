@@ -12,50 +12,34 @@ type ContactLinkProps = {
   children: React.ReactNode;
   accent?: string;
   className?: string;
-  timeline?: gsap.core.Timeline;
-  position?: string | number;
+  onReveal?: (data: { icon: HTMLElement; lines: HTMLElement[] }) => void;
 };
 
 export const ContactLink = React.forwardRef<
   HTMLAnchorElement,
   ContactLinkProps
 >(function ContactLink(
-  { icon, href, children, accent = '#00d4ff', className, timeline, position },
+  { icon, href, children, accent = '#00d4ff', className, onReveal },
   ref,
 ) {
   const iconRef = useRef<HTMLSpanElement>(null);
+  const linesRef = useRef<HTMLElement[] | null>(null);
+  const reportedRef = useRef(false);
 
   useGSAP(
     () => {
       if (!iconRef.current) return;
-
       gsap.set(iconRef.current, { autoAlpha: 0, y: 20, scale: 0.8 });
-
-      if (timeline) {
-        timeline.to(
-          iconRef.current,
-          {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.6,
-            ease: 'power4.out',
-          },
-          position ?? '>',
-        );
-      } else {
-        // fallback if ContactLink is ever used without a shared timeline
-        gsap.to(iconRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 0.6,
-          ease: 'power4.out',
-        });
-      }
     },
-    { scope: iconRef, dependencies: [timeline, position] },
+    { scope: iconRef },
   );
+
+  function maybeReport() {
+    if (reportedRef.current || !iconRef.current || !linesRef.current) return;
+    reportedRef.current = true;
+    onReveal?.({ icon: iconRef.current, lines: linesRef.current });
+  }
+
   return (
     <Link
       ref={ref}
@@ -69,13 +53,6 @@ export const ContactLink = React.forwardRef<
         .filter(Boolean)
         .join(' ')}
     >
-      {/* <span
-        ref={iconRef}
-        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110'
-        style={{ background: `${accent}1a`, color: accent }}
-      >
-        {icon}
-      </span> */}
       <span
         ref={iconRef}
         className='invisible flex h-8 w-8 shrink-0 items-center justify-center rounded-full'
@@ -84,9 +61,25 @@ export const ContactLink = React.forwardRef<
         {icon}
       </span>
 
-      <GsapTextAnimation>
+      <GsapTextAnimation
+        mode='controlled'
+        onLinesReady={(lines) => {
+          linesRef.current = lines;
+          maybeReport();
+        }}
+      >
         <span>{children}</span>
       </GsapTextAnimation>
     </Link>
   );
 });
+
+{
+  /* <span
+        ref={iconRef}
+        className='flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-transform group-hover:scale-110'
+        style={{ background: `${accent}1a`, color: accent }}
+      >
+        {icon}
+      </span> */
+}

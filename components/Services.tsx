@@ -109,7 +109,7 @@ export default function ServicesSection() {
             'descStart',
           )
 
-          .addLabel('badgeStart', '-=0.3')
+          .addLabel('badgeStart', '-=0.5')
           .fromTo(
             badgeRef.current,
             { autoAlpha: 0, y: 20 },
@@ -120,7 +120,7 @@ export default function ServicesSection() {
         const cards = cardsRef.current?.children;
         if (cards) {
           gsap.set(cards, { autoAlpha: 0, y: 48 });
-          tl.addLabel('cardsStart', '-=0.1').to(
+          tl.addLabel('cardsStart', '+=0.1').to(
             cards,
             {
               autoAlpha: 1,

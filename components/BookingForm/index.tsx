@@ -207,210 +207,6 @@ export default function ({ timeline, onReady }: BookingFormProps) {
   const buttonContainerRef = useRef<HTMLDivElement>(null);
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const deviceTweenAddedRef = useRef(false);
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-  //     if (timeline) {
-  //       timeline.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         {
-  //           autoAlpha: 1,
-  //           y: 0,
-  //           duration: 0.8,
-  //           ease: 'power4.out',
-  //           onComplete: () => setCardVisible(true),
-  //         },
-  //         '-=0.2',
-  //       );
-  //       onReady?.(); // <-- tell parent this tween is now registered
-  //     } else {
-  //       // fallback: independent scroll-triggered reveal if no shared timeline provided
-  //       gsap.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         {
-  //           autoAlpha: 1,
-  //           y: 0,
-  //           duration: 0.8,
-  //           ease: 'power4.out',
-  //           onComplete: () => setCardVisible(false),
-  //           scrollTrigger: {
-  //             trigger: cardRef.current,
-  //             start: 'top 80%',
-  //             once: true,
-  //           },
-  //         },
-  //       );
-  //     }
-  //   },
-  //   { scope: cardRef },
-  // );
-
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     if (timeline && !deviceSyncedRef.current) {
-  //       timeline
-  //         .fromTo(
-  //           cardRef.current,
-  //           { autoAlpha: 0, y: 40 },
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.8,
-  //             ease: 'power4.out',
-  //             onComplete: () => setCardVisible(true),
-  //           },
-  //           '-=0.2',
-  //         )
-  //         .addLabel('formCardIn'); // marks the end of the tween just added
-
-  //       if (deviceCardsRef.current) {
-  //         timeline.to(
-  //           deviceCardsRef.current,
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.5,
-  //             ease: 'power4.out',
-  //             stagger: 0.08,
-  //           },
-  //           'formCardIn+=0.1',
-  //         );
-  //       }
-
-  //       deviceSyncedRef.current = true;
-  //       onReady?.(); // now called after the FULL sequence is registered
-  //     } else {
-  //       // Fallback: no shared timeline (or already synced once) — just
-  //       // reveal the card shell on its own.
-  //       gsap.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power4.out' },
-  //       );
-  //     }
-  //   },
-  //   { scope: cardRef, dependencies: [timeline] },
-  // );
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     if (timeline) {
-  //       timeline
-  //         .fromTo(
-  //           cardRef.current,
-  //           { autoAlpha: 0, y: 40 },
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.8,
-  //             ease: 'power4.out',
-  //             onComplete: () => setCardVisible(true),
-  //           },
-  //           '-=0.2',
-  //         )
-  //         .addLabel('formCardIn');
-
-  //         onReady?.()
-
-  //       // Idempotent: only ever add the device stagger tween once, and only
-  //       // once we actually have a non-empty array of card elements.
-  //       if (!deviceTweenAddedRef.current && deviceCardsRef.current?.length) {
-  //         timeline.to(
-  //           deviceCardsRef.current,
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.5,
-  //             ease: 'power4.out',
-  //             stagger: 0.08,
-  //           },
-  //           'formCardIn+=0.1',
-  //         );
-  //         deviceTweenAddedRef.current = true;
-  //       }
-
-  //       onReady?.();
-  //     } else {
-  //       gsap.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power4.out' },
-  //       );
-  //     }
-  //     return () => {
-  //       deviceTweenAddedRef.current = false;
-  //     };
-  //   },
-  //   { scope: cardRef, dependencies: [timeline] },
-  // );
-
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     if (timeline) {
-  //       timeline
-  //         .fromTo(
-  //           cardRef.current,
-  //           { autoAlpha: 0, y: 40 },
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.8,
-  //             ease: 'power4.out',
-  //             onComplete: () => setCardVisible(true),
-  //           },
-  //           '-=0.2',
-  //         )
-  //         .addLabel('formCardIn')
-  //         .fromTo(
-  //           nextButtonRef.current,
-  //           { autoAlpha: 0, y: 20 },
-  //           { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //           '+=0.3',
-  //         );
-
-  //       // Do NOT add device stagger here – wait for cardsReady
-  //       onReady?.();
-  //     } else {
-  //       // fallback when no shared timeline (standalone)
-  //       gsap.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power4.out' },
-  //       )
-  //     }
-  //   },
-  //   { scope: cardRef, dependencies: [timeline] },
-  // );
-
-  // // 2️⃣ Effect that runs when cards are ready
-  // useGSAP(
-  //   () => {
-  //     if (!timeline || !cardsReady || !deviceCardsRef.current?.length) return;
-  //     if (deviceTweenAddedRef.current) return; // safety
-
-  //     timeline.to(
-  //       deviceCardsRef.current,
-  //       {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         duration: 0.5,
-  //         ease: 'power4.out',
-  //         stagger: 0.08,
-  //       },
-  //       'formCardIn+=0.1',
-  //     );
-
-  //     deviceTweenAddedRef.current = true;
-  //   },
-  //   { dependencies: [timeline, cardsReady] },
-  // );
 
   useGSAP(
     () => {
@@ -428,7 +224,7 @@ export default function ({ timeline, onReady }: BookingFormProps) {
               ease: 'power4.out',
               onComplete: () => setCardVisible(true),
             },
-            '-=0.2',
+            '-=0.4',
           )
           .addLabel('formCardIn');
 
@@ -461,7 +257,7 @@ export default function ({ timeline, onReady }: BookingFormProps) {
               ease: 'power4.out',
               stagger: 0.08,
             },
-            'formCardIn+=0.1',
+            'formCardIn-=0.1',
           )
           .addLabel('deviceCardsIn'); // marks end of the stagger
 

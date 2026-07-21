@@ -40,46 +40,6 @@ export default function PricingSection() {
     desc?: HTMLElement[];
   }>({});
 
-  // useGSAP(
-  //   () => {
-  //     if (!sectionRef.current) return;
-  //     const tl = tlRef.current;
-  //     const lines = linesRef.current;
-
-  //     tl.fromTo(
-  //       eyebrowRef.current,
-  //       { autoAlpha: 0, y: 20 },
-  //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //       0,
-  //     );
-
-  //     // Cards, same shared timeline — now positioned off the description's label
-  //     const cards = cardsRef.current?.children;
-  //     if (cards) {
-  //       gsap.set(cards, { autoAlpha: 0, y: 48 });
-  //       tl.to(
-  //         cards,
-  //         {
-  //           autoAlpha: 1,
-  //           y: 0,
-  //           duration: 0.3,
-  //           ease: 'power4.out',
-  //           stagger: 0.2,
-  //         },
-  //         'descDone+=0.2', // starts 0.2s after description's reveal actually finishes
-  //       );
-  //     }
-
-  //     ScrollTrigger.create({
-  //       trigger: sectionRef.current,
-  //       start: 'top 70%',
-  //       once: true,
-  //       onEnter: () => tl.play(),
-  //     });
-  //   },
-  //   { scope: sectionRef },
-  // );
-
   useGSAP(
     () => {
       if (!sectionRef.current) return;
@@ -119,18 +79,10 @@ export default function PricingSection() {
             'descStart',
           );
 
-        // .addLabel('badgeStart', '-=0.3')
-        // .fromTo(
-        //   badgeRef.current,
-        //   { autoAlpha: 0, y: 20 },
-        //   { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
-        //   'badgeStart',
-        // );
-
         const cards = cardsRef.current?.children;
         if (cards) {
           gsap.set(cards, { autoAlpha: 0, y: 48 });
-          tl.addLabel('cardsStart', '-=0.1').to(
+          tl.addLabel('cardsStart', '-=0.05').to(
             cards,
             {
               autoAlpha: 1,
