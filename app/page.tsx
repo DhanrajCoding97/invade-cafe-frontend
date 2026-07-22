@@ -8,7 +8,7 @@ import Contact from '@/components/pages/Contact';
 import BookingSection from '@/components/pages/Booking';
 // import Footer from '@/components/Footer';
 import { Separator } from '@/components/ui/separator';
-export default function Page() {
+export default async function Page() {
   return (
     <>
       <HeroSection />

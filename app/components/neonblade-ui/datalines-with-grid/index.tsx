@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 export interface DatalinesWithGridProps {
   lineColor?: string;
@@ -30,18 +30,17 @@ function hexToRgbA(hex: string, alpha: number): string {
       ')'
     );
   }
-  // Try mapping rgba replacement just in case user passed rgb or string
   if (hex.startsWith('rgb')) {
     return hex
       .replace('rgb', 'rgba')
       .replace(')', `, ${alpha})`)
       .replace(',,', ',');
   }
-  return hex; // if it's already a valid rgba or color name
+  return hex;
 }
 
 function DatalinesCanvas({
-  lineColor = '#00f3ff',
+  lineColor = '00f3ff#',
   shadowColor = '#00f3ff',
   cellSize = 50,
   maxLines = 15,
@@ -57,7 +56,21 @@ function DatalinesCanvas({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    // Respect the user's motion preference — skip the animation loop entirely.
+    // const prefersReducedMotion = window.matchMedia(
+    //   '(prefers-reduced-motion: reduce)',
+    // ).matches;
+    // if (prefersReducedMotion) return;
+
+    // Soft signal for low-end devices (not universally supported — treated as
+    // a bonus reduction, not the primary lever).
+    const deviceMemory = (navigator as any).deviceMemory;
+    const isLowEnd = typeof deviceMemory === 'number' && deviceMemory <= 4;
+    const effectiveMaxLines = isLowEnd ? Math.min(maxLines, 3) : maxLines;
+
     let animationFrameId: number;
+    let startId: number | ReturnType<typeof setTimeout>;
+    let isVisible = true;
 
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
@@ -67,6 +80,14 @@ function DatalinesCanvas({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
 
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        isVisible = entry.isIntersecting;
+      },
+      { threshold: 0 },
+    );
+    io.observe(canvas);
+
     interface DataLine {
       x: number;
       y: number;
@@ -74,16 +95,29 @@ function DatalinesCanvas({
       dx: number;
       dy: number;
       speed: number;
-      // Pixel-based length so visual tail stays constant regardless of speed.
       lineLengthPx: number;
     }
 
     let lines: DataLine[] = [];
 
-    const draw = () => {
+    // Frame-rate cap — this background doesn't need 60fps to read as smooth,
+    // and halving the frame count roughly halves main-thread cost per second.
+    const FRAME_INTERVAL = 1000 / 30;
+    let lastTime = 0;
+
+    const draw = (time: number = 0) => {
+      animationFrameId = requestAnimationFrame(draw);
+
+      if (!isVisible) return;
+      if (time - lastTime < FRAME_INTERVAL) return;
+      lastTime = time;
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      if (Math.random() < spawnProbability && lines.length < maxLines) {
+      if (
+        Math.random() < spawnProbability &&
+        lines.length < effectiveMaxLines
+      ) {
         lines.push({
           x: Math.floor(Math.random() * (canvas.width / cellSize)) * cellSize,
           y: -cellSize,
@@ -91,7 +125,6 @@ function DatalinesCanvas({
           dx: 0,
           dy: 1,
           speed: baseSpeed,
-          // Randomise ±25 % around the configured lineLength.
           lineLengthPx: Math.floor(
             Math.random() * lineLength * 0.5 + lineLength * 0.75,
           ),
@@ -101,8 +134,6 @@ function DatalinesCanvas({
       lines.forEach((line) => {
         line.history.push({ x: line.x, y: line.y });
 
-        // History limit derived from pixel length, not entry count.
-        // This keeps the visual tail the same physical size at any speed.
         const historyLimit = Math.max(
           2,
           Math.ceil(line.lineLengthPx / line.speed),
@@ -114,9 +145,6 @@ function DatalinesCanvas({
         line.x += line.dx * line.speed;
         line.y += line.dy * line.speed;
 
-        // Original modulo-based intersection check: fires only when the line
-        // lands on a grid intersection, preserving the same turn frequency as
-        // the original code at any integer speed.
         if (line.x % cellSize === 0 && line.y % cellSize === 0) {
           const max_x = Math.floor(canvas.width / cellSize) * cellSize;
           if (line.x <= 0 && line.dx === -1) {
@@ -150,10 +178,6 @@ function DatalinesCanvas({
         ctx.lineJoin = 'round';
         ctx.lineWidth = 1.5;
 
-        // Build a gradient from the tail pixel position to the head pixel
-        // position. This gives the classic dim-tail → bright-head fade as a
-        // single unbroken polyline — no per-segment strokes, so no gaps or
-        // dots appear regardless of speed.
         const grad = ctx.createLinearGradient(tail.x, tail.y, head.x, head.y);
         grad.addColorStop(0, hexToRgbA(lineColor, 0));
         grad.addColorStop(0.6, hexToRgbA(lineColor, 0.35));
@@ -166,7 +190,6 @@ function DatalinesCanvas({
         ctx.shadowBlur = 0;
         ctx.stroke();
 
-        // Bright glowing cap at the head — one tiny continuous path.
         const headCount = Math.max(2, Math.ceil(20 / Math.max(1, line.speed)));
         const headIdx = Math.max(0, h.length - 1 - headCount);
         ctx.beginPath();
@@ -184,15 +207,27 @@ function DatalinesCanvas({
         const tail = line.history[0];
         return tail.y < canvas.height + cellSize * 2;
       });
-
-      animationFrameId = requestAnimationFrame(draw);
     };
 
-    draw();
+    // Don't let the draw loop compete with hydration / initial paint —
+    // start once the browser has idle time, with a hard fallback timeout.
+    if ('requestIdleCallback' in window) {
+      startId = (window as any).requestIdleCallback(() => draw(), {
+        timeout: 1000,
+      });
+    } else {
+      startId = setTimeout(() => draw(), 200);
+    }
 
     return () => {
       window.removeEventListener('resize', resizeCanvas);
+      io.disconnect();
       cancelAnimationFrame(animationFrameId);
+      if ('cancelIdleCallback' in window) {
+        (window as any).cancelIdleCallback(startId);
+      } else {
+        clearTimeout(startId as ReturnType<typeof setTimeout>);
+      }
     };
   }, [
     lineColor,
@@ -223,32 +258,18 @@ export function DatalinesWithGrid({
   bgGridColor = 'rgba(255,255,255,0.05)',
   overlay = false,
 }: DatalinesWithGridProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [tiles, setTiles] = useState(0);
-
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const updateTiles = () => {
-      if (containerRef.current) {
-        const { clientWidth, clientHeight } = containerRef.current;
-        const columns = Math.ceil(clientWidth / cellSize);
-        // Add a few extra rows/cols to handle scrolling/resizing edges gracefully
-        const rows = Math.ceil(clientHeight / cellSize) + 1;
-        setTiles(columns * rows);
-      }
-    };
-
-    updateTiles();
-
-    window.addEventListener('resize', updateTiles);
-    return () => window.removeEventListener('resize', updateTiles);
-  }, [cellSize]);
-
   return (
     <div
-      ref={containerRef}
-      className='absolute inset-0 z-0 flex flex-wrap overflow-hidden'
+      className='absolute inset-0 z-0 overflow-hidden'
+      style={{
+        // Single CSS background replaces the previous hundreds-of-divs grid —
+        // no extra DOM nodes, no resize-driven re-render, painted once by the browser.
+        backgroundImage: `
+          linear-gradient(to right, ${bgGridColor} 0.5px, transparent 0.5px),
+          linear-gradient(to bottom, ${bgGridColor} 0.5px, transparent 0.5px)
+        `,
+        backgroundSize: `${cellSize}px ${cellSize}px`,
+      }}
     >
       <DatalinesCanvas
         lineColor={lineColor}
@@ -259,18 +280,6 @@ export function DatalinesWithGrid({
         lineLength={lineLength}
         spawnProbability={spawnProbability}
       />
-      {Array.from({ length: tiles }).map((_, i) => (
-        <div
-          key={i}
-          className='box-border transition-none'
-          style={{
-            width: `${cellSize}px`,
-            height: `${cellSize}px`,
-            border: `0.5px solid ${bgGridColor}`,
-          }}
-        />
-      ))}
-      {/* Add a radial gradient overlay */}
       {overlay && (
         <>
           <div className='pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_center,transparent_0%,#050505_100%)]' />
