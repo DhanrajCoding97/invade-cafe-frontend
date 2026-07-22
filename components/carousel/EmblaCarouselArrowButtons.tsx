@@ -60,7 +60,7 @@ export const PrevButton: React.FC<ComponentPropsWithRef<'button'>> = (
   return (
     <button
       type='button'
-      className='flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-sm transition-colors hover:border-white/40 disabled:opacity-30'
+      className='flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-sm transition-colors hover:border-white/40 disabled:opacity-30 cursor-pointer'
       {...restProps}
     >
       <svg viewBox='0 0 24 24' fill='none' className='h-4 w-4'>
@@ -85,7 +85,7 @@ export const NextButton: React.FC<ComponentPropsWithRef<'button'>> = (
   return (
     <button
       type='button'
-      className='flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-sm transition-colors hover:border-white/40 disabled:opacity-30'
+      className='flex h-9 w-9 items-center justify-center rounded-full border border-white/20 bg-black/40 text-white backdrop-blur-sm transition-colors hover:border-white/40 disabled:opacity-30 cursor-pointer'
       {...restProps}
     >
       <svg viewBox='0 0 24 24' fill='none' className='h-4 w-4'>

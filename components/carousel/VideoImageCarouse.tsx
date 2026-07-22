@@ -11,6 +11,7 @@ import {
 } from './EmblaCarouselArrowButtons';
 import { DotButton, useDotButton } from './EmblaCarouselDotButton';
 import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
 const TWEEN_FACTOR_BASE = 0.84;
 
@@ -127,7 +128,7 @@ export function VideoImageCarousel({
   }, [selectedIndex]);
 
   return (
-    <div className='w-full'>
+    <div className='w-w-full h-full '>
       {renderSsrStyles && (
         <style>
           {emblaServerApi
@@ -135,14 +136,22 @@ export function VideoImageCarousel({
             .ssr?.getStyles(`#${carouselId}`, '.embla__slide')}
         </style>
       )}
-      <div className='overflow-hidden' ref={emblaRef}>
-        <div className='flex'>
+      <div className='overflow-hidden h-full' ref={emblaRef}>
+        <div className='flex h-full'>
           {slides.map((slide, index) => (
             <div
               key={index}
               className='min-w-0 shrink-0 grow-0 basis-[85%] px-2 sm:basis-[70%] md:basis-[60%]'
             >
-              <div className='embla__viewport relative aspect-4/3 w-full overflow-hidden rounded-lg bg-black sm:aspect-video'>
+              <div
+                className={cn(
+                  'embla__viewport relative h-full w-full overflow-hidden rounded-lg bg-black transition-all duration-500 ease-out',
+                  index === selectedIndex
+                    ? 'scale-100 opacity-100 shadow-2xl shadow-cyan-500/20'
+                    : 'scale-[0.93] opacity-60',
+                )}
+              >
+                {/* <div className='embla__viewport relative h-full w-full overflow-hidden rounded-lg bg-black sm:aspect-video'> */}
                 {slide.type === 'image' ? (
                   <>
                     {/* blurred backdrop fills the box regardless of the

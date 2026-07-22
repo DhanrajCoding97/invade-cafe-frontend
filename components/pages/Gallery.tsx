@@ -155,7 +155,7 @@ export default function GallerySection() {
             stations, and unforgettable moments from our café.
           </p>
         </GsapTextAnimation>
-        <div ref={carouselRef} className='mt-8 md:mt-10 lg:mt-12'>
+        <div ref={carouselRef} className='mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
           <VideoImageCarousel slides={CarouselSlides} />
         </div>
       </div>

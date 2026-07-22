@@ -716,7 +716,8 @@ export const NavBar: React.FC<NavBarProps> = ({
               aria-expanded={mobileOpen}
             >
               <span
-                className={`nbr-ham-icon${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
+                // className={`nbr-ham-icon${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
+                className={`nbr-ham-icon ${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
               />
             </button>
           </div>
