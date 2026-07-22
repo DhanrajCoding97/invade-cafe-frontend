@@ -70,7 +70,8 @@ export default function ({ timeline, onReady }: BookingFormProps) {
   const supabase = createClient();
 
   const deviceParam = searchParams.get('device');
-  const playersParam = searchParams.get('players');
+  const playersParam = searchParams.get('players')?.toLowerCase();
+  const tierParam = searchParams.get('tier')?.toLowerCase();
   const deviceFromUrl = deviceParam ? DEVICE_MAP[deviceParam] : undefined;
 
   const initialStep: Step = deviceFromUrl ? 'station' : 'device';
@@ -92,6 +93,9 @@ export default function ({ timeline, onReady }: BookingFormProps) {
       startTime: '',
       duration: 1,
       players: playersParam ? Number(playersParam) : undefined,
+      tier: tierParam
+        ? (tierParam.toLowerCase() as 'single' | 'multiplayer')
+        : undefined,
     },
   });
 
@@ -113,16 +117,26 @@ export default function ({ timeline, onReady }: BookingFormProps) {
       ...form.getValues(),
       device,
       players: playersParam ? Number(playersParam) : undefined,
+      tier: tierParam
+        ? (tierParam.toLowerCase() as 'single' | 'multiplayer')
+        : undefined,
     });
 
+    const hasOptions =
+      (device === 'ps5' && !!playersParam) ||
+      (device === 'racing' && !!tierParam);
+
     const target =
-      needsOptionsStep(device) && !playersParam ? 'device' : 'station';
+      needsOptionsStep(device) && !hasOptions ? 'device' : 'station';
+
+    // const target =
+    //   needsOptionsStep(device) && !playersParam ? 'device' : 'station';
     // if player count came in via URL, options step is already satisfied — skip straight to station
     setStepIndex(STEPS.indexOf(target));
     setDirection(1);
 
     appliedDeviceParamRef.current = deviceParam;
-  }, [deviceParam, playersParam]);
+  }, [deviceParam, playersParam, tierParam]);
 
   //get session on mount
   useEffect(() => {
@@ -293,7 +307,7 @@ export default function ({ timeline, onReady }: BookingFormProps) {
   return (
     <div
       ref={cardRef}
-      className='mt-6 sm:mt-8 md:mt-10 lg:mt-12 w-full rounded-lg animate-rotate-border bg-conic/[from_var(--border-angle)] from-[#860f6c] via-[#2FF0FF] to-black p-px'
+      className='mt-8 md:mt-10 lg:mt-12 w-full rounded-lg animate-rotate-border bg-conic/[from_var(--border-angle)] from-[#860f6c] via-[#2FF0FF] to-black p-px'
     >
       <div className='p-4 sm:p-6 lg:p-8 rounded-lg bg-[radial-gradient(ellipse_at_top_left,rgba(0,212,255,0.08),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(254,17,255,0.06),transparent_60%)] bg-[#05070A]'>
         <FormProvider {...form}>

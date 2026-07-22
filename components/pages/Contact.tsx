@@ -251,7 +251,7 @@ export default function Contact() {
           </p>
         </GsapTextAnimation>
         {/* Two-column body */}
-        <div className='mt-6 sm:mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
+        <div className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
           {/* Info column */}
           <div
             ref={contactCardsRef}

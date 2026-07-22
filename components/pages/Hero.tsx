@@ -15,6 +15,66 @@ export default function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
   const containerRef = useRef<HTMLElement>(null);
 
+  // useLayoutEffect(() => {
+  //   const checkMobile = () => setIsMobile(window.innerWidth < 640);
+  //   checkMobile();
+  //   window.addEventListener('resize', checkMobile);
+
+  //   const refresh = () => ScrollTrigger.refresh();
+  //   window.addEventListener('load', refresh);
+  //   const t = setTimeout(refresh, 300);
+
+  //   const tl = gsap.timeline({
+  //     defaults: { ease: 'power4.inOut' },
+  //   });
+
+  //   tl.fromTo(
+  //     '.hero-badge',
+  //     { autoAlpha: 0, y: -20 },
+  //     { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.8, ease: 'power4.inOut' },
+  //   )
+  //     .fromTo(
+  //       '.hero-cta-book-now',
+  //       { autoAlpha: 0, y: 20 },
+  //       { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+  //       '-=0.2',
+  //     )
+  //     .fromTo(
+  //       '.hero-cta-pricing',
+  //       { autoAlpha: 0, y: 20 },
+  //       { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //       '-=0.3',
+  //     );
+
+  //   gsap.to('.glow-cyan', {
+  //     x: 80,
+  //     y: 60,
+  //     scale: 1.15,
+  //     duration: 10,
+  //     repeat: -1,
+  //     yoyo: true,
+  //     ease: 'sine.inOut',
+  //   });
+  //   gsap.to('.glow-fuchsia', {
+  //     x: -70,
+  //     y: -50,
+  //     scale: 1.2,
+  //     duration: 11,
+  //     repeat: -1,
+  //     yoyo: true,
+  //     ease: 'power2.in',
+  //     delay: 1.5,
+  //   });
+
+  //   return () => {
+  //     window.removeEventListener('resize', checkMobile);
+  //     window.removeEventListener('load', refresh);
+  //     clearTimeout(t);
+  //     tl.kill();
+  //     ScrollTrigger.getAll().forEach((st) => st.kill());
+  //   };
+  // }, []);
+
   useLayoutEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
@@ -31,12 +91,12 @@ export default function HeroSection() {
     tl.fromTo(
       '.hero-badge',
       { autoAlpha: 0, y: -20 },
-      { autoAlpha: 1, y: 0, duration: 0.6, delay: 0.8, ease: 'power4.inOut' },
+      { autoAlpha: 1, y: 0, duration: 0.5, delay: 0.5, ease: 'power4.inOut' },
     )
       .fromTo(
         '.hero-cta-book-now',
         { autoAlpha: 0, y: 20 },
-        { autoAlpha: 1, y: 0, duration: 0.4, ease: 'power4.inOut' },
+        { autoAlpha: 1, y: 0, duration: 0.6, ease: 'power4.inOut' },
         '-=0.2',
       )
       .fromTo(
@@ -45,35 +105,6 @@ export default function HeroSection() {
         { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
         '-=0.3',
       );
-
-    // tl.fromTo(
-    //   '.hero-badge',
-    //   { autoAlpha: 0, y: -20 },
-    //   { autoAlpha: 1, y: 0, duration: 1 },
-    // )
-    //   .fromTo(
-    //     '.hero-heading',
-    //     { autoAlpha: 0, y: 40 },
-    //     { autoAlpha: 1, y: 0, duration: 0.4 },
-    //   )
-    //   .fromTo(
-    //     '.hero-subtext',
-    //     { autoAlpha: 0, y: 20 },
-    //     { autoAlpha: 1, y: 0 },
-    //     '-=0.5',
-    //   )
-    //   .fromTo(
-    //     '.hero-cta-book-now',
-    //     { autoAlpha: 0, y: 20 },
-    //     { autoAlpha: 1, y: 0 },
-    //     '-=0.5',
-    //   )
-    //   .fromTo(
-    //     '.hero-cta-pricing',
-    //     { autoAlpha: 0, y: 20 },
-    //     { autoAlpha: 1, y: 0 },
-    //     '-=0.5',
-    //   );
 
     gsap.to('.glow-cyan', {
       x: 80,
@@ -100,7 +131,6 @@ export default function HeroSection() {
       window.removeEventListener('load', refresh);
       clearTimeout(t);
       tl.kill();
-      ScrollTrigger.getAll().forEach((st) => st.kill());
     };
   }, []);
 
@@ -151,26 +181,6 @@ export default function HeroSection() {
                 'radial-gradient(ellipse 100% 80% at center, rgba(0,0,0,0.65) 0%, transparent 75%)',
             }}
           />
-          {/* <h1 className='hero-heading text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-            {['Invade', 'Gaming', 'Cafe'].map((word, i) => (
-              <span
-                key={word}
-                className='inline-block overflow-hidden align-top mr-[0.25em] last:mr-0'
-              >
-                <span
-                  className='inline-block animate-[lineReveal_0.7s_cubic-bezier(0.16,1,0.3,1)_forwards] bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'
-                  style={{ animationDelay: `${i * 0.12}s` }}
-                >
-                  {word}
-                </span>
-              </span>
-            ))}
-          </h1> */}
-          {/* <GsapTextAnimation animateOnScroll={false} delay={0}>
-            <h1 className='invisible opacity-0 bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-              Invade Gaming Cafe
-            </h1>
-          </GsapTextAnimation> */}
           <GsapTextAnimation delay={0}>
             <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
               <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
@@ -178,11 +188,6 @@ export default function HeroSection() {
               </span>
             </h1>
           </GsapTextAnimation>
-          {/* <h1 className='hero-heading text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-              Invade Gaming Cafe
-            </h1> */}
-          {/* <GlitchText customSpeed="3s" mode="active">
-            </GlitchText> */}
           <GsapTextAnimation delay={0.4}>
             <p className='hero-subtext invisible opacity-0  mx-auto mt-2 max-w-xl text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc] font-normal'>
               Laid-back hangout featuring PC and PlayStation games, plus racing

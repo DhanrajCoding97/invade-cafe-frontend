@@ -156,7 +156,7 @@ export default function PricingSection() {
         </GsapTextAnimation>
         <div
           ref={cardsRef}
-          className='mt-6 sm:mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4'
+          className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4'
         >
           {/* PC Gaming */}
           <PricingCard
@@ -204,7 +204,9 @@ export default function PricingSection() {
             currency='₹'
             accentColor='cyan'
             onBook={({ tier }) =>
-              goToBooking('racing', { tier: tier ?? 'Single Player' })
+              goToBooking('racing', {
+                tier: tier === 'Single Player' ? 'single' : 'multiplayer',
+              })
             }
           />
 

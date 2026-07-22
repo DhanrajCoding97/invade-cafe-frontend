@@ -119,7 +119,7 @@ export default function TestimonialSection() {
       ref={sectionRef}
       className='overflow-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
     >
-      <div className='mx-auto mt-6 sm:mt-8 md:mt-10 lg:mt-12 max-w-6xl'>
+      <div className='mx-auto mt-8 md:mt-10 lg:mt-12 max-w-6xl'>
         <div className='my-4 flex items-center gap-4'>
           <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
           <GsapTextAnimation
@@ -159,7 +159,7 @@ export default function TestimonialSection() {
       </div>
       <div
         ref={marqueeRef}
-        className='relative flex w-full flex-col items-center justify-center overflow-hidden'
+        className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'
       >
         <Marquee pauseOnHover className='[--duration:22s]'>
           {firstRow.map((review, index) => (
