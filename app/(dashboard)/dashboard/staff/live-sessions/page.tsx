@@ -1,9 +1,9 @@
 // app/dashboard/staff/page.tsx
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/requrireRole';
-import LiveSessionBoard from './components/LiveSessionBoard';
+import LiveSessionBoard from '../components/LiveSessionBoard';
 
-export default async function StaffDashboard() {
+export default async function LiveSessionBoardPage() {
   const { role } = await requireRole(['staff', 'owner']);
   const supabase = await createClient();
 
@@ -26,16 +26,9 @@ export default async function StaffDashboard() {
   ]);
 
   return (
-    <div className='flex flex-col gap-6 p-6 mt-14'>
-      <LiveSessionBoard
-        stations={stations ?? []}
-        initialBookings={bookings ?? []}
-      />
-      {role === 'owner' && (
-        <p className='text-xs text-neutral-500'>
-          Owner-only panels (role mgmt, pricing, tournaments) go here next.
-        </p>
-      )}
-    </div>
+    <LiveSessionBoard
+      stations={stations ?? []}
+      initialBookings={bookings ?? []}
+    />
   );
 }

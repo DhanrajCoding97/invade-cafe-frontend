@@ -1,13 +1,10 @@
-import { createClient } from '@/lib/supabase/server';
-
+import React from 'react';
 import { Metadata } from 'next';
 import { Toaster } from '@/components/ui/sonner';
-import AuthSlot from '@/components/auth/AuthSlot';
 import { Orbitron } from 'next/font/google';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/transitions/SmoothScroll';
-import NavBar from './components/neonblade-ui/navbar';
 import { Providers } from '@/providers/QueryProvider';
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -26,27 +23,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  const navItems = [
-    { label: 'Home', href: '/#hero' },
-    { label: 'Services', href: '/#services' },
-    { label: 'Pricing', href: '/#pricing' },
-    { label: 'Gallery', href: '/#gallery' },
-    { label: 'Testimonials', href: '/#testimonials' },
-    { label: 'Booking', href: '/#booking' },
-    { label: 'Contact', href: '/#contact' },
-  ];
-
-  if (user) {
-    navItems.push({
-      label: 'Dashboard',
-      href: '/dashboard',
-    });
-  }
   return (
     <html
       lang='en'
@@ -55,18 +31,6 @@ export default async function RootLayout({
     >
       <body>
         <SmoothScroll>
-          <NavBar
-            variant='standard'
-            position='fixed'
-            transparency='transparent'
-            color='cyan'
-            logoText='Invade'
-            scrollEffect
-            hideOnScroll
-            navAlign='center'
-            items={navItems}
-            authSlot={<AuthSlot />}
-          />
           <Providers>{children}</Providers>
         </SmoothScroll>
         <Toaster />
