@@ -137,6 +137,8 @@ export async function POST(req: NextRequest) {
         amount: Number(order.amount) / 100,
         razorpay_payment_id,
         razorpay_order_id,
+        payment_method: 'razorpay',
+        payment_status: 'paid',
         status: 'confirmed',
         user_id: user.id,
       })

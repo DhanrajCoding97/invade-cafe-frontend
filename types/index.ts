@@ -68,3 +68,43 @@ export interface Review {
   rating: number;
   text: string;
 }
+
+export interface Station {
+  id: string;
+  name: string;
+  type: string;
+  hourly_rate: number;
+  status: string;
+}
+
+// bookings table types
+export interface BookingRow {
+  id: string;
+
+  customer_name: string | null;
+  customer_phone: string | null;
+
+  station_id: string;
+  device: 'pc' | 'ps5' | 'psvr' | 'racing';
+
+  date: string;
+  start_time: string;
+
+  duration_hours: number | null;
+  duration: number | null;
+
+  players: number;
+
+  amount: number;
+
+  payment_method: 'cash' | 'upi_manual' | 'razorpay' | 'complimentary' | null;
+
+  payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
+
+  status: 'confirmed' | 'completed' | 'cancelled';
+
+  session_started_at: string | null;
+  session_ended_at: string | null;
+
+  created_at: string;
+}

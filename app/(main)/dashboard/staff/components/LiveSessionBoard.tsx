@@ -16,6 +16,7 @@ type Booking = {
   session_started_at: string | null;
   session_ended_at: string | null;
   extended_until: string | null;
+  customer_name: string | null;
   profiles: { full_name: string } | null;
 };
 
@@ -67,7 +68,7 @@ function StationCard({
       {booking ? (
         <>
           <p className='text-sm text-neutral-300'>
-            {booking.profiles?.full_name ?? 'Guest'}
+            {booking.profiles?.full_name ?? booking.customer_name ?? 'Guest'}
           </p>
           <p className='text-xs text-neutral-500'>
             {booking.start_time.slice(0, 5)}

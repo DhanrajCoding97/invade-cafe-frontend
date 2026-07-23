@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { isValidPhoneNumber } from 'react-phone-number-input';
 
 export const manualBookingSchema = z
   .object({
@@ -6,8 +7,7 @@ export const manualBookingSchema = z
 
     customerPhone: z
       .string()
-      .trim()
-      .regex(/^[0-9]{10,15}$/, 'Enter a valid phone number'),
+      .refine(isValidPhoneNumber, { message: 'Invalid phone number' }),
 
     device: z.enum(['pc', 'ps5', 'vr', 'racing'], {
       message: 'Please select a device',
@@ -15,9 +15,9 @@ export const manualBookingSchema = z
 
     stationId: z.string().min(1, 'Select a station'),
 
-    duration: z.coerce.number().min(1),
+    duration: z.number().min(1),
 
-    players: z.coerce.number().int().min(1).max(4).optional(),
+    players: z.number().int().min(1).max(4).optional(),
 
     tier: z.enum(['single', 'multiplayer']).optional(),
 
@@ -29,7 +29,7 @@ export const manualBookingSchema = z
 
     paymentMethod: z.enum(['cash', 'upi_manual', 'complimentary']),
 
-    amountOverride: z.coerce.number().min(0).optional(),
+    amountOverride: z.number().min(0).optional(),
 
     notes: z.string().max(300).optional(),
   })
