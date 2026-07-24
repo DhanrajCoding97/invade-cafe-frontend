@@ -35,7 +35,7 @@ export default async function DashboardLayout({
             <ModeToggle />
           </header>
 
-          <main className='p-6'>{children}</main>
+          <main className='p-6 flex-1 overflow-y-auto overscroll-contain'>{children}</main>
         </SidebarInset>
       </SidebarProvider>
     </ThemeProvider>
