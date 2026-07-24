@@ -1,8 +1,8 @@
 'use client';
-import { getLenisInstance } from '@/lib/lenisInstance';
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import './navbar.css';
 import { playSectionTransition } from '@/lib/PageTransition';
+import { getLenisInstance } from '@/lib/lenisInstance';
 
 /** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
 function scrollToSection(href?: string): boolean {

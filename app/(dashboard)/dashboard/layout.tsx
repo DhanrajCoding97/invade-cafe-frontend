@@ -16,20 +16,16 @@ export default async function DashboardLayout({
 }) {
   const { user, role } = await requireRole(['staff', 'owner']);
   return (
-    // <SidebarProvider>
-    //   <AppSidebar role={role} user={user} />
-    //   <main className='flex flex-col gap-6 p-6'>{children}</main>
-    // </SidebarProvider>
     <ThemeProvider
-      attribute='class'
-      defaultTheme='system'
-      enableSystem
-      disableTransitionOnChange
+    attribute='class'
+    defaultTheme='system'
+    enableSystem
+    disableTransitionOnChange
     >
       <SidebarProvider>
         <AppSidebar role={role} user={user} />
 
-        <SidebarInset>
+        <SidebarInset className='h-dvh overflow-hidden'>
           <header className='flex h-14 items-center border-b px-4'>
             <SidebarTrigger />
             <ModeToggle />
@@ -41,3 +37,8 @@ export default async function DashboardLayout({
     </ThemeProvider>
   );
 }
+
+// <SidebarProvider>
+//   <AppSidebar role={role} user={user} />
+//   <main className='flex flex-col gap-6 p-6'>{children}</main>
+// </SidebarProvider>
