@@ -6,7 +6,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import GsapTextAnimation from '../GsapTextAnimation';
 import { VideoImageCarousel, type Slide } from '../carousel/VideoImageCarouse';
-gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(ScrollTrigger);
 
 const CarouselSlides: Slide[] = [
   { type: 'image', src: '/cafe-image-2.webp', alt: 'PS5 lounge setup' },
@@ -31,61 +31,115 @@ export default function GallerySection() {
   }>({});
 
   useGSAP(
-    () => {
-      if (!sectionRef.current) return;
-      const tl = tlRef.current;
+  () => {
+    if (!sectionRef.current) return;
+
+    // Hide immediately — no flash while we wait on fonts
+    gsap.set(carouselRef.current, { opacity: 0, pointerEvents: 'none' });
+
+    let cancelled = false;
+    let st: ScrollTrigger | undefined;
+    const tl = gsap.timeline({ paused: true });
+    tlRef.current = tl;
+
+    document.fonts.ready.then(() => {
+      if (cancelled) return; // unmounted or effect re-ran before fonts resolved
       const lines = linesRef.current;
 
-      // Wait for fonts so SplitText line breaks (and thus trigger start
-      // positions) are computed against final layout — matters most on
-      // mobile where font swap shifts height proportionally more.
-      document.fonts.ready.then(() => {
-        tl.clear();
-
-        tl.addLabel('eyebrowStart', 0)
-          .fromTo(
-            eyebrowLineRef.current,
-            { autoAlpha: 0, y: 20 },
-            { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-            'eyebrowStart',
-          )
-          .to(
-            lines.eyebrowText ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'eyebrowStart',
-          )
-
-          .addLabel('headingStart', '-=0.3')
-          .to(
-            lines.heading ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'headingStart',
-          )
-
-          .addLabel('descStart', '-=0.4')
-          .to(
-            lines.desc ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'descStart',
-          )
-          .fromTo(
-            carouselRef.current,
-            { autoAlpha: 0 },
-            { autoAlpha: 1, duration: 0.4, ease: 'power4.inOut' },
-            '-=0.5',
-          );
-
-        // Single ScrollTrigger drives the whole sequence
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          once: true,
-          onEnter: () => tl.play(),
-        });
+      tl.addLabel('eyebrowStart', 0)
+        .fromTo(
+          eyebrowLineRef.current,
+          { autoAlpha: 0, y: 20 },
+          { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+          'eyebrowStart'
+        )
+        .to(lines.eyebrowText ?? [], { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 'eyebrowStart')
+        .addLabel('headingStart', '-=0.3')
+        .to(lines.heading ?? [], { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 'headingStart')
+        .addLabel('descStart', '-=0.4')
+        .to(lines.desc ?? [], { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' }, 'descStart')
+        .to(carouselRef.current, {
+          opacity: 1,
+          pointerEvents: 'auto',
+          duration: 0.4,
+          ease: 'power4.inOut',
+        }, 
+          '-=0.5'
+        )
+      st = ScrollTrigger.create({
+        trigger: sectionRef.current,
+        start: 'top 70%',
+        once: true,
+        onEnter: () => tl.play(),
       });
-    },
-    { scope: sectionRef },
-  );
+    });
+
+    // useGSAP supports a returned cleanup fn, same as useEffect
+    return () => {
+      cancelled = true;
+      tl.kill();
+      st?.kill();
+    };
+  },
+  { scope: sectionRef }
+);
+
+  // useGSAP(
+  //   () => {
+  //     if (!sectionRef.current) return;
+  //     const tl = tlRef.current;
+  //     const lines = linesRef.current;
+
+  //     // Wait for fonts so SplitText line breaks (and thus trigger start
+  //     // positions) are computed against final layout — matters most on
+  //     // mobile where font swap shifts height proportionally more.
+  //     document.fonts.ready.then(() => {
+  //       tl.clear();
+
+  //       tl.addLabel('eyebrowStart', 0)
+  //         .fromTo(
+  //           eyebrowLineRef.current,
+  //           { autoAlpha: 0, y: 20 },
+  //           { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //           'eyebrowStart',
+  //         )
+  //         .to(
+  //           lines.eyebrowText ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'eyebrowStart',
+  //         )
+
+  //         .addLabel('headingStart', '-=0.3')
+  //         .to(
+  //           lines.heading ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'headingStart',
+  //         )
+
+  //         .addLabel('descStart', '-=0.4')
+  //         .to(
+  //           lines.desc ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'descStart',
+  //         )
+  //         .fromTo(
+  //           carouselRef.current,
+  //           { autoAlpha: 0 },
+  //           { autoAlpha: 1, duration: 0.4, ease: 'power4.inOut' },
+  //           '-=0.5',
+  //         );
+
+  //       // Single ScrollTrigger drives the whole sequence
+  //       ScrollTrigger.create({
+  //         trigger: sectionRef.current,
+  //         start: 'top 70%',
+  //         once: true,
+  //         onEnter: () => tl.play(),
+  //       });
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
   // useGSAP(
   //   () => {
   //     if (!sectionRef.current) return;
@@ -155,7 +209,7 @@ export default function GallerySection() {
             stations, and unforgettable moments from our café.
           </p>
         </GsapTextAnimation>
-        <div ref={carouselRef} className='mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
+        <div ref={carouselRef} className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
           <VideoImageCarousel slides={CarouselSlides} />
         </div>
       </div>

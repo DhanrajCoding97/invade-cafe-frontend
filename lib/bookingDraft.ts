@@ -1,5 +1,5 @@
 // lib/bookingDraft.ts
-import { STEPS, type Step } from '@/components/BookingForm';
+import { type Step } from '@/components/BookingForm';
 import { BookingFormValues } from './schemas/BookingFormSchema';
 const DRAFT_KEY = 'booking_draft_v1';
 const DRAFT_TTL_MS = 10 * 60 * 1000; // 10 min — don't restore stale drafts

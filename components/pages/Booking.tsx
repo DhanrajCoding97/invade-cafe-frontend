@@ -6,8 +6,10 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import GsapTextAnimation from '../GsapTextAnimation';
 import { BookingFormSkeleton } from '../skeletons/BookingSkeleton';
-gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.config({ ignoreMobileResize: true });
+import LineReveal from '../gsap/LineReveal';
+import TextReveal from '../gsap/TextReveal';
+// gsap.registerPlugin(ScrollTrigger);
+// ScrollTrigger.config({ ignoreMobileResize: true });
 
 const BookingForm = dynamic(() => import('../BookingForm'), {
   loading: () => <BookingFormSkeleton />,
@@ -31,54 +33,54 @@ export default function BookingSection() {
     }
   }
 
-  useGSAP(
-    () => {
-      if (!sectionRef.current) return;
-      const tl = tlRef.current;
-      const lines = linesRef.current;
+  // useGSAP(
+  //   () => {
+  //     if (!sectionRef.current) return;
+  //     const tl = tlRef.current;
+  //     const lines = linesRef.current;
 
-      document.fonts.ready.then(() => {
-        tl.clear();
+  //     document.fonts.ready.then(() => {
+  //       tl.clear();
 
-        tl.addLabel('eyebrowStart', 0)
-          .fromTo(
-            eyebrowLineRef.current,
-            { autoAlpha: 0, y: 20 },
-            { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-            'eyebrowStart',
-          )
-          .to(
-            lines.eyebrowText ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'eyebrowStart',
-          )
+  //       tl.addLabel('eyebrowStart', 0)
+  //         .fromTo(
+  //           eyebrowLineRef.current,
+  //           { autoAlpha: 0, y: 20 },
+  //           { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //           'eyebrowStart',
+  //         )
+  //         .to(
+  //           lines.eyebrowText ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'eyebrowStart',
+  //         )
 
-          .addLabel('headingStart', '-=0.3')
-          .to(
-            lines.heading ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'headingStart',
-          )
+  //         .addLabel('headingStart', '-=0.3')
+  //         .to(
+  //           lines.heading ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'headingStart',
+  //         )
 
-          .addLabel('descStart', '-=0.4')
-          .to(
-            lines.desc ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'descStart',
-          );
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          once: true,
-          onEnter: () => {
-            enteredRef.current = true;
-            maybePlay(); // safe now — reads formReadyRef.current fresh every call
-          },
-        });
-      });
-    },
-    { scope: sectionRef },
-  );
+  //         .addLabel('descStart', '-=0.4')
+  //         .to(
+  //           lines.desc ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'descStart',
+  //         );
+  //       ScrollTrigger.create({
+  //         trigger: sectionRef.current,
+  //         start: 'top 70%',
+  //         once: true,
+  //         onEnter: () => {
+  //           enteredRef.current = true;
+  //           maybePlay(); // safe now — reads formReadyRef.current fresh every call
+  //         },
+  //       });
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
 
   function handleFormReady() {
     formReadyRef.current = true;
@@ -95,42 +97,50 @@ export default function BookingSection() {
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
+          <LineReveal delay={0} duration={0.5}>
           <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
-          <GsapTextAnimation
+          </LineReveal>
+          {/* <GsapTextAnimation
             mode='controlled'
             onLinesReady={(lines) => {
               linesRef.current.eyebrowText = lines;
             }}
           >
+          </GsapTextAnimation> */}
+          <TextReveal triggerRef={sectionRef} delay={0.15} >
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               LOCK IN. LEVEL UP
             </span>
-          </GsapTextAnimation>
+          </TextReveal>
         </div>
         {/* main title */}
-        <GsapTextAnimation
+        {/* <GsapTextAnimation
           mode='controlled'
           onLinesReady={(lines) => {
             linesRef.current.heading = lines;
           }}
-        >
+        >        </GsapTextAnimation> */}
+          <TextReveal triggerRef={sectionRef} delay={0.25}>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Claim Your Rig
             </span>
           </h1>
-        </GsapTextAnimation>
+          </TextReveal>
         {/* description */}
-        <GsapTextAnimation
+        {/* <GsapTextAnimation
           mode='controlled'
           onLinesReady={(lines) => {
             linesRef.current.desc = lines;
           }}
         >
+        </GsapTextAnimation> */}
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+
           <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Reserve From competitive PCs to VR and Sim Racing
           </p>
-        </GsapTextAnimation>
+        </TextReveal>
         <BookingForm timeline={tlRef.current} onReady={handleFormReady} />
       </div>
     </section>

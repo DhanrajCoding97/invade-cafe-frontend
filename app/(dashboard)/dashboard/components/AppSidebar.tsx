@@ -47,7 +47,6 @@ import {
   LogOut,
   type LucideIcon,
 } from 'lucide-react';
-import { ModeToggle } from './ModeToggle';
 
 export function NavManagement({
   items,

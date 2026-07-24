@@ -10,9 +10,12 @@ import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import GsapTextAnimation from '../GsapTextAnimation';
+import TextReveal from '../gsap/TextReveal';
+import CardsReveal from '../gsap/CardReveal';
+import LineReveal from '../gsap/LineReveal';
 
-gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.config({ ignoreMobileResize: true });
+// gsap.registerPlugin(ScrollTrigger);
+// ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function PricingSection() {
   const router = useRouter();
@@ -40,72 +43,91 @@ export default function PricingSection() {
     desc?: HTMLElement[];
   }>({});
 
-  useGSAP(
-    () => {
-      if (!sectionRef.current) return;
-      const tl = tlRef.current;
-      const lines = linesRef.current;
+  useGSAP(() => {
+  const cards = cardsRef.current?.children;
+  if (!cards) return;
 
-      // Wait for fonts so SplitText line breaks (and thus trigger start
-      // positions) are computed against final layout — matters most on
-      // mobile where font swap shifts height proportionally more.
-      document.fonts.ready.then(() => {
-        tl.clear();
-
-        tl.addLabel('eyebrowStart', 0)
-          .fromTo(
-            eyebrowLineRef.current,
-            { autoAlpha: 0, y: 20 },
-            { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-            'eyebrowStart',
-          )
-          .to(
-            lines.eyebrowText ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'eyebrowStart',
-          )
-
-          .addLabel('headingStart', '-=0.3')
-          .to(
-            lines.heading ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'headingStart',
-          )
-
-          .addLabel('descStart', '-=0.4')
-          .to(
-            lines.desc ?? [],
-            { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-            'descStart',
-          );
-
-        const cards = cardsRef.current?.children;
-        if (cards) {
-          gsap.set(cards, { autoAlpha: 0, y: 48 });
-          tl.addLabel('cardsStart', '+=0.05').to(
-            cards,
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.4,
-              ease: 'power4.out',
-              stagger: 0.3,
-            },
-            'cardsStart',
-          );
-        }
-
-        // Single ScrollTrigger drives the whole sequence
-        ScrollTrigger.create({
-          trigger: sectionRef.current,
-          start: 'top 70%',
-          once: true,
-          onEnter: () => tl.play(),
-        });
-      });
+  gsap.set(cards, { autoAlpha: 0, y: 48 });
+  gsap.to(cards, {
+    autoAlpha: 1,
+    y: 0,
+    duration: 0.4,
+    ease: 'power4.out',
+    stagger: 0.15,
+    scrollTrigger: {
+      trigger: cardsRef.current,
+      start: 'top 80%',
+      once: true,
     },
-    { scope: sectionRef },
-  );
+  });
+}, { scope: sectionRef });
+
+  // useGSAP(
+  //   () => {
+  //     if (!sectionRef.current) return;
+  //     const tl = tlRef.current;
+  //     const lines = linesRef.current;
+
+  //     // Wait for fonts so SplitText line breaks (and thus trigger start
+  //     // positions) are computed against final layout — matters most on
+  //     // mobile where font swap shifts height proportionally more.
+  //     document.fonts.ready.then(() => {
+  //       tl.clear();
+
+  //       tl.addLabel('eyebrowStart', 0)
+  //         .fromTo(
+  //           eyebrowLineRef.current,
+  //           { autoAlpha: 0, y: 20 },
+  //           { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
+  //           'eyebrowStart',
+  //         )
+  //         .to(
+  //           lines.eyebrowText ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'eyebrowStart',
+  //         )
+
+  //         .addLabel('headingStart', '-=0.3')
+  //         .to(
+  //           lines.heading ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'headingStart',
+  //         )
+
+  //         .addLabel('descStart', '-=0.4')
+  //         .to(
+  //           lines.desc ?? [],
+  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
+  //           'descStart',
+  //         );
+
+  //       const cards = cardsRef.current?.children;
+  //       if (cards) {
+  //         gsap.set(cards, { autoAlpha: 0, y: 48 });
+  //         tl.addLabel('cardsStart', '+=0.05').to(
+  //           cards,
+  //           {
+  //             autoAlpha: 1,
+  //             y: 0,
+  //             duration: 0.4,
+  //             ease: 'power4.out',
+  //             stagger: 0.3,
+  //           },
+  //           'cardsStart',
+  //         );
+  //       }
+
+  //       // Single ScrollTrigger drives the whole sequence
+  //       ScrollTrigger.create({
+  //         trigger: sectionRef.current,
+  //         start: 'top 70%',
+  //         once: true,
+  //         onEnter: () => tl.play(),
+  //       });
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
   return (
     <section
       id='pricing'
@@ -115,48 +137,57 @@ export default function PricingSection() {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
-          <GsapTextAnimation
+          <LineReveal delay={0} duration={0.5}>
+          <div className='h-px w-8 bg-[#00d4ff]' />
+          </LineReveal>
+          {/* <GsapTextAnimation
             mode='controlled'
             onLinesReady={(lines) => {
               linesRef.current.eyebrowText = lines;
             }}
           >
+          </GsapTextAnimation> */}
+          <TextReveal triggerRef={sectionRef} delay={0.15} >
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT IT COSTS
             </span>
-          </GsapTextAnimation>
+          </TextReveal>
         </div>
         {/* main title */}
-        <GsapTextAnimation
+        {/* <GsapTextAnimation
           mode='controlled'
           onLinesReady={(lines) => {
             linesRef.current.heading = lines;
           }}
         >
+        </GsapTextAnimation> */}
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Pricing
             </span>
           </h1>
-        </GsapTextAnimation>
+        </TextReveal>
         {/* description */}
-        <GsapTextAnimation
+        {/* <GsapTextAnimation
           mode='controlled'
           onLinesReady={(lines) => {
             linesRef.current.desc = lines;
           }}
         >
+        </GsapTextAnimation> */}
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+
           <p
             ref={descRef}
             className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
           >
             Simple rates, no hidden fees. Pick your setup and start playing.
           </p>
-        </GsapTextAnimation>
+        </TextReveal>
+        <CardsReveal triggerRef={sectionRef} delay={0.75} stagger={0.3}>
         <div
-          ref={cardsRef}
-          className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4'
+          className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '
         >
           {/* PC Gaming */}
           <PricingCard
@@ -223,6 +254,7 @@ export default function PricingSection() {
             onBook={() => goToBooking('vr')}
           />
         </div>
+        </CardsReveal>
       </div>
     </section>
   );
