@@ -15,10 +15,11 @@ export default function SmoothScroll({
 
   useEffect(() => {
     const isTouch = window.matchMedia('(pointer: coarse)').matches;
-
+    
     if (isTouch) {
-      // Let native scroll drive ScrollTrigger, no Lenis
-      const normalizer = ScrollTrigger.normalizeScroll(true);
+      const normalizer = ScrollTrigger.normalizeScroll({
+        allowNestedScroll: true,
+      });
       return () => normalizer?.kill();
     }
 
