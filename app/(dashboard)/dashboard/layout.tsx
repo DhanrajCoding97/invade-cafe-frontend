@@ -1,5 +1,6 @@
 // src/app/dashboard/layout.tsx
 import { requireRole } from '@/lib/auth/requrireRole';
+import { ThemeProvider } from 'next-themes';
 import React from 'react';
 import {
   SidebarProvider,
@@ -7,6 +8,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import { AppSidebar } from './components/AppSidebar';
+import { ModeToggle } from './components/ModeToggle';
 export default async function DashboardLayout({
   children,
 }: {
@@ -18,16 +20,24 @@ export default async function DashboardLayout({
     //   <AppSidebar role={role} user={user} />
     //   <main className='flex flex-col gap-6 p-6'>{children}</main>
     // </SidebarProvider>
-    <SidebarProvider>
-      <AppSidebar role={role} user={user} />
+    <ThemeProvider
+      attribute='class'
+      defaultTheme='system'
+      enableSystem
+      disableTransitionOnChange
+    >
+      <SidebarProvider>
+        <AppSidebar role={role} user={user} />
 
-      <SidebarInset>
-        <header className='flex h-14 items-center border-b px-4'>
-          <SidebarTrigger />
-        </header>
+        <SidebarInset>
+          <header className='flex h-14 items-center border-b px-4'>
+            <SidebarTrigger />
+            <ModeToggle />
+          </header>
 
-        <main className='p-6'>{children}</main>
-      </SidebarInset>
-    </SidebarProvider>
+          <main className='p-6'>{children}</main>
+        </SidebarInset>
+      </SidebarProvider>
+    </ThemeProvider>
   );
 }

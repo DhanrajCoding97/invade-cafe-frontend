@@ -38,10 +38,18 @@ import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { PhoneInput } from '@/components/ui/phone-input';
-// type ManualBookingInput = z.input<typeof manualBookingSchema>;
-// type ManualBookingOutput = z.output<typeof manualBookingSchema>;
-// type ManualBookingValues = z.infer<typeof manualBookingSchema>;
+import { Checkbox } from '@/components/ui/checkbox';
+import { TimePicker } from '@/components/ui/time-picker';
+import { Textarea } from '@/components/ui/textarea';
+
 type Device = z.infer<typeof manualBookingSchema>['device'];
+type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
+
+const PAYMENT_METHODS: { value: PAYMENT_METHOD; label: string }[] = [
+  { value: 'cash', label: 'Cash' },
+  { value: 'upi_manual', label: 'upi' },
+  { value: 'complimentary', label: 'complimentary' },
+];
 
 const DEVICES: { value: Device; label: string }[] = [
   { value: 'pc', label: 'PC' },
@@ -49,24 +57,6 @@ const DEVICES: { value: Device; label: string }[] = [
   { value: 'racing', label: 'Racing Sim' },
   { value: 'vr', label: 'VR' },
 ];
-// interface Station {
-//   id: string;
-//   name: string;
-//   type: string;
-//   hourly_rate: number;
-//   status: string;
-// }
-
-// async function fetchAvailableStations(): Promise<Station[]> {
-//   const supabase = createClient();
-//   const { data, error } = await supabase
-//     .from('stations')
-//     .select('id, name, type, hourly_rate, status')
-//     .eq('status', 'available')
-//     .order('name');
-//   if (error) throw error;
-//   return data ?? [];
-// }
 
 function nowDateAndTime() {
   const now = new Date();
@@ -78,191 +68,6 @@ interface ManualBookingFormProps {
   onCreated?: (bookingId: string) => void;
 }
 
-// export default function ManualBookingForm({
-//   onCreated,
-// }: ManualBookingFormProps) {
-//   const queryClient = useQueryClient();
-//   const [submitting, setSubmitting] = useState(false);
-//   const [serverError, setServerError] = useState<string | null>(null);
-//   const { date: today, startTime: nowTime } = nowDateAndTime();
-
-//   //   const { data: stations = [], isLoading: stationsLoading } = useQuery({
-//   //     queryKey: ['available-stations'],
-//   //     queryFn: fetchAvailableStations,
-//   //     refetchInterval: 15_000, // walk-in flow — keep this fresh, staff is picking live
-//   //   });
-
-//   const {
-//     register,
-//     control,
-//     handleSubmit,
-//     watch,
-//     setValue,
-//     formState: { errors },
-//   } = useForm<ManualBookingInput, any, ManualBookingOutput>({
-//     resolver: zodResolver(manualBookingSchema),
-//     defaultValues: {
-//       customerName: '',
-//       customerPhone: '',
-//       device: 'pc',
-//       //   stationId: '',
-//       duration: 1,
-//       players: 1,
-//       tier: 'single',
-//       startNow: true,
-//       date: new Date(),
-//       startTime: nowTime,
-//       paymentMethod: 'cash',
-//     },
-//   });
-
-//   const startNow = watch('startNow');
-//   const stationId = watch('stationId');
-//   const device = watch('device');
-//   const tier = watch('tier');
-//   const duration = watch('duration');
-//   const paymentMethod = watch('paymentMethod');
-//   const amountOverride = watch('amountOverride');
-//   const watchedDate = watch('date');
-//   const watchedStartTime = watch('startTime');
-
-//   // Keep date/time pinned to "now" while startNow is checked
-//   useEffect(() => {
-//     if (startNow) {
-//       const { date, startTime } = nowDateAndTime();
-//       setValue('date', date);
-//       setValue('startTime', startTime);
-//     }
-//   }, [startNow, setValue]);
-
-//   useEffect(() => {
-//     if (device === 'ps5') {
-//       setValue('tier', undefined);
-//       // players stays user-controlled, default handled below
-//     } else if (device === 'racing') {
-//       setValue('players', 1);
-//     } else {
-//       // pc or vr
-//       setValue('players', 1);
-//       setValue('tier', undefined);
-//     }
-//   }, [device, setValue]);
-
-//   const showPlayersSelect = device === 'ps5';
-//   const showTierSelect = device === 'racing';
-
-//   const playersValue = Number(watch('players')) || 1;
-//   const durationValue = Number(watch('duration')) || 0;
-//   const rawAmountOverride = watch('amountOverride');
-//   const amountOverrideValue =
-//     rawAmountOverride !== undefined &&
-//     rawAmountOverride !== null &&
-//     rawAmountOverride !== ''
-//       ? Number(rawAmountOverride)
-//       : undefined;
-
-//   const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
-
-//   const { data: stations = [], isLoading: stationsLoading } =
-//     useAvailableStations({
-//       date: dateStr,
-//       startTime: watchedStartTime,
-//       duration: durationValue,
-//     });
-
-//   // Reset station selection when the availability set changes underneath it —
-//   // e.g. staff picks PC-01 for a 1hr slot, then bumps duration to 3hrs and
-//   // PC-01 no longer qualifies; don't silently submit a stale selection.
-//   useEffect(() => {
-//     if (stationId && !stations.some((s) => s.id === stationId)) {
-//       setValue('stationId', undefined);
-//     }
-//   }, [stations, stationId, setValue]);
-
-//   const stationsForDevice = stations.filter(
-//     (station) => station.type === device,
-//   );
-
-//   const selectedStation = stations.find((s) => s.id === stationId);
-//   const rate = selectedStation
-//     ? getDisplayRate({
-//         device,
-//         players: playersValue,
-//         tier,
-//         fallbackRate: selectedStation.hourly_rate,
-//       })
-//     : 0;
-//   const computedTotal = calculateTotal(rate, durationValue);
-//   const displayTotal =
-//     paymentMethod === 'complimentary'
-//       ? 0
-//       : amountOverrideValue !== undefined
-//         ? amountOverrideValue
-//         : computedTotal;
-
-//   async function onSubmit(values: ManualBookingOutput) {
-//     setSubmitting(true);
-//     setServerError(null);
-//     console.log(values);
-//     try {
-//       const supabase = createClient();
-//       const {
-//         data: { user },
-//       } = await supabase.auth.getUser();
-
-//       const total =
-//         values.paymentMethod === 'complimentary'
-//           ? 0
-//           : (values.amountOverride ?? computedTotal);
-
-//       const { data, error } = await supabase
-//         .from('bookings')
-//         .insert({
-//           station_id: values.stationId,
-//           device: values.device,
-//           tier: values.tier ?? null,
-//           players: values.players,
-//           duration_hours: values.duration,
-//           date: values.date.toISOString().slice(0, 10),
-//           start_time: values.startTime,
-//           amount: total,
-//           status: 'confirmed',
-//           user_id: null,
-//           staff_id: user?.id ?? null,
-//           customer_name: values.customerName,
-//           customer_phone: values.customerPhone,
-//           payment_method: values.paymentMethod,
-//         })
-//         .select('id')
-//         .single();
-
-//       if (error) {
-//         // Surface a real double-booking / RLS message rather than a raw PG error
-//         if (
-//           error.code === '23505' ||
-//           error.message?.toLowerCase().includes('conflict')
-//         ) {
-//           throw new Error('That station was just booked — pick another one.');
-//         }
-//         throw new Error(error.message);
-//       }
-
-//       toast.success(`Booking created for ${values.customerName}`);
-//       queryClient.invalidateQueries({ queryKey: ['available-stations'] });
-//       queryClient.invalidateQueries({ queryKey: ['live-session-board'] });
-//       onCreated?.(data.id);
-//     } catch (err) {
-//       setServerError(
-//         err instanceof Error ? err.message : 'Something went wrong',
-//       );
-//     } finally {
-//       setSubmitting(false);
-//     }
-//   }
-//   const stationsForDevice = stations.filter(
-//     (station) => station.type === device,
-//   );
-
 export default function ManualBookingForm({
   onCreated,
 }: ManualBookingFormProps) {
@@ -270,6 +75,7 @@ export default function ManualBookingForm({
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const { startTime: nowTime } = nowDateAndTime();
+  const [open, setOpen] = useState(false);
 
   const {
     register,
@@ -469,6 +275,7 @@ export default function ManualBookingForm({
                   </FieldLabel>
 
                   <PhoneInput
+                    placeholder='8454994242'
                     id='customerPhone'
                     defaultCountry='IN'
                     value={field.value}
@@ -492,9 +299,7 @@ export default function ManualBookingForm({
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel className='text-xs text-[#bcbcbc]'>
-                    Select Device
-                  </FieldLabel>
+                  <FieldLabel htmlFor='device'>Select Device</FieldLabel>
 
                   <Select value={field.value} onValueChange={field.onChange}>
                     <SelectTrigger>
@@ -523,9 +328,7 @@ export default function ManualBookingForm({
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className='text-xs text-[#bcbcbc]'>
-                      Number of players
-                    </FieldLabel>
+                    <FieldLabel htmlFor='players'>Number of players</FieldLabel>
                     <Select
                       value={String(field.value ?? 1)}
                       onValueChange={(v) => field.onChange(Number(v))}
@@ -555,9 +358,7 @@ export default function ManualBookingForm({
                 control={control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel className='text-xs text-[#bcbcbc]'>
-                      Mode
-                    </FieldLabel>
+                    <FieldLabel htmlFor='tier'>Mode</FieldLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
                       <SelectTrigger>
                         <SelectValue placeholder='Select mode' />
@@ -600,17 +401,6 @@ export default function ManualBookingForm({
                 </Field>
               )}
             />
-            {/* <div>
-              <label className='text-xs text-[#bcbcbc]'>Duration (hrs)</label>
-              <input
-                type='number'
-                step={0.5}
-                min={0.5}
-                max={12}
-                {...register('duration')}
-                className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white'
-              />
-            </div> */}
           </div>
 
           {/* Station */}
@@ -619,9 +409,7 @@ export default function ManualBookingForm({
             control={control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel className='text-xs text-[#bcbcbc]'>
-                  Station
-                </FieldLabel>
+                <FieldLabel htmlFor='stationId'>Station</FieldLabel>
                 <Select value={field.value} onValueChange={field.onChange}>
                   <SelectTrigger>
                     <SelectValue placeholder='Select a free station' />
@@ -643,113 +431,141 @@ export default function ManualBookingForm({
 
           {/* Timing */}
           <div className='flex flex-col gap-2'>
-            <label className='flex items-center gap-2 text-sm text-[#bcbcbc]'>
-              <Controller
-                name='startNow'
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type='checkbox'
-                    checked={field.value}
-                    onChange={(e) => field.onChange(e.target.checked)}
-                    className='accent-[#28F1FF]'
-                  />
-                )}
-              />
-              Start session now
-            </label>
+            <Controller
+              name='startNow'
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <div className='flex items-center gap-3'>
+                    <Checkbox
+                      id='startNow'
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(!!checked)}
+                      className='
+                      border-[#28F1FF]/40
+                      data-[state=checked]:bg-[#28F1FF]
+                      data-[state=checked]:border-[#28F1FF]
+                      data-[state=checked]:text-black
+                      '
+                    />
+                    <FieldLabel
+                      htmlFor='startNow'
+                      className='cursor-pointer text-xs text-white/60'
+                    >
+                      Start session now
+                    </FieldLabel>
+                  </div>
 
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             {!startNow && (
               <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-                <div>
-                  {/* <label className='text-xs text-[#bcbcbc]'>Date</label>
-              <input
-                type='date'
-                {...register('date')}
-                className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white'
-              /> */}
-                  <Controller
-                    name='date'
-                    control={control}
-                    render={({ field, fieldState }) => (
-                      <Field data-invalid={fieldState.invalid}>
-                        <FieldLabel>Select date</FieldLabel>
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <Button
-                              type='button'
-                              variant='outline'
-                              className='w-full justify-start text-left font-normal bg-slate-950 text-[#dddddd]'
-                            >
-                              <CalendarIcon className='mr-2 h-4 w-4' />
-                              {field.value
-                                ? format(field.value, 'PPP')
-                                : 'Pick a date'}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className='w-auto p-0' align='start'>
-                            <Calendar
-                              mode='single'
-                              selected={field.value}
-                              onSelect={(d) => {
-                                field.onChange(d);
-                                setValue('startTime', ''); // reset time when date changes
-                              }}
-                              disabled={(d) =>
-                                d < new Date(new Date().setHours(0, 0, 0, 0))
-                              }
-                              autoFocus
-                            />
-                          </PopoverContent>
-                        </Popover>
-                        {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
-                        )}
-                      </Field>
-                    )}
-                  />
-                </div>
-                <div>
-                  <label className='text-xs text-[#bcbcbc]'>Start time</label>
-                  <input
-                    type='time'
-                    {...register('startTime')}
-                    className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white'
-                  />
-                </div>
+                <Controller
+                  name='date'
+                  control={control}
+                  render={({ field, fieldState }) => (
+                    <Field data-invalid={fieldState.invalid}>
+                      <FieldLabel htmlFor='date' onClick={() => setOpen(true)}>
+                        Select date
+                      </FieldLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            className='w-full justify-start text-left font-normal bg-slate-950 text-[#dddddd]'
+                          >
+                            <CalendarIcon className='mr-2 h-4 w-4' />
+                            {field.value
+                              ? format(field.value, 'PPP')
+                              : 'Pick a date'}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className='w-auto p-0' align='start'>
+                          <Calendar
+                            mode='single'
+                            selected={field.value}
+                            onSelect={(d) => {
+                              field.onChange(d);
+                              setValue('startTime', ''); // reset time when date changes
+                            }}
+                            disabled={(d) =>
+                              d < new Date(new Date().setHours(0, 0, 0, 0))
+                            }
+                            autoFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {fieldState.invalid && (
+                        <FieldError errors={[fieldState.error]} />
+                      )}
+                    </Field>
+                  )}
+                />
+                {/* start time */}
+                <Controller
+                  name='startTime'
+                  control={control}
+                  render={({ field }) => (
+                    <Field>
+                      <FieldLabel htmlFor='startTime'>Start Time</FieldLabel>
+                      <TimePicker
+                        id='startTime'
+                        {...field}
+                        className='w-full rounded-lg bg-black/40 border-white/10 text-white hover:bg-black/50 hover:text-white'
+                      />
+                    </Field>
+                  )}
+                />
               </div>
             )}
           </div>
 
           {/* Payment */}
           <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-            <div>
-              <label className='text-xs text-[#bcbcbc]'>Payment method</label>
-              <select
-                {...register('paymentMethod')}
-                className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white'
-              >
-                <option value='cash'>Cash</option>
-                <option value='upi_manual'>UPI (manual)</option>
-                <option value='complimentary'>Complimentary</option>
-              </select>
-            </div>
+            <Controller
+              name='paymentMethod'
+              control={control}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor='device'>
+                    Select Payment method
+                  </FieldLabel>
+
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select method' />
+                    </SelectTrigger>
+
+                    <SelectContent>
+                      {PAYMENT_METHODS.map((method) => (
+                        <SelectItem key={method.value} value={method.value}>
+                          {method.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
             {/* amount field */}
             <Controller
               name='amountOverride'
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='duration'>
-                    {' '}
-                    Amount{' '}
-                    {paymentMethod === 'complimentary'
-                      ? '(waived)'
-                      : '(₹, override if needed)'}
-                  </FieldLabel>
+                  <FieldLabel htmlFor='amountOverride'>Amount</FieldLabel>
 
                   <Input
-                    id=''
+                    id='amountOverride'
                     type='number'
                     value={field.value ?? ''}
                     onChange={(e) => {
@@ -769,55 +585,54 @@ export default function ManualBookingForm({
                 </Field>
               )}
             />
-            {/* <div>
-              <label className='text-xs text-[#bcbcbc]'>
-                Amount{' '}
-                {paymentMethod === 'complimentary'
-                  ? '(waived)'
-                  : '(₹, override if needed)'}
-              </label>
-              <input
-                type='number'
-                min={0}
-                disabled={paymentMethod === 'complimentary'}
-                placeholder={String(computedTotal)}
-                {...register('amountOverride')}
-                className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white disabled:opacity-40'
-              />
-            </div> */}
           </div>
-
-          <div className='rounded-lg bg-white/3 px-3 py-2 flex items-center justify-between text-sm'>
-            <span className='text-[#bcbcbc]'>Total to collect</span>
-            <span className='text-lg font-bold text-[#28F1FF]'>
-              ₹{displayTotal}
-            </span>
-          </div>
-
           {/* Notes */}
-          <div>
-            <label className='text-xs text-[#bcbcbc]'>Notes (optional)</label>
-            <textarea
-              {...register('notes')}
-              rows={2}
-              className='mt-1 w-full rounded-lg bg-black/40 border border-white/10 px-3 py-2 text-sm text-white'
-              placeholder='e.g. parent waiting outside, birthday group, etc.'
-            />
-          </div>
+          <Controller
+            name='notes'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='notes'>Notes</FieldLabel>
+                <Textarea
+                  placeholder='add notes here..'
+                  id='notes'
+                  cols={4}
+                  className='resize-none'
+                />
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
         </FieldGroup>
         {serverError && <p className='text-sm text-red-400'>{serverError}</p>}
+        <div className='flex flex-col gap-5'>
+          {/* total display */}
+          <div className='mt-2 rounded-xl border border-[#28F1FF]/20 bg-[#28F1FF]/5 px-4 py-4'>
+            <div className='flex items-center justify-between'>
+              <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF] uppercase tracking-wider'>
+                Total
+              </span>
 
-        <CornerCutButton
-          type='submit'
-          disabled={submitting}
-          color='cyan'
-          variant='outline'
-          hoverEffect='scan'
-          fullWidthOnMobile={true}
-          className='ml-auto'
-        >
-          {submitting ? 'Creating…' : 'Create Booking'}
-        </CornerCutButton>
+              <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF]'>
+                ₹{displayTotal}
+              </span>
+            </div>
+          </div>
+          <CornerCutButton
+            type='submit'
+            disabled={submitting}
+            color='cyan'
+            variant='outline'
+            hoverEffect='scan'
+            fullWidthOnMobile={true}
+            className='ml-auto'
+          >
+            {submitting ? 'Creating…' : 'Create Booking'}
+          </CornerCutButton>
+        </div>
       </form>
     </div>
   );
