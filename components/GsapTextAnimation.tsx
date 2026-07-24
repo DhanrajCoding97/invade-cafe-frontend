@@ -10,7 +10,7 @@ gsap.registerPlugin(SplitText, ScrollTrigger);
 type GsapTextAnimationProps = {
   children: React.ReactElement<{
     ref?: React.Ref<HTMLElement>;
-    className?: string;
+  className?: string;
   }>;
   // 'standalone' = this component owns its own ScrollTrigger (safe for isolated text blocks)
   // 'controlled' = a parent timeline owns the ScrollTrigger; this component just splits

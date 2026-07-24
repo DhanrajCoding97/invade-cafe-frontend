@@ -14,7 +14,7 @@ type TextRevealProps = {
   }>;
   delay?: number;
   triggerRef?: React.RefObject<HTMLElement | null>;
-  start?: string; // ScrollTrigger start position, e.g. 'top 70%'
+  start?: string; 
 };
 
 export default function TextReveal({

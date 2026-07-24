@@ -226,7 +226,6 @@ export default function () {
 
   useGSAP(() => {
     if (!cardRef.current) return;
-
     gsap.fromTo(
       cardRef.current,
       { autoAlpha: 0, y: 40 },
@@ -235,15 +234,31 @@ export default function () {
         y: 0,
         duration: 0.8,
         ease: 'power4.out',
-        onComplete: () => setFormRevealed(true),
-        scrollTrigger: {
-          trigger: cardRef.current,
-          start: 'top 85%',
-          once: true,
-        },
+        scrollTrigger: { trigger: cardRef.current, start: 'top 85%', once: true },
       },
     );
   }, { scope: cardRef });
+
+  // useGSAP(() => {
+  //   if (!cardRef.current) return;
+
+  //   gsap.fromTo(
+  //     cardRef.current,
+  //     { autoAlpha: 0, y: 40 },
+  //     {
+  //       autoAlpha: 1,
+  //       y: 0,
+  //       duration: 0.8,
+  //       ease: 'power4.out',
+  //       onComplete: () => setFormRevealed(true),
+  //       scrollTrigger: {
+  //         trigger: cardRef.current,
+  //         start: 'top 85%',
+  //         once: true,
+  //       },
+  //     },
+  //   );
+  // }, { scope: cardRef });
 
   
   // useGSAP(
@@ -353,15 +368,10 @@ export default function () {
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
-            <StepTransition stepKey={step} direction={direction}>
+            <StepTransition stepKey={step} direction={direction}>https://claude.ai/chat/55dfd80e-d5c3-431b-8b3a-25ed24be4fe2
               {step === 'device' && (
           <DeviceStep
-          canAnimate={formRevealed}
-            isFirstReveal={!hasRevealedDeviceStep.current}
-            onRevealComplete={() => {
-              hasRevealedDeviceStep.current = true;
-              revealNextButton();
-            }}
+          formCardRef={cardRef} isFirstReveal={!hasRevealedDeviceStep.current}
           />
               )}
               {step === 'options' && <OptionsStep />}

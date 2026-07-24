@@ -7,8 +7,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 import GsapTextAnimation from '../GsapTextAnimation';
 
-gsap.registerPlugin(ScrollTrigger);
-ScrollTrigger.config({ ignoreMobileResize: true });
+// gsap.registerPlugin(ScrollTrigger);
+// ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function ServicesSection() {
   const sectionRef = useRef<HTMLElement>(null);

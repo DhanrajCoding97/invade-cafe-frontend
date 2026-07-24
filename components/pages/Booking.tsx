@@ -136,12 +136,11 @@ export default function BookingSection() {
         >
         </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-
           <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Reserve From competitive PCs to VR and Sim Racing
           </p>
         </TextReveal>
-        <BookingForm timeline={tlRef.current} onReady={handleFormReady} />
+        <BookingForm  />
       </div>
     </section>
   );

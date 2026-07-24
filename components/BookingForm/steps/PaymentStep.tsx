@@ -235,7 +235,7 @@ export default function PaymentStep({
 
     const rzp = new window.Razorpay(options);
 
-    rzp.on('payment.failed', (resp) => {
+    rzp.on('payment.failed', (resp: RazorpayFailureResponse) => {
       setError(resp.error.description ?? 'Payment failed');
       setLoading(false);
     });
