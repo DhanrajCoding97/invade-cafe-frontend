@@ -109,13 +109,19 @@ export default function HeroSection() {
         <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
             className=' hero-cta-book-now'
-            onClick={() =>
-              playSectionTransition(() => {
-                getLenisInstance().scrollTo('#booking', {
-                  offset: 40,
-                });
-              })
-            }
+            onClick={() => {
+              document.querySelector('#booking')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+            }}
+            // onClick={() =>
+            //   playSectionTransition(() => {
+            //     getLenisInstance().scrollTo('#booking', {
+            //       offset: 40,
+            //     });
+            //   })
+            // }
             color='cyan'
             variant='solid'
             showArrow
@@ -126,13 +132,20 @@ export default function HeroSection() {
           </CornerCutButton>
           <CornerCutButton
             className=' hero-cta-pricing'
-            onClick={() =>
-              playSectionTransition(() => {
-                getLenisInstance().scrollTo('#pricing', {
-                  offset: 40,
-                });
-              })
-            }
+            onClick={() => {
+              document.querySelector('#pricing')?.scrollIntoView({
+              behavior: 'smooth',
+              block: 'start',
+            });
+            }}
+            // onclick
+            // onClick={() =>
+            //   playSectionTransition(() => {
+            //     getLenisInstance().scrollTo('#pricing', {
+            //       offset: 40,
+            //     });
+            //   })
+            // }
             color='green'
             variant='ghost'
             hoverEffect='pulse'

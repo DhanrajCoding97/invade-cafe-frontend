@@ -1,7 +1,7 @@
 import { createClient } from '@/lib/supabase/server';
 import AuthSlot from '@/components/auth/AuthSlot';
 import NavBar from '../components/neonblade-ui/navbar';
-
+import SmoothScroll from '@/components/transitions/SmoothScroll';
 export default async function LandingPageLayout({
   children,
 }: Readonly<{
@@ -42,7 +42,9 @@ export default async function LandingPageLayout({
         items={navItems}
         authSlot={<AuthSlot />}
       />
-      {children}
+      <SmoothScroll>
+          {children}
+      </SmoothScroll>
     </>
   );
 }

@@ -5,19 +5,45 @@ import { playSectionTransition } from '@/lib/PageTransition';
 import { getLenisInstance } from '@/lib/lenisInstance';
 
 /** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
+// function scrollToSection(href?: string): boolean {
+//   if (!href || !href.startsWith('#')) return false;
+//   const lenis = getLenisInstance();
+//   console.log('lenis instance:', lenis);
+//   if (lenis && typeof lenis.scrollTo === 'function') {
+//     lenis.scrollTo(href, { offset: 20 });
+//   } else {
+//     // now correctly hit on mobile
+//     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+//   }
+//   return true;
+// }
+// ---- Types -------------------------------------------------
+
+
 function scrollToSection(href?: string): boolean {
-  if (!href || !href.startsWith('#')) return false;
+  if (!href) {
+    console.log('bailing — no href');
+    return false;
+  }
+
+  const hashIndex = href.indexOf('#');
+  if (hashIndex === -1) {
+    console.log('bailing — no hash in href');
+    return false;
+  }
+
+  const hash = href.slice(hashIndex); // '#services', regardless of any path prefix
+
   const lenis = getLenisInstance();
+
   if (lenis && typeof lenis.scrollTo === 'function') {
-    lenis.scrollTo(href, { offset: 20 });
+    lenis.scrollTo(hash, { offset: 20 });
   } else {
-    document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
+    document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
   }
 
   return true;
 }
-// ---- Types -------------------------------------------------
-
 /** Named color presets or any valid CSS color string */
 export type NavBarColor = 'cyan' | 'pink' | 'green' | (string & {});
 
