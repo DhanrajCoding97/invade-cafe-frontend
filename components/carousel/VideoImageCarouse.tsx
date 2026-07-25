@@ -20,7 +20,7 @@ const numberWithinRange = (n: number, min: number, max: number) =>
 
 export type Slide =
   | { type: 'image'; src: string; alt: string }
-  | { type: 'video'; src: string; alt?: string };
+  | { type: 'video'; src: string; alt?: string, poster: string };
 
 type VideoImageCarouselProps = {
   slides: Slide[];
@@ -168,18 +168,17 @@ export function VideoImageCarousel({
                   </>
                 ) : (
                   <>
-                    {/* same blurred-backdrop trick for video — a muted,
-                        looping, scaled-up copy behind the real video */}
                     <video
                       ref={(el) => {
                         videoRefs.current[index] = el;
                       }}
                       src={slide.src}
-                      // poster={/* a static frame/thumbnail, e.g. slide.src.replace('.mp4', '-poster.webp') */}
+                      poster={slide.poster}
+
                       muted
                       loop
                       playsInline
-                      preload='metadata'
+                      preload='none'
                       className='h-full w-full object-cover'
                     />
                   </>

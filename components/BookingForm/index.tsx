@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BookingFormSkeleton } from '../skeletons/BookingSkeleton';
-import { SubmitHandler, useForm } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
 import { FormProvider } from 'react-hook-form';
 import { createClient } from '@/lib/supabase/client';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -28,7 +28,7 @@ import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { useQueryClient } from '@tanstack/react-query';
-// order matters - index = step number
+
 export const STEPS = [
   'device',
   'options',
@@ -59,11 +59,6 @@ const DEVICE_MAP: Record<string, BookingFormValues['device']> = {
   racing: 'racing',
 };
 
-// interface BookingFormProps {
-//   timeline?: gsap.core.Timeline;
-//   onReady?: () => void;
-// }
-
 export default function () {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
@@ -73,7 +68,6 @@ export default function () {
   const playersParam = searchParams.get('players')?.toLowerCase();
   const tierParam = searchParams.get('tier')?.toLowerCase();
   const deviceFromUrl = deviceParam ? DEVICE_MAP[deviceParam] : undefined;
-  const [formRevealed, setFormRevealed] = useState(false);
 
   const initialStep: Step = deviceFromUrl ? 'station' : 'device';
   const [stepIndex, setStepIndex] = useState(STEPS.indexOf(initialStep));
@@ -127,12 +121,7 @@ export default function () {
       (device === 'ps5' && !!playersParam) ||
       (device === 'racing' && !!tierParam);
 
-    const target =
-      needsOptionsStep(device) && !hasOptions ? 'device' : 'station';
-
-    // const target =
-    //   needsOptionsStep(device) && !playersParam ? 'device' : 'station';
-    // if player count came in via URL, options step is already satisfied — skip straight to station
+    const target = needsOptionsStep(device) && !hasOptions ? 'device' : 'station';
     setStepIndex(STEPS.indexOf(target));
     setDirection(1);
 
@@ -239,100 +228,6 @@ export default function () {
     );
   }, { scope: cardRef });
 
-  // useGSAP(() => {
-  //   if (!cardRef.current) return;
-
-  //   gsap.fromTo(
-  //     cardRef.current,
-  //     { autoAlpha: 0, y: 40 },
-  //     {
-  //       autoAlpha: 1,
-  //       y: 0,
-  //       duration: 0.8,
-  //       ease: 'power4.out',
-  //       onComplete: () => setFormRevealed(true),
-  //       scrollTrigger: {
-  //         trigger: cardRef.current,
-  //         start: 'top 85%',
-  //         once: true,
-  //       },
-  //     },
-  //   );
-  // }, { scope: cardRef });
-
-  
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-
-  //     if (timeline) {
-  //       timeline
-  //         .fromTo(
-  //           cardRef.current,
-  //           { autoAlpha: 0, y: 40 },
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.8,
-  //             ease: 'power4.out',
-  //             onComplete: () => setCardVisible(true),
-  //           },
-  //           '-=0.4',
-  //         )
-  //         .addLabel('formCardIn');
-
-  //       onReady?.();
-  //     } else {
-  //       gsap.fromTo(
-  //         cardRef.current,
-  //         { autoAlpha: 0, y: 40 },
-  //         { autoAlpha: 1, y: 0, duration: 0.8, ease: 'power4.out' },
-  //       );
-  //     }
-  //   },
-  //   { scope: cardRef, dependencies: [timeline] },
-  // );
-
-  // Runs once device cards are actually available — guarantees the button
-  // tween is added AFTER the device stagger tween exists in `tl`.
-  // useGSAP(
-  //   () => {
-  //     if (!timeline || !deviceCardsRef.current?.length) return;
-  //     if (deviceLandingSyncedRef.current) return;
-  //     if (!deviceTweenAddedRef.current) {
-  //       timeline
-  //         .to(
-  //           deviceCardsRef.current,
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.5,
-  //             ease: 'power4.out',
-  //             stagger: 0.08,
-  //           },
-  //           'formCardIn-=0.1',
-  //         )
-  //         .addLabel('deviceCardsIn'); // marks end of the stagger
-
-  //       deviceTweenAddedRef.current = true;
-  //     }
-
-  //     if (nextButtonRef.current) {
-  //       timeline.fromTo(
-  //         nextButtonRef.current,
-  //         { autoAlpha: 0, y: 20 },
-  //         { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //         'deviceCardsIn+=0.01',
-  //       );
-  //     }
-  //     deviceLandingSyncedRef.current = true;
-
-  //     return () => {
-  //       deviceTweenAddedRef.current = false;
-  //     };
-  //   },
-  //   { scope: cardRef, dependencies: [timeline, cardsReady] },
-  // );
 
   function revealNextButton() {
     if (!buttonContainerRef.current) return;
@@ -368,11 +263,11 @@ export default function () {
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
-            <StepTransition stepKey={step} direction={direction}>https://claude.ai/chat/55dfd80e-d5c3-431b-8b3a-25ed24be4fe2
+            <StepTransition stepKey={step} direction={direction}>
               {step === 'device' && (
-          <DeviceStep
-          formCardRef={cardRef} isFirstReveal={!hasRevealedDeviceStep.current}
-          />
+                <DeviceStep
+                formCardRef={cardRef} isFirstReveal={!hasRevealedDeviceStep.current}
+                />
               )}
               {step === 'options' && <OptionsStep />}
               {step === 'station' && <StationStep />}
@@ -430,6 +325,7 @@ export default function () {
                       type='button'
                       onClick={goNext}
                       className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
+                      
                     >
                       Next
                     </button>

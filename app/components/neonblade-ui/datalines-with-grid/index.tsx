@@ -12,6 +12,7 @@ export interface DatalinesWithGridProps {
   lineLength?: number;
   spawnProbability?: number;
   overlay?: boolean;
+  isMobile?: boolean
 }
 
 function hexToRgbA(hex: string, alpha: number): string {
@@ -47,6 +48,7 @@ function DatalinesCanvas({
   baseSpeed = 2,
   lineLength = 150,
   spawnProbability = 0.1,
+  isMobile
 }: Omit<DatalinesWithGridProps, 'bgGridColor'>) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -57,17 +59,17 @@ function DatalinesCanvas({
     if (!ctx) return;
 
     // Respect the user's motion preference — skip the animation loop entirely.
-    // const prefersReducedMotion = window.matchMedia(
-    //   '(prefers-reduced-motion: reduce)',
-    // ).matches;
-    // if (prefersReducedMotion) return;
+    const prefersReducedMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
+    if (prefersReducedMotion) return;
 
     // Soft signal for low-end devices (not universally supported — treated as
     // a bonus reduction, not the primary lever).
     const deviceMemory = (navigator as any).deviceMemory;
     const isLowEnd = typeof deviceMemory === 'number' && deviceMemory <= 4;
     const effectiveMaxLines = isLowEnd ? Math.min(maxLines, 3) : maxLines;
-
+    const skipShadow = isLowEnd || isMobile;
     let animationFrameId: number;
     let startId: number | ReturnType<typeof setTimeout>;
     let isVisible = true;
@@ -196,10 +198,12 @@ function DatalinesCanvas({
         ctx.moveTo(h[headIdx].x, h[headIdx].y);
         for (let i = headIdx + 1; i < h.length; i++) ctx.lineTo(h[i].x, h[i].y);
         ctx.strokeStyle = hexToRgbA(lineColor, 0.95);
-        ctx.shadowColor = shadowColor;
-        ctx.shadowBlur = 10;
+        if (!skipShadow) {
+          ctx.shadowColor = shadowColor;
+          ctx.shadowBlur = 10;
+        }
         ctx.stroke();
-        ctx.shadowBlur = 0;
+        if (!skipShadow) ctx.shadowBlur = 0;
       });
 
       lines = lines.filter((line) => {

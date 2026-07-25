@@ -44,90 +44,24 @@ export default function PricingSection() {
   }>({});
 
   useGSAP(() => {
-  const cards = cardsRef.current?.children;
-  if (!cards) return;
+    const cards = cardsRef.current?.children;
+    if (!cards) return;
 
-  gsap.set(cards, { autoAlpha: 0, y: 48 });
-  gsap.to(cards, {
-    autoAlpha: 1,
-    y: 0,
-    duration: 0.4,
-    ease: 'power4.out',
-    stagger: 0.15,
-    scrollTrigger: {
-      trigger: cardsRef.current,
-      start: 'top 80%',
-      once: true,
-    },
-  });
-}, { scope: sectionRef });
+    gsap.set(cards, { autoAlpha: 0, y: 48 });
+    gsap.to(cards, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.4,
+      ease: 'power4.out',
+      stagger: 0.15,
+      scrollTrigger: {
+        trigger: cardsRef.current,
+        start: 'top 80%',
+        once: true,
+      },
+    });
+  }, { scope: sectionRef });
 
-  // useGSAP(
-  //   () => {
-  //     if (!sectionRef.current) return;
-  //     const tl = tlRef.current;
-  //     const lines = linesRef.current;
-
-  //     // Wait for fonts so SplitText line breaks (and thus trigger start
-  //     // positions) are computed against final layout — matters most on
-  //     // mobile where font swap shifts height proportionally more.
-  //     document.fonts.ready.then(() => {
-  //       tl.clear();
-
-  //       tl.addLabel('eyebrowStart', 0)
-  //         .fromTo(
-  //           eyebrowLineRef.current,
-  //           { autoAlpha: 0, y: 20 },
-  //           { autoAlpha: 1, y: 0, duration: 0.5, ease: 'power4.inOut' },
-  //           'eyebrowStart',
-  //         )
-  //         .to(
-  //           lines.eyebrowText ?? [],
-  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-  //           'eyebrowStart',
-  //         )
-
-  //         .addLabel('headingStart', '-=0.3')
-  //         .to(
-  //           lines.heading ?? [],
-  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-  //           'headingStart',
-  //         )
-
-  //         .addLabel('descStart', '-=0.4')
-  //         .to(
-  //           lines.desc ?? [],
-  //           { y: '0%', duration: 1, stagger: 0.1, ease: 'power4.out' },
-  //           'descStart',
-  //         );
-
-  //       const cards = cardsRef.current?.children;
-  //       if (cards) {
-  //         gsap.set(cards, { autoAlpha: 0, y: 48 });
-  //         tl.addLabel('cardsStart', '+=0.05').to(
-  //           cards,
-  //           {
-  //             autoAlpha: 1,
-  //             y: 0,
-  //             duration: 0.4,
-  //             ease: 'power4.out',
-  //             stagger: 0.3,
-  //           },
-  //           'cardsStart',
-  //         );
-  //       }
-
-  //       // Single ScrollTrigger drives the whole sequence
-  //       ScrollTrigger.create({
-  //         trigger: sectionRef.current,
-  //         start: 'top 70%',
-  //         once: true,
-  //         onEnter: () => tl.play(),
-  //       });
-  //     });
-  //   },
-  //   { scope: sectionRef },
-  // );
   return (
     <section
       id='pricing'
@@ -140,13 +74,6 @@ export default function PricingSection() {
           <LineReveal delay={0} duration={0.5}>
           <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
-          {/* <GsapTextAnimation
-            mode='controlled'
-            onLinesReady={(lines) => {
-              linesRef.current.eyebrowText = lines;
-            }}
-          >
-          </GsapTextAnimation> */}
           <TextReveal triggerRef={sectionRef} delay={0.15} >
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT IT COSTS
@@ -154,13 +81,6 @@ export default function PricingSection() {
           </TextReveal>
         </div>
         {/* main title */}
-        {/* <GsapTextAnimation
-          mode='controlled'
-          onLinesReady={(lines) => {
-            linesRef.current.heading = lines;
-          }}
-        >
-        </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
@@ -169,15 +89,7 @@ export default function PricingSection() {
           </h1>
         </TextReveal>
         {/* description */}
-        {/* <GsapTextAnimation
-          mode='controlled'
-          onLinesReady={(lines) => {
-            linesRef.current.desc = lines;
-          }}
-        >
-        </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-
           <p
             ref={descRef}
             className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
