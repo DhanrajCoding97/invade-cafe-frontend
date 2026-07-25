@@ -3,8 +3,9 @@
 import React, { HTMLAttributes, ReactNode } from 'react';
 import Image from 'next/image';
 import { FcGoogle } from 'react-icons/fc';
-import './neonglow-cornercut-card.css';
-
+// import './neonglow-cornercut-card.css';
+import styles from './neonglow-cornercut-card.module.css'
+import { cn } from '@/lib/utils';
 // ---- Types -------------------------------------------------
 
 export type NGCCColor =
@@ -31,20 +32,20 @@ const COLOR_PRESETS: Record<string, string> = {
 };
 
 const CORNER_CLASSES: Record<NGCCCorner, string> = {
-  'bottom-right': 'ngcc-clip-br',
-  'bottom-left': 'ngcc-clip-bl',
-  'top-right': 'ngcc-clip-tr',
-  'top-left': 'ngcc-clip-tl',
-  all: 'ngcc-clip-all',
+  'bottom-right': styles['ngcc-clip-br'],
+  'bottom-left': styles['ngcc-clip-bl'],
+  'top-right': styles['ngcc-clip-tr'],
+  'top-left': styles['ngcc-clip-tl'],
+  all: styles['ngcc-clip-all'],
 };
 
 const HOVER_CLASSES: Record<NGCCHoverEffect, string> = {
-  gradient: 'ngcc-hover-gradient',
-  solid: 'ngcc-hover-solid',
-  'glow-only': 'ngcc-hover-glow-only',
-  pulse: 'ngcc-hover-pulse',
-  trace: 'ngcc-hover-trace',
-  none: 'ngcc-hover-none',
+  gradient: styles['ngcc-hover-gradient'],
+  solid: styles['ngcc-hover-solid'],
+  'glow-only': styles[ 'ngcc-hover-glow-only'],
+  pulse: styles['ngcc-hover-pulse'],
+  trace: styles['ngcc-hover-trace'],
+  none: styles['ngcc-hover-none'],
 };
 
 const GLOW_SIZES: Record<NGCCGlowIntensity, { glow: number; blur: number }> = {
@@ -54,8 +55,8 @@ const GLOW_SIZES: Record<NGCCGlowIntensity, { glow: number; blur: number }> = {
 };
 
 const IMAGE_OVERLAY_CLASSES: Record<NGCCImageOverlay, string> = {
-  bottom: 'ngcc-img-overlay-bottom',
-  full: 'ngcc-img-overlay-full',
+  bottom: styles['ngcc-img-overlay-bottom'],
+  full: styles['ngcc-img-overlay-full'],
   none: '',
 };
 
@@ -261,28 +262,31 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
       {...props}
     >
       <div
-        className='ngcc-glow pointer-events-none absolute -inset-0.5 z-0 rounded-[3px]'
+        className={cn(
+          styles['ngcc-glow'],
+          'pointer-events-none absolute -inset-0.5 z-0 rounded-[3px]'
+        )}
         aria-hidden='true'
       />
 
       <div
-        className={[
-          'ngcc-border-frame',
+        className={cn(
+          styles['ngcc-border-frame'],
           'pointer-events-none absolute inset-0 z-5 bg-white/10 transition-[background,opacity] duration-300',
-          CORNER_CLASSES[corner],
-        ].join(' ')}
-        aria-hidden='true'
+          CORNER_CLASSES[corner]
+        )}
+        aria-hidden="true"
       />
 
       <div
-        className={[
-          'ngcc-card group relative z-10 flex h-full flex-col items-start justify-start overflow-hidden transition-shadow duration-300',
+        className={cn(
+          styles['ngcc-card'],
+          'group relative z-10 flex h-full flex-col items-start justify-start overflow-hidden transition-shadow duration-300',
           CORNER_CLASSES[corner],
-          isMediaMode ? '' : isMarquee ? 'gap-3 p-5' : CARD_PADDING[size],
-        ].join(' ')}
+          !isMediaMode && (isMarquee ? 'gap-3 p-5' : CARD_PADDING[size])
+        )}
         style={{
           backgroundColor: bgColor ?? '#0a0a0a',
-          // minHeight: isMediaMode ? imageHeight : undefined,
         }}
       >
         {isMediaMode ? (
@@ -322,10 +326,11 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
             >
               {icon && (
                 <div
-                  className={[
-                    'ngcc-icon-box mb-4 flex shrink-0 items-center justify-center h-64 rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm',
-                    ICON_BOX_SIZE[size],
-                  ].join(' ')}
+                  className={cn(
+                    styles['ngcc-icon-box'],
+                    'mb-4 flex h-64 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black/40 backdrop-blur-sm',
+                    ICON_BOX_SIZE[size]
+                  )}
                 >
                   <span
                     className={[
@@ -340,10 +345,11 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
 
               {title && (
                 <h3
-                  className={[
-                    'ngcc-title font-orbitron mb-3 leading-[1.3] font-bold text-white',
+                  className={cn(
+                    styles['ngcc-title'],
+                    'font-orbitron mb-3 leading-[1.3] font-bold text-white',
                     TITLE_SIZE[size],
-                  ].join(' ')}
+                  )}
                 >
                   {title}
                 </h3>
@@ -359,10 +365,11 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
           <>
             {icon && (
               <div
-                className={[
-                  'ngcc-icon-box mb-6 flex shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black transition-[border-color,box-shadow] duration-300',
+                className={cn(
+                  styles['ngcc-icon-box'], 
+                  'mb-6 flex shrink-0 items-center justify-center rounded-lg border border-white/10 bg-black transition-[border-color,box-shadow] duration-300',
                   ICON_BOX_SIZE[size],
-                ].join(' ')}
+                )}
               >
                 <span
                   className={[
@@ -377,10 +384,11 @@ export const NeonGlowCornerCutCard: React.FC<NeonGlowCornerCutCardProps> = ({
 
             {title && (
               <h3
-                className={[
-                  'ngcc-title font-orbitron mb-3 leading-[1.3] font-bold text-white transition-[text-shadow] duration-300',
+                className={cn(
+                  styles['ngcc-title'],
+                  'font-orbitron mb-3 leading-[1.3] font-bold text-white transition-[text-shadow] duration-300',
                   TITLE_SIZE[size],
-                ].join(' ')}
+                )}
               >
                 {title}
               </h3>

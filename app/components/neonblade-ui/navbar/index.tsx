@@ -1,9 +1,10 @@
 'use client';
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
-import './navbar.css';
+// import './navbar.css';
 import { playSectionTransition } from '@/lib/PageTransition';
 import { getLenisInstance } from '@/lib/lenisInstance';
-
+import styles from "./navbar.module.css"
+import { cn } from '@/lib/utils';
 /** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
 // function scrollToSection(href?: string): boolean {
 //   if (!href || !href.startsWith('#')) return false;
@@ -303,14 +304,14 @@ function SubMenuDropdown({
 }) {
   const alignClass =
     align === 'left'
-      ? 'nbr-submenu--left'
+      ? styles['nbr-submenu--left']
       : align === 'right'
-        ? 'nbr-submenu--right'
-        : 'nbr-submenu--center';
+        ? styles['nbr-submenu--right']
+        : styles['nbr-submenu--center']
 
   return (
     <div
-      className={`nbr-submenu ${alignClass}`}
+      className={`${styles['nbr-submenu']} ${alignClass}`}
       style={{ '--nbr-color': color } as React.CSSProperties}
     >
       {items.map((item, idx) =>
@@ -322,7 +323,7 @@ function SubMenuDropdown({
               item.onClick?.();
               if (scrollToSection(item.href)) e.preventDefault();
             }}
-            className='nbr-submenu-item'
+            className={styles['nbr-submenu-item']}
           >
             {item.icon && (
               <span className='inline-flex h-[0.8rem] w-[0.8rem] items-center'>
@@ -332,7 +333,7 @@ function SubMenuDropdown({
             {item.label}
           </a>
         ) : (
-          <button key={idx} className='nbr-submenu-item' onClick={item.onClick}>
+          <button key={idx} className={styles['nbr-submenu-item']} onClick={item.onClick}>
             {item.icon && (
               <span className='inline-flex h-[0.8rem] w-[0.8rem] items-center'>
                 {item.icon}
@@ -376,7 +377,7 @@ function NavDesktopItem({
     return item.href ? (
       <a
         href={item.href}
-        className='nbr-nav-item'
+        className={styles['nbr-nav-item']}
         style={style}
         onClick={(e) => {
           item.onClick?.();
@@ -391,7 +392,7 @@ function NavDesktopItem({
         {item.label}
       </a>
     ) : (
-      <button className='nbr-nav-item' style={style} onClick={item.onClick}>
+      <button className={styles['nbr-nav-item']} style={style} onClick={item.onClick}>
         {item.icon && (
           <span className='inline-flex h-[0.9rem] w-[0.9rem] items-center'>
             {item.icon}
@@ -405,7 +406,10 @@ function NavDesktopItem({
   return (
     <div ref={wrapRef} className='relative'>
       <button
-        className='nbr-nav-item nbr-nav-item--has-sub'
+        className={cn(
+          styles['nbr-nav-item'],
+          styles['nbr-nav-item--has-sub']
+        )}
         style={style}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -417,7 +421,12 @@ function NavDesktopItem({
           </span>
         )}
         {item.label}
-        <span className={`nbr-chevron${open ? 'nbr-chevron--open' : ''}`}>
+        <span
+          className={cn(
+            styles['nbr-chevron'],
+            open && styles['nbr-chevron--open']
+          )}
+        >
           ▾
         </span>
       </button>
@@ -471,7 +480,7 @@ function ProfileDropdown({
     ) : avatar !== undefined ? (
       avatar
     ) : (
-      <span className='nbr-avatar-initials'>
+      <span className={styles['nbr-avatar-initials']}>
         {name ? name.charAt(0).toUpperCase() : 'U'}
       </span>
     );
@@ -479,7 +488,7 @@ function ProfileDropdown({
   return (
     <div ref={wrapRef} className='relative'>
       <button
-        className='nbr-avatar-btn'
+        className={styles['nbr-avatar-btn']}
         style={style}
         onClick={() => setOpen((v) => !v)}
         aria-label='User account menu'
@@ -490,16 +499,16 @@ function ProfileDropdown({
       </button>
 
       {open && (
-        <div className='nbr-profile-menu' style={style}>
-          {name && <div className='nbr-profile-menu-header'>{name}</div>}
+        <div className={styles['nbr-profile-menu']} style={style}>
+          {name && <div className={styles['nbr-profile-menu-header']}>{name}</div>}
           {items.map((item, idx) => {
             if (item.divider) {
-              return <div key={idx} className='nbr-profile-divider' />;
+              return <div key={idx} className={styles['nbr-profile-divider']} />;
             }
             return (
               <button
                 key={item.key}
-                className='nbr-profile-menu-item'
+                className={styles['nbr-profile-menu-item']}
                 onClick={() => {
                   item.onClick?.();
                   onAction?.(item.key);
@@ -597,19 +606,28 @@ export const NavBar: React.FC<NavBarProps> = ({
   const logoNode = (
     <a
       href={logoHref}
-      className='nbr-logo inline-flex shrink-0 cursor-pointer items-center gap-2.5 no-underline'
+      className={cn(
+        styles['nbr-logo'], 
+        'inline-flex shrink-0 cursor-pointer items-center gap-2.5 no-underline'
+      )}
     >
       {typeof logo === 'string' ? (
         <img
           src={logo}
           alt='Logo'
-          className='nbr-logo-img h-9 w-9 object-contain'
+          className={cn(
+            styles['nbr-logo-img'],
+            'h-9 w-9 object-contain'
+          )}
         />
       ) : (
         logo
       )}
       {logoText && (
-        <span className='nbr-logo-text font-orbitron duration-280ms text-[1.05rem] font-bold tracking-[0.08em] text-white transition-[color,text-shadow]'>
+        <span className={cn(
+          styles['nbr-logo-text'],
+          'font-orbitron duration-280ms text-[1.05rem] font-bold tracking-[0.08em] text-white transition-[color,text-shadow]'
+        )}>
           {logoText}
         </span>
       )}
@@ -623,23 +641,33 @@ export const NavBar: React.FC<NavBarProps> = ({
   if (variant === 'dock') {
     const dockPosClass =
       position === 'static'
-        ? 'nbr-pos-static'
+        ? styles['nbr-pos-static']
         : position === 'sticky'
-          ? 'nbr-pos-sticky'
-          : 'nbr-pos-fixed';
+          ? styles['nbr-pos-sticky']
+          : styles['nbr-pos-fixed']
 
     return (
       <nav
-        className={`nbr-dock nbr-dock--${dockPosition} ${hidden ? 'nbr-hidden' : ''} ${dockPosClass} ${className}`}
+      className={cn(
+        styles['nbr-dock'],
+        styles[`nbr-dock--${dockPosition}`],
+        hidden && styles['nbr-hidden'],
+        dockPosClass,
+        className
+      )}
+        // className={`nbr-dock nbr-dock--${dockPosition} ${hidden ? 'nbr-hidden' : ''} ${dockPosClass} ${className}`}
         style={cssVars}
         aria-label='Navigation'
       >
-        <div className='nbr-dock-inner'>
+        <div className={styles['nbr-dock-inner']}>
           {items.map((item, idx) => (
             <a
               key={idx}
               href={item.href}
-              className={`nbr-dock-item${item.active ? 'nbr-dock-item--active' : ''}`}
+              className={cn(
+                styles['nbr-dock-item'],
+                item.active && styles['nbr-dock-item--active']
+              )}
               onClick={item.onClick}
               title={item.label}
               aria-label={item.label}
@@ -650,15 +678,15 @@ export const NavBar: React.FC<NavBarProps> = ({
                 </span>
               )}
               {dockShowLabels && (
-                <span className='nbr-dock-item-label'>{item.label}</span>
+                <span className={styles['nbr-dock-item-label']}>{item.label}</span>
               )}
             </a>
           ))}
 
           {showProfile && (
             <>
-              <div className='nbr-dock-profile-sep' aria-hidden />
-              <div className='nbr-dock-item'>
+              <div className={styles['nbr-dock-profile-sep']} aria-hidden />
+              <div className={styles['nbr-dock-item']}>
                 <ProfileDropdown
                   avatar={profileAvatar}
                   name={profileName}
@@ -667,7 +695,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                   onAction={onProfileAction}
                 />
                 {dockShowLabels && (
-                  <span className='nbr-dock-item-label'>Account</span>
+                  <span className={styles['nbr-dock-item-label']}>Account</span>
                 )}
               </div>
             </>
@@ -685,21 +713,29 @@ export const NavBar: React.FC<NavBarProps> = ({
     position === 'floating'
       ? 'nbr-pos-floating'
       : position === 'sticky'
-        ? 'nbr-pos-sticky'
+        ? styles['nbr-pos-sticky']
         : position === 'static'
-          ? 'nbr-pos-static'
-          : 'nbr-pos-fixed';
+          ? styles['nbr-pos-static']
+          : styles['nbr-pos-fixed'];
 
   // Determine background class — transparent can upgrade to glass on scroll
   const bgClass =
     scrollEffect && transparency === 'transparent' && scrolled
-      ? 'nbr-bg-glass nbr-scrolled'
-      : `nbr-bg-${transparency}`;
+      ? cn(styles['nbr-bg-glass'],styles['nbr-scrolled'])
+      : styles[`nbr-bg-${transparency}`]
 
   return (
     <>
       <nav
-        className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-100 w-full ${className}`}
+      className={cn(
+        styles['nbr-root'],
+        posClass,
+        bgClass,
+        hidden && styles['nbr-hidden'],
+        'z-100 w-full',
+        className
+      )}
+        // className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-100 w-full ${className}`}
         style={cssVars}
         aria-label='Navigation'
       >
@@ -736,14 +772,21 @@ export const NavBar: React.FC<NavBarProps> = ({
             {authSlot && <div className='hidden md:block'>{authSlot}</div>}
 
             <button
-              className='nbr-hamburger flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-[280ms] md:hidden'
+              className={cn(
+                styles['nbr-hamburger'],
+                'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-280 md:hidden'
+              )}
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
               aria-expanded={mobileOpen}
             >
               <span
                 // className={`nbr-ham-icon${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
-                className={`nbr-ham-icon ${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
+                className={cn(
+                  styles['nbr-ham-icon'],
+                  mobileOpen && styles['nbr-ham-icon--open']
+                )}
+                // className={`nbr-ham-icon ${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
               />
             </button>
           </div>
@@ -751,17 +794,20 @@ export const NavBar: React.FC<NavBarProps> = ({
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className='nbr-mobile-menu' style={cssVars}>
+          <div className={styles['nbr-mobile-menu']} style={cssVars}>
             {items.map((item, idx) => {
               const hasChildren = !!item.children?.length;
               const isOpen = openMobileIdx === idx;
 
               return (
-                <div key={idx} className='nbr-mobile-item-wrap'>
+                <div key={idx} className={styles['nbr-mobile-item-wrap']}>
                   {hasChildren ? (
                     <>
                       <button
-                        className='nbr-mobile-item nbr-mobile-item--has-sub'
+                        className={cn(
+                          styles['nbr-mobile-item'],
+                          styles['nbr-mobile-item--has-sub']
+                        )}
                         onClick={() => setOpenMobileIdx(isOpen ? null : idx)}
                         aria-expanded={isOpen}
                       >
@@ -772,20 +818,22 @@ export const NavBar: React.FC<NavBarProps> = ({
                         )}
                         <span>{item.label}</span>
                         <span
-                          className={`nbr-chevron${isOpen ? 'nbr-chevron--open' : ''}`}
+                        className={cn(styles['nbr-chevron'],
+                          isOpen && styles['nbr-chevron--open']
+                        )}
                         >
                           ▾
                         </span>
                       </button>
 
                       {isOpen && (
-                        <div className='nbr-mobile-submenu'>
+                        <div className={styles['nbr-mobile-submenu']}>
                           {item.children!.map((child, cidx) =>
                             child.href ? (
                               <a
                                 key={cidx}
                                 href={child.href}
-                                className='nbr-mobile-submenu-item'
+                                className={styles['nbr-mobile-submenu']}
                                 onClick={() => {
                                   child.onClick?.();
                                   setMobileOpen(false);
@@ -801,7 +849,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                             ) : (
                               <button
                                 key={cidx}
-                                className='nbr-mobile-submenu-item'
+                                className={styles['nbr-mobile-submenu-item']}
                                 onClick={() => {
                                   child.onClick?.();
                                   setMobileOpen(false);
@@ -822,7 +870,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                   ) : item.href ? (
                     <a
                       href={item.href}
-                      className='nbr-mobile-item'
+                      className={styles['nbr-mobile-item']}
                       onClick={(e) => {
                         item.onClick?.();
                         if (scrollToSection(item.href)) e.preventDefault();
@@ -838,7 +886,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                     </a>
                   ) : (
                     <button
-                      className='nbr-mobile-item'
+                      className={styles['nbr-mobile-item']}
                       onClick={() => {
                         item.onClick?.();
                         setMobileOpen(false);
@@ -865,7 +913,7 @@ export const NavBar: React.FC<NavBarProps> = ({
       {/* Backdrop — closes mobile menu when tapping outside */}
       {mobileOpen && (
         <div
-          className='nbr-mobile-backdrop'
+          className={styles['nbr-mobile-backdrop']}
           onClick={() => setMobileOpen(false)}
           aria-hidden
         />

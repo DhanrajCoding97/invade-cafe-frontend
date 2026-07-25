@@ -1,7 +1,8 @@
 'use client';
-import './pricing-card.css';
+import styles from './pricing-card.module.css';
 import React, { HTMLAttributes, ReactNode, useState } from 'react';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import { cn } from '@/lib/utils';
 // ---- Types -------------------------------------------------
 
 export type NBColor = 'cyan' | 'pink' | 'green' | (string & {});
@@ -115,18 +116,17 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       ? (playerPriceMap?.[players] ?? pricePerPlayer * players)
       : (price ?? 0);
 
-  // const computedPrice =
-  //   pricingMode === "per-player" ? pricePerPlayer * players : (price ?? 0)
 
   const handleDecrease = () => setPlayers((p) => Math.max(minPlayers, p - 1));
   const handleIncrease = () => setPlayers((p) => Math.min(maxPlayers, p + 1));
 
   return (
     <div
-      className={[
-        'pricing-card relative flex h-full flex-col overflow-visible rounded-2xl',
-        className,
-      ].join(' ')}
+      className={cn(
+        styles['pricing-card'],
+        'relative flex h-full flex-col overflow-visible rounded-2xl',
+        className
+      )}
       style={
         {
           '--accent': accent,
@@ -174,13 +174,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             {title}
           </h3>
         )}
-
-        {/* Subtitle */}
-        {/* {subtitle && (
-          <p className={["mb-5 text-white/50", s.subtitle].join(" ")}>
-            {subtitle}
-          </p>
-        )} */}
 
         {/* Price — fixed or per-player */}
         {pricingMode !== 'tiered' && (
@@ -230,36 +223,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             </button>
           </div>
         )}
-
-        {/* Tiered pricing rows */}
-        {/* {pricingMode === "tiered" && tiers && (
-          <div className="mt-1 w-full">
-            {tiers.map((tier, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between py-3 text-sm"
-                style={{
-                  borderBottom:
-                    i < tiers.length - 1
-                      ? "1px solid rgba(255,255,255,0.08)"
-                      : "none",
-                }}
-              >
-                <span className="text-white/70">{tier.label}</span>
-                <div className="flex items-center gap-1">
-                  <div
-                    className="flex items-center font-bold"
-                    style={{ color: accent }}
-                  >
-                    <span>{currency}</span>
-                    <span>{tier.price}</span>
-                  </div>
-                  <span className="text-sm text-[#00d4e8]">{priceUnit}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        )} */}
         {/* Tiered pricing — now selectable via radio */}
         {pricingMode === 'tiered' && tiers && (
           <div className='mt-1 w-full'>
@@ -320,14 +283,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
             })}
           </div>
         )}
-
-        {/* Custom children */}
         {children}
-
-        {/* Spacer pushes CTA to bottom */}
-        {/* <div className="grow" /> */}
-
-        {/* CTA */}
         <CornerCutButton
           className='mt-auto'
           onClick={() =>

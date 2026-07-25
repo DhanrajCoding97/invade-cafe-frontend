@@ -1,8 +1,9 @@
 'use client';
 
 import React, { ButtonHTMLAttributes, ReactNode } from 'react';
-import './corner-cut-button.css';
-
+// import './corner-cut-button.css';
+import styles from  './corner-cut-button.module.css'
+import { cn } from '@/lib/utils';
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string (e.g. "#ff4400", "hsl(180,100%,50%)") */
@@ -58,21 +59,21 @@ const SIZE_CLASSES: Record<CCBSize, string> = {
 };
 
 const CORNER_CLASSES: Record<CCBCorner, string> = {
-  'bottom-right': 'ccb-clip-br',
-  'bottom-left': 'ccb-clip-bl',
-  'top-right': 'ccb-clip-tr',
-  'top-left': 'ccb-clip-tl',
-  all: 'ccb-clip-all',
+  'bottom-right': styles['ccb-clip-br'],
+  'bottom-left': styles['ccb-clip-bl'],
+  'top-right': styles['ccb-clip-tr'],
+  'top-left': styles['ccb-clip-tl'],
+  all: styles['ccb-clip-all'],
 };
 
 const HOVER_CLASSES: Record<CCBHoverEffect, string> = {
-  glow: 'ccb-hover-glow',
-  shift: 'ccb-hover-shift',
-  shine: 'ccb-hover-shine',
-  pulse: 'ccb-hover-pulse',
-  scan: 'ccb-hover-scan',
-  flicker: 'ccb-hover-flicker',
-  default: 'ccb-hover-default',
+  glow: styles['ccb-hover-glow'],
+  shift: styles['ccb-hover-shift'],
+  shine: styles['ccb-hover-shine'],
+  pulse: styles['ccb-hover-pulse'],
+  scan: styles['ccb-hover-scan'],
+  flicker: styles['ccb-hover-flicker'],
+  default: styles['ccb-hover-default'],
   none: '',
 };
 
@@ -209,18 +210,15 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
 
   return (
     <div
-      className={[
-        'group/ccb relative inline-flex p-px',
+      className={cn(
+        'group/ccb relative p-px',
         fullWidthOnMobile
           ? 'flex w-full sm:inline-flex sm:w-auto'
           : 'inline-flex',
-        `ccb-wrapper-${hoverEffect}`,
-        // ccb-wrapper class retained ONLY for the flicker :has() selector in CSS
-        hoverEffect === 'flicker' ? 'ccb-wrapper' : '',
-        className,
-      ]
-        .filter(Boolean)
-        .join(' ')}
+        styles[`ccb-wrapper-${hoverEffect}`],
+        hoverEffect === 'flicker' && styles['ccb-wrapper'],
+        className
+      )}
       style={
         {
           '--ccb-color': resolvedColor,
@@ -253,23 +251,26 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
       <button
         type={type}
         onClick={onClick}
-        className={[
+        className={cn(
           'group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all',
           SIZE_CLASSES[size],
           CORNER_CLASSES[corner],
           HOVER_CLASSES[hoverEffect],
-          // Class kept for compound hover-state CSS selectors (.ccb-solid.ccb-hover-glow:hover etc.)
-          `ccb-${variant}`,
-          hoverOutlined ? 'ccb-hover-outlined' : '',
-          variant === 'solid'
-            ? `bg-(--ccb-color) ${resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-black'}`
-            : '',
-          variant === 'outline'
-            ? `bg-black ${resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-(--ccb-color)'}`
-            : '',
-        ]
-          .filter(Boolean)
-          .join(' ')}
+          styles[`ccb-${variant}`],
+          hoverOutlined && styles['ccb-hover-outlined'],
+          variant === 'solid' &&
+            cn(
+              'bg-(--ccb-color)',
+              resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-black'
+            ),
+          variant === 'outline' &&
+            cn(
+              'bg-black',
+              resolvedTextColor
+                ? 'text-(--ccb-text-color)'
+                : 'text-(--ccb-color)'
+            )
+        )}
         style={{
           ...ghostStyle,
           ...(resolvedTextColor && variant === 'ghost'
@@ -280,12 +281,12 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
       >
         {/* Shine sweep layer — only rendered when needed */}
         {hoverEffect === 'shine' && (
-          <span className='ccb-shine-layer' aria-hidden='true' />
+          <span className={styles['ccb-shine-layer']} aria-hidden='true' />
         )}
 
         {/* Scan line layer — only rendered when needed */}
         {hoverEffect === 'scan' && (
-          <span className='ccb-scan-layer' aria-hidden='true' />
+          <span className={styles['ccb-scan-layer']} aria-hidden='true' />
         )}
 
         {/* Content sits above decorative layers */}
