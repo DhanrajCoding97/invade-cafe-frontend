@@ -112,7 +112,7 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   },
   {
     id: 'actions',
-    header: '',
+    header: 'Actions',
     cell: ({ row }) => <BookingActions booking={row.original} />,
   },
 ];

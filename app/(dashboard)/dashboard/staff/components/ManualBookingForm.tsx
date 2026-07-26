@@ -91,6 +91,7 @@ export default function ManualBookingForm({
       customerPhone: '',
       device: 'pc',
       duration: 1,
+      stationId:'',
       players: 1,
       tier: 'single',
       startNow: true,
@@ -137,12 +138,13 @@ export default function ManualBookingForm({
   const rawAmountOverride = watch('amountOverride');
 
   const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
-
+const watchedDevice = watch('device');
   const { data: stations = [], isLoading: stationsLoading } =
     useAvailableStations({
-      date: dateStr,
-      startTime: watchedStartTime,
-      duration: durationValue,
+    device: watchedDevice,
+    date: dateStr,
+    startTime: watchedStartTime,
+    duration: durationValue,
     });
 
   // Reset station selection when the availability set changes underneath it —
@@ -154,9 +156,18 @@ export default function ManualBookingForm({
     }
   }, [stations, stationId, setValue]);
 
-  const stationsForDevice = stations.filter(
-    (station) => station.type === device,
-  );
+
+
+  const stationsForDevice = stations.filter((station) => {
+    if (device === 'vr') {
+      return station.type === 'ps5';
+    }
+
+   return station.type === device;
+  });
+
+  const noStationsAvailable = !stationsLoading && stationsForDevice.length === 0;
+
 
   const selectedStation = stationsForDevice.find((s) => s.id === stationId);
   const rate = selectedStation
@@ -422,6 +433,14 @@ export default function ManualBookingForm({
                     ))}
                   </SelectContent>
                 </Select>
+                {noStationsAvailable && (
+                <p className="mt-2 text-xs text-amber-400">
+                  No {device === "vr" ? "VR" : device.toUpperCase()} station is
+                  available for the selected time.
+                  <br />
+                  Choose a different start time to make an advance booking.
+                 </p>
+                )}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}
