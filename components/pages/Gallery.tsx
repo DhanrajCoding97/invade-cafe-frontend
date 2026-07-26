@@ -1,10 +1,16 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useRef } from 'react';
 import LineReveal from '../gsap/LineReveal';
 import TextReveal from '../gsap/TextReveal';
-import { VideoImageCarousel, type Slide } from '../carousel/VideoImageCarouse';
-
+// import { VideoImageCarousel, type Slide } from '../carousel/VideoImageCarousel';
+import { GallerySkeleton } from '../skeletons/GallerySkeleton';
+import { type Slide } from '../carousel/VideoImageCarousel';
+const VideoImageCarousel = dynamic(
+  () => import('../carousel/VideoImageCarousel').then((mod) => ({ default: mod.VideoImageCarousel })),
+  { loading: () => <GallerySkeleton />, ssr: false },
+);
 const CarouselSlides: Slide[] = [
   { type: 'image', src: '/cafe-image-2.webp', alt: 'PS5 lounge setup' },
   { type: 'video', src: '/videos/cafe-video-4.webm', poster:'/images/video-poster-1.webp' },

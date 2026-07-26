@@ -127,12 +127,27 @@ export const PricingCard: React.FC<PricingCardProps> = ({
         'relative flex h-full flex-col overflow-visible rounded-2xl',
         className
       )}
+      // style={
+      //   {
+      //     '--accent': accent,
+      //     background: featured
+      //       ? 'linear-gradient(160deg, #0d1b2e 0%, #0a1525 100%)'
+      //       : 'linear-gradient(160deg, #0c1624 0%, #091220 100%)',
+      //     border: featured
+      //       ? `2px solid ${accent}`
+      //       : '1px solid rgba(255,255,255,0.08)',
+      //     boxShadow: featured
+      //       ? `0 0 32px 0 ${accent}44, 0 8px 40px 0 #000a`
+      //       : '0 4px 32px 0 #0008',
+      //     ...style,
+      //   } as React.CSSProperties
+      // }
       style={
         {
           '--accent': accent,
           background: featured
-            ? 'linear-gradient(160deg, #0d1b2e 0%, #0a1525 100%)'
-            : 'linear-gradient(160deg, #0c1624 0%, #091220 100%)',
+            ? 'radial-gradient(125% 125% at 50% 10%, #000000 40%, #350136 100%)'
+            : 'radial-gradient(125% 125% at 50% 10%, #000000 45%, #0c1624 100%)',
           border: featured
             ? `2px solid ${accent}`
             : '1px solid rgba(255,255,255,0.08)',
