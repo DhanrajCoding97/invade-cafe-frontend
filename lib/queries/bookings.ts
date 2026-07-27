@@ -10,7 +10,15 @@ export const bookingKeys = {
 export async function fetchBookings(): Promise<BookingRow[]> {
   const { data, error } = await supabase
     .from('bookings')
-    .select('*')
+    .select(`
+      *,
+      profiles:user_id (
+        full_name,
+        avatar_url,
+        email,
+        phone
+      )
+    `)
     .order('created_at', { ascending: false });
 
   if (error) {

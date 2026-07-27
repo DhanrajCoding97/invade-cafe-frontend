@@ -1,29 +1,66 @@
 //column def for tanstack table
 // columns.tsx
 'use client';
-
-import { ColumnDef } from '@tanstack/react-table';
+import Badge from '@/app/components/neonblade-ui/badge';
+import { ColumnDef, RowExpanding } from '@tanstack/react-table';
 import { type BookingRow } from '@/types';
 import { BookingActions } from '@/app/actions/booking-actions';
+import {
+  Banknote,
+  CreditCard,
+  Smartphone,
+  Gift,
+  type LucideIcon,
+} from 'lucide-react';
+
+const paymentColor = {
+  paid: 'green',
+  pending: '#facc15',
+  failed: '#ef4444',
+  refunded: '#9ca3af',
+} as const;
+
+const PAYMENT_ICONS: Record<string, LucideIcon> = {
+  cash: Banknote,
+  razorpay: CreditCard,
+  upi_manual: Smartphone,
+  complimentary: Gift,
+};
 
 export const bookingColumns: ColumnDef<BookingRow>[] = [
   {
     id: 'customer',
     header: 'Customer',
-    cell: ({ row }) => (
-      <div>
-        <div className='font-medium'>
-          {row.original.customer_name ?? 'Walk-in'}
+    accessorFn: (row) =>
+      `${row.customer_name ?? row.profiles?.full_name ?? 'Walk-in'} ${row.customer_phone ?? row.profiles?.phone ?? ''}`,
+    cell: ({ row }) => {
+      const name =
+        row.original.customer_name ??
+        row.original.profiles?.full_name ??
+        'Walk-in';
+      const phone =
+        row.original.customer_phone ?? row.original.profiles?.phone ?? '—';
+      const isOnline = !!row.original.user_id;
+
+      return (
+        <div>
+          <div className='flex items-center gap-1.5 font-medium'>
+            {name}
+            {isOnline && (
+              <span className='rounded bg-[#07200D] px-1.5 py-0.5 text-[10px] text-[#39FF6E]'>
+                Online
+              </span>
+            )}
+          </div>
+          <div className='text-xs text-muted-foreground'>{phone}</div>
         </div>
-        <div className='text-xs text-muted-foreground'>
-          {row.original.customer_phone ?? '—'}
-        </div>
-      </div>
-    ),
+      );
+    },
   },
   {
     accessorKey: 'device',
     header: 'Device',
+    accessorFn: (row) => row.device,
     cell: ({ row }) => (
       <span className='capitalize'>{row.original.device}</span>
     ),
@@ -63,29 +100,57 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   },
   {
     accessorKey: 'amount',
+    accessorFn: (row) => row.amount,
     header: 'Amount',
     cell: ({ row }) => `₹${Number(row.original.amount).toFixed(0)}`,
   },
+  // {
+  //   id: 'payment',
+  //   header: 'Payment',
+  //   cell: ({ row }) => {
+  //     const { payment_method, payment_status } = row.original;
+  //     const statusStyles: Record<string, string> = {
+  //       paid: 'bg-green-100 text-green-700',
+  //       pending: 'bg-yellow-100 text-yellow-700',
+  //       failed: 'bg-red-100 text-red-700',
+  //       refunded: 'bg-gray-100 text-gray-700',
+  //     };
+  //     return (
+  //       <div className='space-y-1'>
+  //         <span
+  //           className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles[payment_status]}`}
+  //         >
+  //           {payment_status}
+  //         </span>
+  //         <div className='text-xs capitalize text-muted-foreground'>
+  //           {payment_method?.replace('_', ' ') ?? '—'}
+  //         </div>
+  //       </div>
+  //     );
+  //   },
+  // },
   {
     id: 'payment',
     header: 'Payment',
     cell: ({ row }) => {
-      const { payment_method, payment_status } = row.original;
-      const statusStyles: Record<string, string> = {
-        paid: 'bg-green-100 text-green-700',
-        pending: 'bg-yellow-100 text-yellow-700',
+      const b = row.original;
+      const Icon = b.payment_method ? PAYMENT_ICONS[b.payment_method] : null;
+      const styles: Record<string, string> = {
+        paid: 'bg-[#07200D] text-[#39FF6E]',
+        pending: 'bg-amber-800 text-amber-200',
         failed: 'bg-red-100 text-red-700',
-        refunded: 'bg-gray-100 text-gray-700',
+        refunded: 'bg-blue-800 text-blue-200',
       };
       return (
-        <div className='space-y-1'>
+        <div className='flex flex-col gap-0.5 items-center justify-center'>
           <span
-            className={`rounded-full px-2 py-0.5 text-xs font-medium ${statusStyles[payment_status]}`}
+            className={`rounded-full px-3 py-1 text-xs font-medium ${styles[b.payment_status]}`}
           >
-            {payment_status}
+            {b.payment_status}
           </span>
-          <div className='text-xs capitalize text-muted-foreground'>
-            {payment_method?.replace('_', ' ') ?? '—'}
+          <div className='flex items-center gap-1 text-xs text-muted-foreground justify-center'>
+            {Icon && <Icon className='h-3 w-3' />}
+            {b.payment_method ?? '—'}
           </div>
         </div>
       );
@@ -94,6 +159,7 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   {
     accessorKey: 'status',
     header: 'Status',
+    accessorFn: (row) => row.payment_status,
     cell: ({ row }) => {
       const status = row.original.status;
       const styles: Record<string, string> = {
@@ -112,7 +178,30 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   },
   {
     id: 'actions',
-    header: 'Actions',
     cell: ({ row }) => <BookingActions booking={row.original} />,
+    // cell: ({ row }) => {
+    //   const b = row.original;
+    //   if (b.status === 'completed') {
+    //     return b.user_id && b.payment_status === 'paid' ? (
+    //       <button onClick={() => openRefund(b)}>Refund</button>
+    //     ) : null;
+    //   }
+    //   if (b.status === 'cancelled') return null;
+    //   return (
+    //     <>
+    //       {b.payment_status === 'pending' && (
+    //         <button onClick={() => markPaid(b)}>Mark paid</button>
+    //       )}
+    //       <button onClick={() => cancelBooking(b)} className='text-red-400'>
+    //         Cancel
+    //       </button>
+    //     </>
+    //   );
+    // },
   },
+  // {
+  //   id: 'actions',
+  //   header: 'Actions',
+  //   cell: ({ row }) => <BookingActions booking={row.original} />,
+  // },
 ];

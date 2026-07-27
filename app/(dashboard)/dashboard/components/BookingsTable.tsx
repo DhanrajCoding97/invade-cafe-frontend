@@ -21,8 +21,8 @@ export function BookingsTable<TData>({ columns, data }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter,setGlobalFilter] = useState("")
 
-  const tableData = useMemo(() => data, [])
-  const tableColumns = useMemo(() => columns,[])
+  const tableData = useMemo(() => data, [data])
+  const tableColumns = useMemo(() => columns,[columns])
 
   const table = useReactTable({
     data: tableData,
@@ -39,18 +39,42 @@ export function BookingsTable<TData>({ columns, data }: DataTableProps<TData>) {
   });
 
   return (
-      <div className='overflow-x-auto rounded-lg border'>
-        <div className="relative w-full p-2">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+    <>
+<div className="relative w-full max-w-sm">
+  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#28F1FF]/70" />
 
-          <Input
-            type="text"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Search..."
-              className="w-full rounded-lg border border-gray-300 bg-white py-2 pl-10 pr-4 text-sm text-gray-700 placeholder-gray-400 shadow-sm transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 focus:outline-none"
-          />
-      </div>
+  <Input
+    type="text"
+    value={globalFilter}
+    onChange={(e) => setGlobalFilter(e.target.value)}
+    placeholder="Search customer, phone, device..."
+    className="
+      h-10
+      rounded-lg
+      border border-[#28F1FF]/20
+      bg-white/5
+      pl-10
+      pr-10
+      text-white
+      placeholder:text-white/40
+      transition-all
+      focus:border-[#28F1FF]
+      focus:ring-2
+      focus:ring-[#28F1FF]/20
+    "
+  />
+
+  {globalFilter && (
+    <button
+      type="button"
+      onClick={() => setGlobalFilter('')}
+      className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white"
+    >
+      ✕
+    </button>
+  )}
+</div>
+    <div className='overflow-x-auto rounded-lg border'>
       <table className='w-full text-sm border-collapse shadow-lg'>
         <thead className='bg-muted/50'>
           {table.getHeaderGroups().map((headerGroup) => (
@@ -97,5 +121,6 @@ export function BookingsTable<TData>({ columns, data }: DataTableProps<TData>) {
         </tbody>
       </table>
     </div>
+    </>
   );
 }

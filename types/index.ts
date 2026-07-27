@@ -81,6 +81,8 @@ export interface Station {
 export interface BookingRow {
   id: string;
 
+  user_id: string | null;
+
   customer_name: string | null;
   customer_phone: string | null;
 
@@ -107,4 +109,16 @@ export interface BookingRow {
   session_ended_at: string | null;
 
   created_at: string;
+
+  profiles: {
+    full_name: string | null;
+    avatar_url: string | null;
+    email: string | null;
+    phone: string | null;
+  } | null;
 }
+
+export type PaymentMethod =
+  'cash' | 'upi_manual' | 'razorpay' | 'complimentary';
+
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';

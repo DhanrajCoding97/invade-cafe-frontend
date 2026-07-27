@@ -1,6 +1,6 @@
 // hooks/use-booking-mutations.ts
 'use client';
-
+import { createClient } from '@/lib/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bookingKeys } from '@/lib/queries/bookings';
 import {
@@ -30,5 +30,23 @@ export function useMarkPaid() {
     }) => updatePaymentStatus(bookingId, 'paid', method),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+  });
+}
+
+export function useMarkRefunded() {
+  const queryClient = useQueryClient();
+  const supabase = createClient();
+
+  return useMutation({
+    mutationFn: async (bookingId: string) => {
+      const { error } = await supabase
+        .from('bookings')
+        .update({ payment_status: 'refunded' })
+        .eq('id', bookingId);
+      if (error) throw new Error(error.message);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+    },
   });
 }
