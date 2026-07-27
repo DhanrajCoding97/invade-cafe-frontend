@@ -77,7 +77,6 @@ export interface Station {
   status: string;
 }
 
-// bookings table types
 export interface BookingRow {
   id: string;
 
@@ -104,6 +103,9 @@ export interface BookingRow {
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
 
   status: 'confirmed' | 'completed' | 'cancelled';
+
+  razorpay_order_id: string | null;
+  razorpay_payment_id: string | null;
 
   session_started_at: string | null;
   session_ended_at: string | null;

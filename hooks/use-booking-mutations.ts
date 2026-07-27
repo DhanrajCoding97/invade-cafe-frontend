@@ -34,17 +34,49 @@ export function useMarkPaid() {
   });
 }
 
+// export function useMarkRefunded() {
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: async (bookingId: string) => {
+//       const { error } = await supabase
+//         .from('bookings')
+//         .update({ payment_status: 'refunded' })
+//         .eq('id', bookingId);
+//       if (error) throw new Error(error.message);
+//     },
+//     onSuccess: () => {
+//       queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+//     },
+//   });
+// }
+
 export function useMarkRefunded() {
   const queryClient = useQueryClient();
-  const supabase = createClient();
 
   return useMutation({
-    mutationFn: async (bookingId: string) => {
-      const { error } = await supabase
-        .from('bookings')
-        .update({ payment_status: 'refunded' })
-        .eq('id', bookingId);
-      if (error) throw new Error(error.message);
+    mutationFn: async ({
+      bookingId,
+      paymentId,
+      amount,
+    }: {
+      bookingId: string;
+      paymentId: string;
+      amount?: number; // in paise — omit for full refund
+    }) => {
+      const res = await fetch('/api/razorpay/refund', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ paymentId, amount }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error ?? 'Refund failed');
+      }
+
+      // Only mark refunded in the DB once Razorpay confirms the refund succeeded
+      return updatePaymentStatus(bookingId, 'refunded');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bookingKeys.all });

@@ -33,8 +33,10 @@ import { useQuery } from '@tanstack/react-query';
 import { fetchBookings, bookingKeys } from '@/lib/queries/bookings';
 import { bookingColumns } from '../../components/Columns';
 import { BookingsTable } from '../../components/BookingsTable';
+import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
 
 export default function BookingsPage() {
+  useRealtimeBookings();
   const {
     data: bookings,
     isLoading,

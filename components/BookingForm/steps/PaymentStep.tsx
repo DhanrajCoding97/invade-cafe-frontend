@@ -157,95 +157,101 @@ export default function PaymentStep({
   //   }
   // }
   async function handlePay() {
-  setLoading(true);
-  setError(null);
+    setLoading(true);
+    setError(null);
 
-  try {
-    const values = getValues();
+    try {
+      const values = getValues();
+      console.log(values.date);
+      console.log(typeof values.date);
 
-    const orderRes = await fetch('/api/razorpay/create-order', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        stationId: values.stationId,
-        device: values.device,
-        tier: values.tier,
-        players: values.players,
-        duration: values.duration,
-        date: values.date,
-        startTime: values.startTime,
-      }),
-    });
+      if (values.date instanceof Date) {
+        console.log(values.date.toString());
+        console.log(values.date.toISOString());
+      }
+      const orderRes = await fetch('/api/razorpay/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          stationId: values.stationId,
+          device: values.device,
+          tier: values.tier,
+          players: values.players,
+          duration: values.duration,
+          date: values.date,
+          startTime: values.startTime,
+        }),
+      });
 
-    if (!orderRes.ok) {
-      const body = await orderRes.json().catch(() => null);
-      throw new Error(body?.error ?? 'Could not create order');
-    }
+      if (!orderRes.ok) {
+        const body = await orderRes.json().catch(() => null);
+        throw new Error(body?.error ?? 'Could not create order');
+      }
 
-    const { order, amount, keyId } = await orderRes.json();
+      const { order, amount, keyId } = await orderRes.json();
 
-    const loaded = await loadRazorpayScript();
-    if (!loaded) throw new Error('Razorpay SDK failed to load');
+      const loaded = await loadRazorpayScript();
+      if (!loaded) throw new Error('Razorpay SDK failed to load');
 
-    const options: RazorpayOptions = {
-      key: keyId,
-      amount,
-      currency: 'INR',
-      name: 'Invade Cafe',
-      description: `${values.device?.toUpperCase()} · ${values.duration}hr session`,
-      order_id: order.id,
+      const options: RazorpayOptions = {
+        key: keyId,
+        amount,
+        currency: 'INR',
+        name: 'Invade Cafe',
+        description: `${values.device?.toUpperCase()} · ${values.duration}hr session`,
+        order_id: order.id,
 
-      theme: {
-        color: '#22d3ee',
-      },
+        theme: {
+          color: '#22d3ee',
+        },
 
-      handler: async (response) => {
-        const verifyRes = await fetch('/api/razorpay/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(response),
-        });
+        handler: async (response) => {
+          const verifyRes = await fetch('/api/razorpay/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
 
-        if (!verifyRes.ok) {
-          const body = await verifyRes.json().catch(() => null);
+          if (!verifyRes.ok) {
+            const body = await verifyRes.json().catch(() => null);
 
-          if (body?.code === 'SLOT_CONFLICT') {
-            setError(body.error);
+            if (body?.code === 'SLOT_CONFLICT') {
+              setError(body.error);
+              setLoading(false);
+              onSlotConflict?.(body.error);
+              return;
+            }
+
+            setError(
+              body?.error ??
+                'Payment succeeded but confirmation failed. Contact support.',
+            );
             setLoading(false);
-            onSlotConflict?.(body.error);
             return;
           }
 
-          setError(
-            body?.error ??
-              'Payment succeeded but confirmation failed. Contact support.',
-          );
-          setLoading(false);
-          return;
-        }
+          const { bookingId } = await verifyRes.json();
+          onPaymentSuccess(bookingId);
+        },
 
-        const { bookingId } = await verifyRes.json();
-        onPaymentSuccess(bookingId);
-      },
+        modal: {
+          ondismiss: () => setLoading(false),
+        },
+      };
 
-      modal: {
-        ondismiss: () => setLoading(false),
-      },
-    };
+      const rzp = new window.Razorpay(options);
 
-    const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', (resp: RazorpayFailureResponse) => {
+        setError(resp.error.description ?? 'Payment failed');
+        setLoading(false);
+      });
 
-    rzp.on('payment.failed', (resp: RazorpayFailureResponse) => {
-      setError(resp.error.description ?? 'Payment failed');
+      rzp.open();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Something went wrong');
       setLoading(false);
-    });
-
-    rzp.open();
-  } catch (err) {
-    setError(err instanceof Error ? err.message : 'Something went wrong');
-    setLoading(false);
+    }
   }
-}
 
   return (
     <div className='flex flex-col items-center gap-4 sm:gap-5 w-full'>

@@ -25,7 +25,12 @@ export function BookingActions({ booking }: { booking: BookingRow }) {
   if (booking.status === 'cancelled') return null;
 
   if (booking.status === 'completed') {
-    const canRefund = !!booking.user_id && booking.payment_status === 'paid';
+    const canRefund =
+      !!booking.user_id &&
+      booking.payment_status === 'paid' &&
+      booking.payment_method === 'razorpay' &&
+      !!booking.razorpay_payment_id;
+
     if (!canRefund) return null;
 
     return (
@@ -33,15 +38,18 @@ export function BookingActions({ booking }: { booking: BookingRow }) {
         onClick={() => {
           if (
             confirm(
-              "Mark this booking as refunded? Make sure you've processed the refund in Razorpay first.",
+              'Refund this booking through Razorpay? This will process the refund immediately.',
             )
           )
-            markRefunded.mutate(booking.id);
+            markRefunded.mutate({
+              bookingId: booking.id,
+              paymentId: booking.razorpay_payment_id!,
+            });
         }}
         disabled={markRefunded.isPending}
         className='text-xs text-orange-600 hover:underline'
       >
-        Mark refunded
+        Refund
       </button>
     );
   }
