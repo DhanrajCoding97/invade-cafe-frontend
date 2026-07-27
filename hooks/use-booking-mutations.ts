@@ -8,6 +8,7 @@ import {
   updatePaymentStatus,
   //   updateBooking,
 } from '@/app/actions/bookings';
+import type { PaymentMethod } from '@/types';
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
@@ -26,7 +27,7 @@ export function useMarkPaid() {
       method,
     }: {
       bookingId: string;
-      method: string;
+      method: PaymentMethod;
     }) => updatePaymentStatus(bookingId, 'paid', method),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
