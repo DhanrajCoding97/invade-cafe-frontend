@@ -1,10 +1,25 @@
 // app/dashboard/staff/LiveSessionBoard.tsx
 'use client';
-
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { startSession, endSession, extendSession } from '../actions';
 import { toast } from 'sonner';
+import { Loader2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
+// import { Button } from '@/components/ui/button';
+import { Trash2Icon } from 'lucide-react';
 // app/dashboard/staff/LiveSessionBoard.tsx
 type Booking = {
   id: string;
@@ -22,15 +37,123 @@ type Booking = {
 
 type Station = { id: string; name: string; type: string };
 
+// function StationCard({
+//   station,
+//   booking,
+// }: {
+//   station: Station;
+//   booking?: Booking;
+// }) {
+//   const isActive = !!booking?.session_started_at && !booking?.session_ended_at;
+//   const isBooked = !!booking && !isActive;
+
+//   let timeLeft: number | null = null;
+//   if (isActive && booking?.session_started_at) {
+//     const actualEnd = new Date(booking.session_started_at);
+//     actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
+//     const end = booking.extended_until ?? actualEnd.toISOString();
+//     timeLeft = getTimeLeft(end);
+//   }
+
+//   return (
+//     <div
+//       className={`rounded-xl border p-4 flex flex-col gap-2 ${
+//         isActive
+//           ? 'border-cyan-400 bg-cyan-400/10'
+//           : isBooked
+//             ? 'border-fuchsia-500/50 bg-fuchsia-500/5'
+//             : 'border-neutral-800 bg-neutral-900'
+//       }`}
+//     >
+//       <div className='flex justify-between items-center'>
+//         <span className='font-semibold text-sm'>{station.name}</span>
+//         <span
+//           className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
+//             isActive
+//               ? 'bg-cyan-400 text-black'
+//               : isBooked
+//                 ? 'bg-fuchsia-500 text-black'
+//                 : 'bg-neutral-700 text-neutral-300'
+//           }`}
+//         >
+//           {isActive ? 'Active' : isBooked ? 'Booked' : 'Free'}
+//         </span>
+//       </div>
+
+//       {booking ? (
+//         <>
+//           <p className='text-sm text-neutral-300'>
+//             {booking.profiles?.full_name ?? booking.customer_name ?? 'Guest'}
+//           </p>
+//           <p className='text-xs text-neutral-500'>
+//             {booking.start_time.slice(0, 5)}
+//           </p>
+//           {timeLeft !== null && (
+//             <p
+//               className={`text-xs font-mono ${timeLeft <= 5 ? 'text-red-400' : 'text-cyan-300'}`}
+//             >
+//               {timeLeft} min left
+//             </p>
+//           )}
+
+//           <div className='flex gap-2 mt-2'>
+//             {isBooked && (
+//               <button
+//                 onClick={() => startSession(booking.id)}
+//                 className='text-xs px-3 py-1.5 rounded-md bg-cyan-400 text-black font-medium'
+//               >
+//                 Start
+//               </button>
+//             )}
+//             {isActive && (
+//               <>
+//                 <button
+//                   onClick={() => endSession(booking.id)}
+//                   className='text-xs px-3 py-1.5 rounded-md bg-red-500/80 text-white font-medium'
+//                 >
+//                   End
+//                 </button>
+//                 <button
+//                   onClick={async () => {
+//                     const res = await extendSession(booking.id, station.id, 30);
+//                     if (!res.ok)
+//                       toast.message(
+//                         'Station is booked right after — cannot extend.',
+//                       );
+//                   }}
+//                   className='text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium'
+//                 >
+//                   +30m
+//                 </button>
+//               </>
+//             )}
+//           </div>
+//         </>
+//       ) : (
+//         <p className='text-xs text-neutral-500'>No booking</p>
+//       )}
+//     </div>
+//   );
+// }
+
 function StationCard({
   station,
   booking,
+  pendingIds,
+  onStart,
+  onEnd,
+  onExtend,
 }: {
   station: Station;
   booking?: Booking;
+  pendingIds: Set<string>;
+  onStart: (booking: Booking) => void;
+  onEnd: (booking: Booking) => void;
+  onExtend: (booking: Booking, stationId: string) => void;
 }) {
   const isActive = !!booking?.session_started_at && !booking?.session_ended_at;
   const isBooked = !!booking && !isActive;
+  const isPending = booking ? pendingIds.has(booking.id) : false;
 
   let timeLeft: number | null = null;
   if (isActive && booking?.session_started_at) {
@@ -84,30 +207,58 @@ function StationCard({
           <div className='flex gap-2 mt-2'>
             {isBooked && (
               <button
-                onClick={() => startSession(booking.id)}
-                className='text-xs px-3 py-1.5 rounded-md bg-cyan-400 text-black font-medium'
+                onClick={() => onStart(booking)}
+                disabled={isPending}
+                className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-cyan-400 text-black font-medium disabled:opacity-60'
               >
+                {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
                 Start
               </button>
             )}
             {isActive && (
               <>
-                <button
-                  onClick={() => endSession(booking.id)}
-                  className='text-xs px-3 py-1.5 rounded-md bg-red-500/80 text-white font-medium'
+                {/* <button
+                  onClick={() => onEnd(booking)}
+                  disabled={isPending}
+                  className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-red-500/80 text-white font-medium disabled:opacity-60'
                 >
+                  {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
                   End
-                </button>
+                </button> */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant='destructive'>End Session</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent size='sm'>
+                    <AlertDialogHeader>
+                      <AlertDialogMedia className='bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive'>
+                        <Trash2Icon />
+                      </AlertDialogMedia>
+                      <AlertDialogTitle>End Session?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        This will permanently end the session
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant='ghost'>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        variant='destructive'
+                        disabled={isPending}
+                        onClick={async () => await onEnd(booking)}
+                      >
+                        End Session
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
                 <button
-                  onClick={async () => {
-                    const res = await extendSession(booking.id, station.id, 30);
-                    if (!res.ok)
-                      toast.message(
-                        'Station is booked right after — cannot extend.',
-                      );
-                  }}
-                  className='text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium'
+                  onClick={() => onExtend(booking, station.id)}
+                  disabled={isPending}
+                  className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium disabled:opacity-60'
                 >
+                  {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
                   +30m
                 </button>
               </>
@@ -145,8 +296,119 @@ export default function LiveSessionBoard({
 }) {
   const [bookings, setBookings] = useState(initialBookings);
   const [activeType, setActiveType] = useState<StationType>('pc');
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
   const supabase = createClient();
 
+  function addPending(id: string) {
+    setPendingIds((prev) => new Set(prev).add(id));
+  }
+  function removePending(id: string) {
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+  }
+  function handleStart(booking: Booking) {
+    addPending(booking.id);
+    const promise = startSession(booking.id).finally(() =>
+      removePending(booking.id),
+    );
+    toast.promise(promise, {
+      loading: 'Starting session…',
+      success: 'Session started',
+      error: (err) =>
+        err instanceof Error ? err.message : 'Failed to start session',
+    });
+  }
+
+  // function handleEnd(booking: Booking) {
+  //   addPending(booking.id);
+  //   const promise = endSession(booking.id).finally(() =>
+  //     removePending(booking.id),
+  //   );
+  //   toast.promise(promise, {
+  //     loading: 'Ending session…',
+  //     success: 'Session ended',
+  //     error: (err) =>
+  //       err instanceof Error ? err.message : 'Failed to end session',
+  //   });
+  // }
+  // async function handleEnd(booking: Booking) {
+  //   addPending(booking.id);
+
+  //   try {
+  //     await toast.promise(endSession(booking.id), {
+  //       loading: 'Ending session...',
+  //       success: 'Session ended',
+  //       error: (err) =>
+  //         err instanceof Error ? err.message : 'Failed to end session',
+  //     });
+  //   } finally {
+  //     removePending(booking.id);
+  //   }
+  // }
+
+  async function handleEnd(booking: Booking) {
+    addPending(booking.id);
+
+    try {
+      await toast.promise(endSession(booking.id), {
+        loading: 'Ending session...',
+        success: 'Session ended',
+        error: (err) =>
+          err instanceof Error ? err.message : 'Failed to end session',
+      });
+    } finally {
+      removePending(booking.id);
+    }
+  }
+
+  function handleExtend(booking: Booking, stationId: string) {
+    addPending(booking.id);
+    const promise = extendSession(booking.id, stationId, 30)
+      .then((res) => {
+        if (!res.ok)
+          throw new Error('Station is booked right after — cannot extend.');
+        return res;
+      })
+      .finally(() => removePending(booking.id));
+    toast.promise(promise, {
+      loading: 'Extending session…',
+      success: 'Extended by 30 minutes',
+      error: (err) =>
+        err instanceof Error ? err.message : 'Failed to extend session',
+    });
+  }
+
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel('bookings-live')
+  //     .on(
+  //       'postgres_changes',
+  //       { event: '*', schema: 'public', table: 'bookings' },
+  //       (payload) => {
+  //         setBookings((prev) => {
+  //           if (payload.eventType === 'INSERT')
+  //             return [...prev, payload.new as Booking];
+  //           if (payload.eventType === 'UPDATE')
+  //             return prev.map((b) =>
+  //               b.id === payload.new.id
+  //                 ? ({ ...b, ...payload.new } as Booking)
+  //                 : b,
+  //             );
+  //           if (payload.eventType === 'DELETE')
+  //             return prev.filter((b) => b.id !== payload.old.id);
+  //           return prev;
+  //         });
+  //       },
+  //     )
+  //     .subscribe();
+
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [supabase]);
   useEffect(() => {
     const channel = supabase
       .channel('bookings-live')
@@ -175,7 +437,6 @@ export default function LiveSessionBoard({
       supabase.removeChannel(channel);
     };
   }, [supabase]);
-
   const currentBookingFor = (stationId: string) =>
     bookings
       .filter((b) => b.station_id === stationId && b.status === 'confirmed')
@@ -250,6 +511,10 @@ export default function LiveSessionBoard({
                     key={station.id}
                     station={station}
                     booking={currentBookingFor(station.id)}
+                    pendingIds={pendingIds}
+                    onStart={handleStart}
+                    onEnd={handleEnd}
+                    onExtend={handleExtend}
                   />
                 ))}
               </div>
