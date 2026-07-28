@@ -98,7 +98,7 @@ export default function BookingSection() {
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
           <LineReveal delay={0} duration={0.5}>
-          <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
+            <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
           {/* <GsapTextAnimation
             mode='controlled'
@@ -107,7 +107,7 @@ export default function BookingSection() {
             }}
           >
           </GsapTextAnimation> */}
-          <TextReveal triggerRef={sectionRef} delay={0.15} >
+          <TextReveal triggerRef={sectionRef} delay={0.15}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               LOCK IN. LEVEL UP
             </span>
@@ -120,13 +120,13 @@ export default function BookingSection() {
             linesRef.current.heading = lines;
           }}
         >        </GsapTextAnimation> */}
-          <TextReveal triggerRef={sectionRef} delay={0.25}>
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Claim Your Rig
             </span>
           </h1>
-          </TextReveal>
+        </TextReveal>
         {/* description */}
         {/* <GsapTextAnimation
           mode='controlled'
@@ -136,11 +136,11 @@ export default function BookingSection() {
         >
         </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Reserve From competitive PCs to VR and Sim Racing
           </p>
         </TextReveal>
-        <BookingForm  />
+        <BookingForm />
       </div>
     </section>
   );

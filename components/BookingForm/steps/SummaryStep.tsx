@@ -1,6 +1,6 @@
 // components/BookingForm/steps/SummaryStep.tsx
 'use client';
-
+import { PhoneInput } from '@/components/ui/phone-input';
 import { useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { format } from 'date-fns';
@@ -10,6 +10,10 @@ import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { FcGoogle } from 'react-icons/fc';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { cn } from '@/lib/utils';
+
+import { useState } from 'react';
+import { useProfile } from '@/hooks/use-profile';
+import { useUpdatePhone } from '@/hooks/use-update-phone';
 
 async function fetchStationName(stationId: string): Promise<string> {
   const supabase = createClient();
@@ -25,7 +29,7 @@ async function fetchStationName(stationId: string): Promise<string> {
 interface SummaryStepProps {
   session: { id: string } | null;
   onGoogleLogin: () => void;
-  onContinue: () => void; // advances to payment — only called when session exists
+  onContinue: () => void;
   isSubmitting: boolean;
 }
 
@@ -38,6 +42,25 @@ export default function SummaryStep({
   const { watch } = useFormContext<BookingFormValues>();
   const values = watch();
 
+  //update profile with phone number
+  const { data: profile, isLoading: profileLoading } = useProfile(session?.id);
+  const updatePhone = useUpdatePhone();
+  const [phoneInput, setPhoneInput] = useState('');
+  const [phoneError, setPhoneError] = useState<string | null>(null);
+
+  function handleSavePhone() {
+    const trimmed = phoneInput.trim();
+    if (!/^\+?[0-9]{10,15}$/.test(trimmed)) {
+      setPhoneError('Enter a valid phone number');
+      return;
+    }
+    setPhoneError(null);
+    updatePhone.mutate({ userId: session!.id, phone: trimmed });
+  }
+
+  const needsPhone = !!session && !profileLoading && !profile?.phone;
+
+  //fetch station
   const { data: stationName, isLoading } = useQuery({
     queryKey: ['station-name', values.stationId],
     queryFn: () => fetchStationName(values.stationId),
@@ -82,7 +105,7 @@ export default function SummaryStep({
         {rows.map((row) => (
           <div
             key={row.label}
-            className='flex justify-between text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+            className='flex justify-between text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'
           >
             <span className='text-white/50'>{row.label}</span>
             <span className='text-white'>{row.value}</span>
@@ -94,14 +117,7 @@ export default function SummaryStep({
         </div>
       </div>
 
-      {session ? (
-        // <button
-        //   type='button'
-        //   onClick={onContinue}
-        //   className='w-full rounded-lg bg-cyan-400 px-4 py-3 font-semibold text-black'
-        // >
-        //   Continue to Payment
-        // </button>
+      {/* {session ? (
         <CornerCutButton
           onClick={onContinue}
           variant='outline'
@@ -129,6 +145,68 @@ export default function SummaryStep({
           ) : (
             <>Signin In..</>
           )}
+        </CornerCutButton>
+      )} */}
+      {!session ? (
+        <CornerCutButton
+          disabled={isSubmitting}
+          onClick={onGoogleLogin}
+          variant='ghost'
+          className={cn(
+            'ml-auto',
+            'disabled:opacity-50 disabled:cursor-not-allowed',
+            isSubmitting && 'pointer-events-none',
+          )}
+          size='sm'
+        >
+          {!isSubmitting ? (
+            <>
+              Continue with <FcGoogle size={20} />
+            </>
+          ) : (
+            <>Signin In..</>
+          )}
+        </CornerCutButton>
+      ) : needsPhone ? (
+        <div className='flex flex-col gap-2 rounded-xl border border-cyan-400/40 p-4'>
+          <label htmlFor='phone' className='text-sm text-white/70'>
+            Add your phone number to continue
+          </label>
+
+          <div className='flex flex-col gap-3 sm:flex-row'>
+            <PhoneInput
+              id='phone'
+              placeholder='8454994242'
+              defaultCountry='IN'
+              value={phoneInput}
+              onChange={setPhoneInput}
+              className='flex-1'
+            />
+
+            <CornerCutButton
+              onClick={handleSavePhone}
+              disabled={updatePhone.isPending}
+              variant='outline'
+              size='sm'
+            >
+              {updatePhone.isPending ? 'Saving...' : 'Save'}
+            </CornerCutButton>
+          </div>
+
+          {phoneError && <p className='text-xs text-red-400'>{phoneError}</p>}
+
+          {updatePhone.isError && (
+            <p className='text-xs text-red-400'>{updatePhone.error.message}</p>
+          )}
+        </div>
+      ) : (
+        <CornerCutButton
+          onClick={onContinue}
+          variant='outline'
+          className='ml-auto'
+          size='sm'
+        >
+          Checkout
         </CornerCutButton>
       )}
     </div>

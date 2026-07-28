@@ -142,7 +142,7 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
         refunded: 'bg-blue-800 text-blue-200',
       };
       return (
-        <div className='flex flex-col gap-0.5 items-center justify-center'>
+        <div className='flex flex-col gap-0.5 items-start justify-center'>
           <span
             className={`rounded-full px-3 py-1 text-xs font-medium ${styles[b.payment_status]}`}
           >
@@ -178,30 +178,7 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   },
   {
     id: 'actions',
+    header: 'Actions',
     cell: ({ row }) => <BookingActions booking={row.original} />,
-    // cell: ({ row }) => {
-    //   const b = row.original;
-    //   if (b.status === 'completed') {
-    //     return b.user_id && b.payment_status === 'paid' ? (
-    //       <button onClick={() => openRefund(b)}>Refund</button>
-    //     ) : null;
-    //   }
-    //   if (b.status === 'cancelled') return null;
-    //   return (
-    //     <>
-    //       {b.payment_status === 'pending' && (
-    //         <button onClick={() => markPaid(b)}>Mark paid</button>
-    //       )}
-    //       <button onClick={() => cancelBooking(b)} className='text-red-400'>
-    //         Cancel
-    //       </button>
-    //     </>
-    //   );
-    // },
   },
-  // {
-  //   id: 'actions',
-  //   header: 'Actions',
-  //   cell: ({ row }) => <BookingActions booking={row.original} />,
-  // },
 ];

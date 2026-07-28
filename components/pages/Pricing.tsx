@@ -43,24 +43,27 @@ export default function PricingSection() {
     desc?: HTMLElement[];
   }>({});
 
-  useGSAP(() => {
-    const cards = cardsRef.current?.children;
-    if (!cards) return;
+  useGSAP(
+    () => {
+      const cards = cardsRef.current?.children;
+      if (!cards) return;
 
-    gsap.set(cards, { autoAlpha: 0, y: 48 });
-    gsap.to(cards, {
-      autoAlpha: 1,
-      y: 0,
-      duration: 0.4,
-      ease: 'power4.out',
-      stagger: 0.15,
-      scrollTrigger: {
-        trigger: cardsRef.current,
-        start: 'top 80%',
-        once: true,
-      },
-    });
-  }, { scope: sectionRef });
+      gsap.set(cards, { autoAlpha: 0, y: 48 });
+      gsap.to(cards, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.4,
+        ease: 'power4.out',
+        stagger: 0.15,
+        scrollTrigger: {
+          trigger: cardsRef.current,
+          start: 'top 80%',
+          once: true,
+        },
+      });
+    },
+    { scope: sectionRef },
+  );
 
   return (
     <section
@@ -72,9 +75,9 @@ export default function PricingSection() {
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
           <LineReveal delay={0} duration={0.5}>
-          <div className='h-px w-8 bg-[#00d4ff]' />
+            <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
-          <TextReveal triggerRef={sectionRef} delay={0.15} >
+          <TextReveal triggerRef={sectionRef} delay={0.15}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT IT COSTS
             </span>
@@ -92,80 +95,78 @@ export default function PricingSection() {
         <TextReveal triggerRef={sectionRef} delay={0.55}>
           <p
             ref={descRef}
-            className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
+            className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'
           >
             Simple rates, no hidden fees. Pick your setup and start playing.
           </p>
         </TextReveal>
         <CardsReveal triggerRef={sectionRef} delay={0.75} stagger={0.3}>
-        <div
-          className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '
-        >
-          {/* PC Gaming */}
-          <PricingCard
-            onBook={() => goToBooking('pc')}
-            icon={<PcIcon className='h-16 w-16' />}
-            title='PC gaming'
-            subtitle='Per hour'
-            price={80}
-            currency='₹'
-            priceUnit='/hr'
-            pricingMode='fixed'
-            accentColor='cyan'
-          />
+          <div className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '>
+            {/* PC Gaming */}
+            <PricingCard
+              onBook={() => goToBooking('pc')}
+              icon={<PcIcon className='h-16 w-16' />}
+              title='PC gaming'
+              subtitle='Per hour'
+              price={80}
+              currency='₹'
+              priceUnit='/hr'
+              pricingMode='fixed'
+              accentColor='cyan'
+            />
 
-          {/* PS5 — featured */}
-          <PricingCard
-            icon={<PsIcon className='h-16 w-16 text-white' />}
-            title='PS5'
-            subtitle='Price scales with players'
-            pricingMode='per-player'
-            playerPriceMap={{ 1: 100, 2: 160, 3: 240, 4: 300 }}
-            pricePerPlayer={100}
-            minPlayers={1}
-            maxPlayers={4}
-            currency='₹'
-            priceUnit='/hr'
-            featured
-            featuredLabel='Most popular'
-            accentColor='cyan'
-            onBook={({ players }) =>
-              goToBooking('ps5', { players: players ?? 1 })
-            }
-          />
+            {/* PS5 — featured */}
+            <PricingCard
+              icon={<PsIcon className='h-16 w-16 text-white' />}
+              title='PS5'
+              subtitle='Price scales with players'
+              pricingMode='per-player'
+              playerPriceMap={{ 1: 100, 2: 160, 3: 240, 4: 300 }}
+              pricePerPlayer={100}
+              minPlayers={1}
+              maxPlayers={4}
+              currency='₹'
+              priceUnit='/hr'
+              featured
+              featuredLabel='Most popular'
+              accentColor='cyan'
+              onBook={({ players }) =>
+                goToBooking('ps5', { players: players ?? 1 })
+              }
+            />
 
-          {/* Racing cockpit — tiered */}
-          <PricingCard
-            icon={<RacingSimIcon className='h-16 w-16' />}
-            title='Racing cockpit'
-            subtitle='Single or double rig'
-            pricingMode='tiered'
-            tiers={[
-              { label: 'Single Player', price: 150 },
-              { label: 'Multiplayer', price: 300 },
-            ]}
-            currency='₹'
-            accentColor='cyan'
-            onBook={({ tier }) =>
-              goToBooking('racing', {
-                tier: tier === 'Single Player' ? 'single' : 'multiplayer',
-              })
-            }
-          />
+            {/* Racing cockpit — tiered */}
+            <PricingCard
+              icon={<RacingSimIcon className='h-16 w-16' />}
+              title='Racing cockpit'
+              subtitle='Single or double rig'
+              pricingMode='tiered'
+              tiers={[
+                { label: 'Single Player', price: 150 },
+                { label: 'Multiplayer', price: 300 },
+              ]}
+              currency='₹'
+              accentColor='cyan'
+              onBook={({ tier }) =>
+                goToBooking('racing', {
+                  tier: tier === 'Single Player' ? 'single' : 'multiplayer',
+                })
+              }
+            />
 
-          {/* PSVR */}
-          <PricingCard
-            icon={<VrIcon className='h-16 w-16 text-white' />}
-            title='PSVR'
-            subtitle='Per hour'
-            price={200}
-            currency='₹'
-            priceUnit='/hr'
-            pricingMode='fixed'
-            accentColor='cyan'
-            onBook={() => goToBooking('vr')}
-          />
-        </div>
+            {/* PSVR */}
+            <PricingCard
+              icon={<VrIcon className='h-16 w-16 text-white' />}
+              title='PSVR'
+              subtitle='Per hour'
+              price={200}
+              currency='₹'
+              priceUnit='/hr'
+              pricingMode='fixed'
+              accentColor='cyan'
+              onBook={() => goToBooking('vr')}
+            />
+          </div>
         </CardsReveal>
       </div>
     </section>

@@ -7,7 +7,13 @@ import LineReveal from '../gsap/LineReveal';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';
 
-function InfoCard({ label, children }: { label: string; children: React.ReactNode }) {
+function InfoCard({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className='space-y-2 rounded-xl border border-white/10 bg-[#0a0a0a] p-5 transition-colors hover:border-[#00d4ff]/30'>
       <p className='text-[12px] tracking-wide text-[#00D4FF] uppercase sm:text-base'>
@@ -40,7 +46,7 @@ export default function Contact() {
           </TextReveal>
         </div>
         {/* main title */}
-         <TextReveal triggerRef={sectionRef} delay={0.25}>
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Visit Invade
@@ -49,7 +55,7 @@ export default function Contact() {
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Our location, hours, and the easiest ways to reach us.
           </p>
         </TextReveal>
@@ -57,20 +63,14 @@ export default function Contact() {
         <div className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
           {/* Info column */}
           <CardsReveal triggerRef={sectionRef} delay={1.05} stagger={0.4}>
-            <div
-              className='order-2 flex flex-col gap-4 md:order-1'
-            >
+            <div className='order-2 flex flex-col gap-4 md:order-1'>
               {/* social links card */}
-              <InfoCard
-                label='Get in touch'
-
-              >
+              <InfoCard label='Get in touch'>
                 <div className='flex flex-col gap-2.5'>
                   <ContactLink
                     icon={<WhatsappIcon height={16} width={16} />}
                     href='https://wa.me/918291158779'
                     accent='#25D366'
-
                   >
                     <span>WhatsApp us</span>
                   </ContactLink>
@@ -78,7 +78,6 @@ export default function Contact() {
                     icon={<InstagramIcon height={16} width={16} />}
                     href='https://instagram.com/invadegamingcafe'
                     accent='#E1306C'
-
                   >
                     @invadegamingcafe
                   </ContactLink>
@@ -86,7 +85,6 @@ export default function Contact() {
                     icon={<PhoneIcon height={16} width={16} />}
                     href='tel:+918291158779'
                     accent='#00d4ff'
-
                   >
                     +91 82911 58779
                   </ContactLink>
@@ -94,22 +92,19 @@ export default function Contact() {
                     icon={<MailIcon height={16} width={16} />}
                     href='mailto:hello@invadecafe.com'
                     accent='#FDD267'
-
                   >
                     hello@invadecafe.com
                   </ContactLink>
                 </div>
               </InfoCard>
               {/* address */}
-              <InfoCard
-                label='Address'
-              >
-                  <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
-                    Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
-                    opposite Juinagar Railway Station, Sector 11,
-                    <br />
-                    Sanpada, Navi Mumbai, Maharashtra 400705
-                  </p>
+              <InfoCard label='Address'>
+                <p className='text-[11px] sm:text-sm text-[#bcbcbc]'>
+                  Ground Floor, Bhakti Residency, Shop-08/A, Plot Number-06,
+                  opposite Juinagar Railway Station, Sector 11,
+                  <br />
+                  Sanpada, Navi Mumbai, Maharashtra 400705
+                </p>
               </InfoCard>
               {/* hours card */}
               <InfoCard label='Hours'>
@@ -122,9 +117,7 @@ export default function Contact() {
           </CardsReveal>
           {/* Map */}
           <LineReveal triggerRef={sectionRef} delay={0.75} duration={0.4}>
-            <div
-              className='group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2'
-            >
+            <div className='group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2'>
               <div className='pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-[#00d4ff]/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100' />{' '}
               <iframe
                 src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.5212078436365!2d73.01288567520483!3d19.05530278214504!2m3!1f0!2f0!3f0!3m2!1i1020!2i768!4f13.1!3m3!1m2!1s0x3be7c17d6e4b5365%3A0x3ef9695a4157527c!2sINVADE%20GAMING%20CAFE!5e1!3m2!1sen!2sin!4v1783675916752!5m2!1sen!2sin'

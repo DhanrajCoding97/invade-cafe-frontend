@@ -8,7 +8,7 @@ import CardsReveal from '../gsap/CardReveal';
 
 export default function ServicesSection() {
   const sectionRef = useRef<HTMLElement>(null);
- 
+
   return (
     <section
       id='services'
@@ -19,7 +19,7 @@ export default function ServicesSection() {
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
           <LineReveal triggerRef={sectionRef} delay={0}>
-            <div className='h-px w-8 bg-[#00d4ff]'/>
+            <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
           <TextReveal triggerRef={sectionRef} delay={0.15}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff] '>
@@ -37,9 +37,7 @@ export default function ServicesSection() {
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p
-            className='mx-auto mb-4 text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'
-          >
+          <p className='mx-auto mb-4 text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Everything you need for the ultimate gaming experience.
           </p>
         </TextReveal>
@@ -52,9 +50,7 @@ export default function ServicesSection() {
           </div>
         </LineReveal>
         <CardsReveal triggerRef={sectionRef} delay={0.85} stagger={0.45}>
-          <div
-            className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 '
-          >
+          <div className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 '>
             {services.map((service) => (
               <NeonGlowCornerCutCard
                 key={service.id}

@@ -1,7 +1,20 @@
 'use client';
-
-import { useMemo, useState } from 'react';
+import { useMemo, useRef } from 'react';
+import Link from 'next/link';
+import {
+  CalendarDays,
+  History,
+  User2,
+  Gamepad2,
+  LogOut,
+  Mail,
+  Phone,
+  Trophy,
+  Clock3,
+  Wallet,
+} from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import Badge from '@/app/components/neonblade-ui/badge';
 import {
   Card,
   CardContent,
@@ -10,13 +23,31 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CalendarDays, History, User, Gamepad2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogMedia,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { Button } from '@/components/ui/button';
 import {
   useMyBookings,
   useCancelMyBooking,
 } from '@/hooks/use-customer-booking';
+import { useMyProfile } from '@/hooks/use-my-profile';
+import { useRefundPercent } from '@/hooks/use-refund-percent';
 import type { BookingRow } from '@/types';
-import { useRef } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { handleSignOut } from '@/lib/auth/oauth';
+
 function hoursUntil(booking: BookingRow) {
   const start = new Date(`${booking.date}T${booking.start_time}`);
   return (start.getTime() - Date.now()) / 3_600_000;
@@ -24,6 +55,10 @@ function hoursUntil(booking: BookingRow) {
 
 function UpcomingCard({ booking }: { booking: BookingRow }) {
   const cancelMutation = useCancelMyBooking();
+  const { data } = useRefundPercent();
+
+  const refundPercent = data?.refundPercent ?? 100;
+
   const hrsLeft = hoursUntil(booking);
   const cancellingRef = useRef(false);
   const canCancel = booking.status === 'confirmed' && hrsLeft >= 2;
@@ -66,23 +101,89 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
 
       <CardFooter className='flex flex-col items-start gap-2'>
         {canCancel ? (
-          <button
-            onClick={() => {
-              if (cancellingRef.current) return;
-              if (confirm('Cancel this booking?')) {
-                cancellingRef.current = true;
-                cancelMutation.mutate(booking.id, {
-                  onSettled: () => {
-                    cancellingRef.current = false;
-                  },
-                });
-              }
-            }}
-            disabled={cancelMutation.isPending}
-            className='text-sm text-red-500 hover:underline disabled:opacity-50'
-          >
-            {cancelMutation.isPending ? 'Cancelling…' : 'Cancel Booking'}
-          </button>
+          // <button
+          //   onClick={() => {
+          //     if (cancellingRef.current) return;
+          //     if (confirm('Cancel this booking?')) {
+          //       cancellingRef.current = true;
+          //       cancelMutation.mutate(booking.id, {
+          //         onSettled: () => {
+          //           cancellingRef.current = false;
+          //         },
+          //       });
+          //     }
+          //   }}
+          //   disabled={cancelMutation.isPending}
+          //   className='text-sm text-red-500 hover:underline disabled:opacity-50'
+          // >
+          //   {cancelMutation.isPending ? 'Cancelling…' : 'Cancel Booking'}
+          // </button>
+          // <AlertDialog>
+          //   <AlertDialogTrigger asChild>
+          //     <Button variant='destructive'>Cancel Booking</Button>
+          //   </AlertDialogTrigger>
+          //   <AlertDialogContent size='sm'>
+          //     <AlertDialogHeader>
+          //       <AlertDialogMedia className='bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive'>
+          //         <Trash2Icon />
+          //       </AlertDialogMedia>
+          //       <AlertDialogTitle>Cancel Booking?</AlertDialogTitle>
+          //       {refundp}
+          //       <AlertDialogDescription>
+          //         This will permanently cancel your booking.Full refund for
+          //         first few cancellations then 90%
+          //       </AlertDialogDescription>
+          //     </AlertDialogHeader>
+          //     <AlertDialogFooter>
+          //       <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
+          //       <AlertDialogAction
+          //         variant='destructive'
+          //         disabled={cancelMutation.isPending}
+          //         onClick={() => {
+          //           if (cancellingRef.current) return;
+
+          //           cancellingRef.current = true;
+
+          //           cancelMutation.mutate(booking.id, {
+          //             onSettled: () => {
+          //               cancellingRef.current = false;
+          //             },
+          //           });
+          //         }}
+          //       >
+          //         {cancelMutation.isPending
+          //           ? 'Cancelling...'
+          //           : 'Cancel Booking'}
+          //       </AlertDialogAction>
+          //     </AlertDialogFooter>
+          //   </AlertDialogContent>
+          // </AlertDialog>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button disabled={!canCancel}>Cancel Booking</Button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Cancel booking?</AlertDialogTitle>
+
+                <AlertDialogDescription>
+                  This will permanently cancel your booking. You will receive a{' '}
+                  <strong>{refundPercent}% refund</strong>.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>Keep Booking</AlertDialogCancel>
+
+                <AlertDialogAction
+                  onClick={() => cancelMutation.mutate(booking.id)}
+                >
+                  Cancel Booking
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         ) : // <button
         //   onClick={() => {
         //     if (confirm('Cancel this booking?'))
@@ -116,20 +217,41 @@ function EmptyUpcoming() {
         <p className='mb-4 text-sm text-muted-foreground'>
           Book your next session.
         </p>
-        <a
+        <Link
           href='/#booking'
           className='inline-block rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
         >
           Book Session
-        </a>
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
+
+function StatCard({
+  icon,
+  title,
+  value,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  value: React.ReactNode;
+}) {
+  return (
+    <Card className='border-cyan-500/10 bg-black/30'>
+      <CardContent className='flex flex-col items-center gap-2 py-6'>
+        {icon}
+        <p className='text-sm text-muted-foreground'>{title}</p>
+        <p className='text-2xl font-bold text-cyan-400'>{value}</p>
       </CardContent>
     </Card>
   );
 }
 
 export default function CustomerDashboard() {
+  const { data: profile } = useMyProfile();
   const { data: bookings, isLoading, error } = useMyBookings();
-  const { upcoming, history } = useMemo(() => {
+  const { upcoming, history, stats } = useMemo(() => {
     const list = bookings ?? [];
     const now = Date.now();
 
@@ -153,6 +275,17 @@ export default function CustomerDashboard() {
 
         return end.getTime() < now;
       }),
+      stats: {
+        bookings: list.length,
+        hoursPlayed: list.reduce(
+          (total, booking) => total + Number(booking.duration_hours ?? 0),
+          0,
+        ),
+        totalSpent: list.reduce(
+          (total, booking) => total + Number(booking.amount ?? 0),
+          0,
+        ),
+      },
     };
   }, [bookings]);
   // const { upcoming, history } = useMemo(() => {
@@ -176,19 +309,20 @@ export default function CustomerDashboard() {
 
   return (
     <div className='container mx-auto max-w-6xl py-8'>
-      <div className='mb-8 flex items-center justify-between'>
-        <div>
-          <p className='text-sm text-muted-foreground'>Welcome back</p>
-          <h1 className='text-3xl font-bold'>Customer Dashboard</h1>
-        </div>
-        <a
+      <div className='mb-8 flex flex-col items-center justify-between'>
+        <p className='text-xl text-muted-foreground tracking-wider'>
+          Welcome back,
+          <span className='text-2xl font-black text-[#00F3FF] tracking-wider'>
+            {profile?.full_name ? ` ${profile.full_name}` : ''}{' '}
+          </span>
+        </p>
+        {/* <a
           href='/#booking'
           className='rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
         >
           Book Session
-        </a>
+        </a> */}
       </div>
-
       <Tabs defaultValue='upcoming' className='w-full'>
         <TabsList className='grid w-full grid-cols-3'>
           <TabsTrigger value='upcoming'>
@@ -200,7 +334,7 @@ export default function CustomerDashboard() {
             History
           </TabsTrigger>
           <TabsTrigger value='account'>
-            <User className='mr-2 h-4 w-4' />
+            <User2 className='mr-2 h-4 w-4' />
             Account
           </TabsTrigger>
         </TabsList>
@@ -213,6 +347,12 @@ export default function CustomerDashboard() {
               {upcoming.map((b) => (
                 <UpcomingCard key={b.id} booking={b} />
               ))}
+              <Link
+                href='/#booking'
+                className='rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
+              >
+                Book Session
+              </Link>
             </div>
           ) : (
             <EmptyUpcoming />
@@ -287,8 +427,143 @@ export default function CustomerDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value='account' className='mt-4'>
+        <TabsContent value='account' className='mt-4 flex flex-col gap-4'>
           {/* Account card content */}
+          <Card className='border-cyan-500/20 bg-zinc-900/50 backdrop-blur p-3 sm:p-4 lg:p-5'>
+            <CardHeader>
+              <CardTitle className='p-0'>Profile</CardTitle>
+            </CardHeader>
+
+            <CardContent className='flex items-center gap-2 sm:gap-4 lg:gap-6'>
+              <Avatar className='h-14 w-14 sm:h-20 sm:w-20'>
+                <AvatarImage src={profile?.avatar_url ?? ''} />
+                <AvatarFallback>
+                  {profile?.full_name.slice(0, 2)}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className='flex-1 space-y-4'>
+                <div>
+                  <h3 className='text-xl font-semibold text-cyan-400'>
+                    {profile?.full_name.name}
+                  </h3>
+                </div>
+
+                <div className='space-y-3 text-sm text-muted-foreground'>
+                  <div className='flex items-center gap-2'>
+                    <Mail size={16} />
+                    {profile?.email}
+                  </div>
+
+                  <div className='flex items-center gap-2'>
+                    <Phone size={16} />
+                    {profile?.phone || 'No phone number'}
+                  </div>
+
+                  <div>
+                    Member Since{' '}
+                    <span className='text-white'>
+                      {new Date(profile?.created_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='border-cyan-500/20 bg-zinc-900/50 p-2 sm:p-3 lg:p-5'>
+            <CardHeader>
+              <CardTitle>Gaming Stats</CardTitle>
+            </CardHeader>
+
+            <CardContent className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
+              <StatCard
+                icon={<Trophy />}
+                title='Bookings'
+                value={stats.bookings}
+              />
+
+              <StatCard
+                icon={<Clock3 />}
+                title='Hours Played'
+                value={stats.hoursPlayed}
+              />
+
+              <StatCard
+                icon={<Wallet />}
+                title='Total Spent'
+                value={`₹${stats.totalSpent}`}
+              />
+            </CardContent>
+          </Card>
+
+          <Card className='border-cyan-500/20 bg-zinc-900/50 p-2 sm:p-3 lg:p-5'>
+            <CardHeader>
+              <CardTitle>Preferences</CardTitle>
+            </CardHeader>
+
+            <CardContent className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                Booking Reminders
+                <Switch defaultChecked />
+              </div>
+
+              <Separator />
+
+              <div className='flex items-center justify-between'>
+                Promotional Emails
+                <Switch />
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className='border-cyan-500/20 bg-zinc-900/50 p-2 sm:p-3 lg:p-5'>
+            <CardHeader>
+              <CardTitle>Connected Account</CardTitle>
+            </CardHeader>
+
+            <CardContent className='flex items-center justify-between'>
+              <span>Google</span>
+
+              <Badge
+                responsive
+                variant='outline'
+                dot='pulse'
+                glow={true}
+                size='sm'
+              >
+                Connected
+              </Badge>
+            </CardContent>
+          </Card>
+
+          <Button
+            variant='outline'
+            className='w-full gap-2'
+            onClick={handleSignOut}
+          >
+            <LogOut size={18} />
+            Sign Out
+          </Button>
+
+          {/* {onDelete && (
+            <Card className='border-red-500/30 bg-red-950/10'>
+              <CardHeader>
+                <CardTitle className='text-red-400'>Danger Zone</CardTitle>
+              </CardHeader>
+
+              <CardContent>
+                <Button
+                  variant='destructive'
+                  className='gap-2'
+                  onClick={onDelete}
+                >
+                  <Trash2Icon size={16} />
+                  Delete Account
+                </Button>
+              </CardContent>
+            </Card>
+          )} */}
         </TabsContent>
       </Tabs>
     </div>

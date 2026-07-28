@@ -83,58 +83,120 @@
 // }
 
 // lenisInstance.ts
+// import Lenis from 'lenis';
+// import gsap from 'gsap';
+// import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+// let lenis: Lenis | null = null;
+// let resizeObserver: ResizeObserver | null = null;
+
+// export function isTouchDevice() {
+//   return typeof window !== 'undefined' &&
+//     window.matchMedia('(pointer: coarse)').matches;
+// }
+
+// export function getLenisInstance() {
+//   if (isTouchDevice()) return null;
+//   if (!lenis) {
+//     lenis = new Lenis({
+//       duration: 1.2,
+//       smoothWheel: true,
+//       syncTouch: true, // no longer needed since touch never reaches here, but harmless
+//     });
+
+//     lenis.on('scroll', () => ScrollTrigger.update());
+
+//     gsap.ticker.add((time) => {
+//       lenis!.raf(time * 1000);
+//     });
+//     gsap.ticker.lagSmoothing(0);
+
+//     let refreshTimeout: ReturnType<typeof setTimeout>;
+//     resizeObserver = new ResizeObserver(() => {
+//       clearTimeout(refreshTimeout);
+//       refreshTimeout = setTimeout(() => {
+//         ScrollTrigger.refresh();
+//       }, 150);
+//     });
+//     resizeObserver.observe(document.body);
+//   }
+//   return lenis;
+// }
+
+// export function destroyLenis() {
+//   if (lenis) {
+//     gsap.ticker.remove((time) => {
+//       lenis!.raf(time * 1000);
+//     });
+//     lenis.destroy();
+//     lenis = null;
+//   }
+//   if (resizeObserver) {
+//     resizeObserver.disconnect();
+//     resizeObserver = null;
+//   }
+// }
+
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 let lenis: Lenis | null = null;
 let resizeObserver: ResizeObserver | null = null;
+let tickerCallback: ((time: number) => void) | null = null;
 
 export function isTouchDevice() {
-  return typeof window !== 'undefined' &&
-    window.matchMedia('(pointer: coarse)').matches;
+  return (
+    typeof window !== 'undefined' &&
+    window.matchMedia('(pointer: coarse)').matches
+  );
 }
 
 export function getLenisInstance() {
-  // Don't create Lenis on touch devices — normalizeScroll owns scroll there.
   if (isTouchDevice()) return null;
-// console.log('lenis created', lenis)
+
   if (!lenis) {
-    // console.log('lenis created', lenis)
     lenis = new Lenis({
       duration: 1.2,
       smoothWheel: true,
-      syncTouch: true, // no longer needed since touch never reaches here, but harmless
     });
 
     lenis.on('scroll', () => ScrollTrigger.update());
 
-    gsap.ticker.add((time) => {
-      lenis!.raf(time * 1000);
-    });
+    tickerCallback = (time) => {
+      lenis?.raf(time * 1000);
+    };
+
+    gsap.ticker.add(tickerCallback);
     gsap.ticker.lagSmoothing(0);
 
     let refreshTimeout: ReturnType<typeof setTimeout>;
+
     resizeObserver = new ResizeObserver(() => {
       clearTimeout(refreshTimeout);
+
       refreshTimeout = setTimeout(() => {
         ScrollTrigger.refresh();
       }, 150);
     });
+
     resizeObserver.observe(document.body);
   }
-  // console.log('lenins created')
+
   return lenis;
 }
 
 export function destroyLenis() {
+  if (tickerCallback) {
+    gsap.ticker.remove(tickerCallback);
+    tickerCallback = null;
+  }
+
   if (lenis) {
-    gsap.ticker.remove((time) => {
-      lenis!.raf(time * 1000);
-    });
     lenis.destroy();
     lenis = null;
   }
+
   if (resizeObserver) {
     resizeObserver.disconnect();
     resizeObserver = null;

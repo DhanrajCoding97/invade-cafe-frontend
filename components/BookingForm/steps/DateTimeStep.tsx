@@ -299,11 +299,11 @@ export default function DateTimeStep() {
 
                 {availableSlots.length === 0 && !canPlayNow && (
                   <div className='flex flex-col '>
-                    <p className='mt-2 text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+                    <p className='mt-2 text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
                       No slots left today for a {duration}-hour session.
                     </p>
                     <Link
-                      className='hover underline underline-offset-2 text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]  decoration-primary hover:decoration-pink-600 transition-all duration-300 ease-in'
+                      className='hover underline underline-offset-2 text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]  decoration-primary hover:decoration-pink-600 transition-all duration-300 ease-in'
                       href='tel:+918291158779'
                     >
                       Call for confirmation

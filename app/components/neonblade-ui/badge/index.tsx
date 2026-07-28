@@ -31,7 +31,7 @@ const CORNER_CLIP: Record<BadgeCorner, string> = {
 };
 // Size: padding + font-size + gap for inner badge content
 const INNER_SIZE: Record<BadgeSize, string> = {
-  xs: 'px-2 py-0.5 text-[9px] gap-1',
+  xs: 'px-2 py-0.5 text-[9px] gap-2',
   sm: 'px-2.5 py-1 text-[10px] gap-[5px]',
   md: 'px-3.5 py-[5px] text-[11px] gap-[6px]',
 };
@@ -40,10 +40,10 @@ const INNER_SIZE: Record<BadgeSize, string> = {
 //   "px-2 py-0.5 text-[9px] gap-1 min-[340px]:px-2.5 min-[340px]:py-1 min-[340px]:text-[8px] min-[340px]:gap-[5px] md:px-3.5 md:py-[5px] text-[9px] md:text-[14px] md:gap-[6px]"
 
 const RESPONSIVE_INNER_SIZE =
-  'px-2 py-0.5 gap-1 text-[clamp(9px,1.8vw,14px)] md:px-3.5 md:py-[5px]';
+  'px-1.5 py-1 gap-1 sm:gap-2 text-[9px] sm:text-[10px] md:px-3 md:py-[5px] tracking-whider';
 
 const RESPONSIVE_DOT_SIZE =
-  'w-[5px] h-[5px] min-[340px]:w-[6px] min-[340px]:h-[6px] md:w-[7px] md:h-[7px]';
+  'w-[2px] h-[2px] min-[340px]:w-[6px] min-[340px]:h-[6px] md:w-[7px] md:h-[7px]';
 
 // Dot dimensions per badge size
 const DOT_SIZE: Record<BadgeSize, string> = {
@@ -71,7 +71,7 @@ export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
 
 export const Badge: React.FC<BadgeProps> = ({
   children,
-  color = 'cyan',
+  color = 'green',
   variant = 'outline',
   shape = 'pill',
   corner = 'bottom-right',
@@ -93,9 +93,7 @@ export const Badge: React.FC<BadgeProps> = ({
     'absolute inset-0 pointer-events-none z-0',
     roundedClass,
     clipClass,
-    variant === 'outline'
-      ? 'bg-[var(--bdg-color)]'
-      : 'bg-white/[0.08]'
+    variant === 'outline' ? 'bg-[var(--bdg-color)]' : 'bg-white/[0.08]',
   );
 
   // Inner badge content
@@ -104,13 +102,10 @@ export const Badge: React.FC<BadgeProps> = ({
     responsive ? RESPONSIVE_INNER_SIZE : INNER_SIZE[size],
     roundedClass,
     clipClass,
-    variant === 'solid' &&
-      'bg-[var(--bdg-color)] text-black',
-    variant === 'outline' &&
-      'bg-black text-[var(--bdg-color)]',
-    variant === 'ghost' &&
-      'text-[var(--bdg-color)]',
-    glow && styles['bdg-glow']
+    variant === 'solid' && 'bg-[var(--bdg-color)] text-black',
+    variant === 'outline' && 'bg-black text-[var(--bdg-color)]',
+    variant === 'ghost' && 'text-[var(--bdg-color)]',
+    glow && styles['bdg-glow'],
   );
 
   // Ghost variant needs color-mix background (not expressible in Tailwind)
@@ -123,7 +118,7 @@ export const Badge: React.FC<BadgeProps> = ({
 
   const dotAnimClass = cn(
     dot === 'pulse' && styles['bdg-dot-pulse'],
-    dot === 'flicker' && styles['bdg-dot-flicker']
+    dot === 'flicker' && styles['bdg-dot-flicker'],
   );
 
   return (
@@ -131,7 +126,7 @@ export const Badge: React.FC<BadgeProps> = ({
       className={cn(
         'relative inline-flex p-px align-middle',
         roundedClass,
-        className
+        className,
       )}
       style={
         {
@@ -148,14 +143,14 @@ export const Badge: React.FC<BadgeProps> = ({
       {/* Inner content */}
       <span className={innerClass} style={ghostStyle}>
         {dot !== 'none' && (
-        <span
-          className={cn(
-            'inline-block shrink-0 rounded-full bg-var(--bdg-color)',
-            responsive ? RESPONSIVE_DOT_SIZE : DOT_SIZE[size],
-            dotAnimClass
-          )}
-          aria-hidden="true"
-        />
+          <span
+            className={cn(
+              'inline-block shrink-0 rounded-full bg-[var(--bdg-color)]',
+              responsive ? RESPONSIVE_DOT_SIZE : DOT_SIZE[size],
+              dotAnimClass,
+            )}
+            aria-hidden='true'
+          />
         )}
         {children}
       </span>

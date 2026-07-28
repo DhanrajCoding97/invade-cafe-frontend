@@ -10,3 +10,8 @@ export async function handleOAuthLogin(next: string = '/') {
     },
   });
 }
+
+export const handleSignOut = async () => {
+  const supabase = createClient();
+  await supabase.auth.signOut();
+};

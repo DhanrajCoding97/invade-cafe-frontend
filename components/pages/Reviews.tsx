@@ -54,7 +54,7 @@ export default function TestimonialSection() {
       <div className='mx-auto mt-8 md:mt-10 lg:mt-12 max-w-6xl'>
         <div className='my-4 flex items-center gap-4'>
           <LineReveal triggerRef={sectionRef} delay={0}>
-            <div  className='h-px w-8 bg-[#00d4ff]' />
+            <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
           <TextReveal triggerRef={sectionRef} delay={0.25}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
@@ -71,15 +71,13 @@ export default function TestimonialSection() {
           </h1>
         </TextReveal>
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+          <p className='text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Real feedback from real customers.
           </p>
         </TextReveal>
       </div>
       <LineReveal triggerRef={sectionRef} delay={0.75}>
-        <div
-          className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'
-        >
+        <div className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'>
           <Marquee pauseOnHover className='[--duration:22s]'>
             {firstRow.map((review, index) => (
               <Link

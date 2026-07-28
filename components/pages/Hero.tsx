@@ -76,7 +76,10 @@ export default function HeroSection() {
             </span>
           </h1>
           <span className='line-mask'>
-            <span className='line-inner' style={{ animationDelay: '0.4s' }}>
+            <span
+              className='line-inner text-white  text-[clamp(0.8rem,2vw,1.125rem)]'
+              style={{ animationDelay: '0.4s' }}
+            >
               Laid-back hangout featuring PC and PlayStation games, plus racing
               simulators and VR options.
             </span>
@@ -87,9 +90,9 @@ export default function HeroSection() {
             className=' hero-cta-book-now'
             onClick={() => {
               document.querySelector('#booking')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
+                behavior: 'smooth',
+                block: 'start',
+              });
             }}
             color='cyan'
             variant='solid'
@@ -103,9 +106,9 @@ export default function HeroSection() {
             className=' hero-cta-pricing'
             onClick={() => {
               document.querySelector('#pricing')?.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
+                behavior: 'smooth',
+                block: 'start',
+              });
             }}
             color='green'
             variant='ghost'
