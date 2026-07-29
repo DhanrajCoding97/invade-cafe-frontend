@@ -1,35 +1,16 @@
 'use client';
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
-// import './navbar.css';
-import { playSectionTransition } from '@/lib/PageTransition';
 import { getLenisInstance } from '@/lib/lenisInstance';
-import styles from "./navbar.module.css"
 import { cn } from '@/lib/utils';
-/** Intercepts hash-link clicks and routes them through Lenis and page transition if available. */
-// function scrollToSection(href?: string): boolean {
-//   if (!href || !href.startsWith('#')) return false;
-//   const lenis = getLenisInstance();
-//   console.log('lenis instance:', lenis);
-//   if (lenis && typeof lenis.scrollTo === 'function') {
-//     lenis.scrollTo(href, { offset: 20 });
-//   } else {
-//     // now correctly hit on mobile
-//     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
-//   }
-//   return true;
-// }
-// ---- Types -------------------------------------------------
-
+import styles from './navbar.module.css';
 
 function scrollToSection(href?: string): boolean {
   if (!href) {
-    console.log('bailing — no href');
     return false;
   }
 
   const hashIndex = href.indexOf('#');
   if (hashIndex === -1) {
-    console.log('bailing — no hash in href');
     return false;
   }
 
@@ -307,7 +288,7 @@ function SubMenuDropdown({
       ? styles['nbr-submenu--left']
       : align === 'right'
         ? styles['nbr-submenu--right']
-        : styles['nbr-submenu--center']
+        : styles['nbr-submenu--center'];
 
   return (
     <div
@@ -333,7 +314,11 @@ function SubMenuDropdown({
             {item.label}
           </a>
         ) : (
-          <button key={idx} className={styles['nbr-submenu-item']} onClick={item.onClick}>
+          <button
+            key={idx}
+            className={styles['nbr-submenu-item']}
+            onClick={item.onClick}
+          >
             {item.icon && (
               <span className='inline-flex h-[0.8rem] w-[0.8rem] items-center'>
                 {item.icon}
@@ -392,7 +377,11 @@ function NavDesktopItem({
         {item.label}
       </a>
     ) : (
-      <button className={styles['nbr-nav-item']} style={style} onClick={item.onClick}>
+      <button
+        className={styles['nbr-nav-item']}
+        style={style}
+        onClick={item.onClick}
+      >
         {item.icon && (
           <span className='inline-flex h-[0.9rem] w-[0.9rem] items-center'>
             {item.icon}
@@ -406,10 +395,7 @@ function NavDesktopItem({
   return (
     <div ref={wrapRef} className='relative'>
       <button
-        className={cn(
-          styles['nbr-nav-item'],
-          styles['nbr-nav-item--has-sub']
-        )}
+        className={cn(styles['nbr-nav-item'], styles['nbr-nav-item--has-sub'])}
         style={style}
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
@@ -424,7 +410,7 @@ function NavDesktopItem({
         <span
           className={cn(
             styles['nbr-chevron'],
-            open && styles['nbr-chevron--open']
+            open && styles['nbr-chevron--open'],
           )}
         >
           ▾
@@ -500,10 +486,14 @@ function ProfileDropdown({
 
       {open && (
         <div className={styles['nbr-profile-menu']} style={style}>
-          {name && <div className={styles['nbr-profile-menu-header']}>{name}</div>}
+          {name && (
+            <div className={styles['nbr-profile-menu-header']}>{name}</div>
+          )}
           {items.map((item, idx) => {
             if (item.divider) {
-              return <div key={idx} className={styles['nbr-profile-divider']} />;
+              return (
+                <div key={idx} className={styles['nbr-profile-divider']} />
+              );
             }
             return (
               <button
@@ -607,27 +597,26 @@ export const NavBar: React.FC<NavBarProps> = ({
     <a
       href={logoHref}
       className={cn(
-        styles['nbr-logo'], 
-        'inline-flex shrink-0 cursor-pointer items-center gap-2.5 no-underline'
+        styles['nbr-logo'],
+        'inline-flex shrink-0 cursor-pointer items-center gap-2.5 no-underline',
       )}
     >
       {typeof logo === 'string' ? (
         <img
           src={logo}
           alt='Logo'
-          className={cn(
-            styles['nbr-logo-img'],
-            'h-9 w-9 object-contain'
-          )}
+          className={cn(styles['nbr-logo-img'], 'h-9 w-9 object-contain')}
         />
       ) : (
         logo
       )}
       {logoText && (
-        <span className={cn(
-          styles['nbr-logo-text'],
-          'font-orbitron duration-280ms text-[1.05rem] font-bold tracking-[0.08em] text-white transition-[color,text-shadow]'
-        )}>
+        <span
+          className={cn(
+            styles['nbr-logo-text'],
+            'font-orbitron duration-280ms text-[1.05rem] font-bold tracking-[0.08em] text-white transition-[color,text-shadow]',
+          )}
+        >
           {logoText}
         </span>
       )}
@@ -644,17 +633,17 @@ export const NavBar: React.FC<NavBarProps> = ({
         ? styles['nbr-pos-static']
         : position === 'sticky'
           ? styles['nbr-pos-sticky']
-          : styles['nbr-pos-fixed']
+          : styles['nbr-pos-fixed'];
 
     return (
       <nav
-      className={cn(
-        styles['nbr-dock'],
-        styles[`nbr-dock--${dockPosition}`],
-        hidden && styles['nbr-hidden'],
-        dockPosClass,
-        className
-      )}
+        className={cn(
+          styles['nbr-dock'],
+          styles[`nbr-dock--${dockPosition}`],
+          hidden && styles['nbr-hidden'],
+          dockPosClass,
+          className,
+        )}
         // className={`nbr-dock nbr-dock--${dockPosition} ${hidden ? 'nbr-hidden' : ''} ${dockPosClass} ${className}`}
         style={cssVars}
         aria-label='Navigation'
@@ -666,7 +655,7 @@ export const NavBar: React.FC<NavBarProps> = ({
               href={item.href}
               className={cn(
                 styles['nbr-dock-item'],
-                item.active && styles['nbr-dock-item--active']
+                item.active && styles['nbr-dock-item--active'],
               )}
               onClick={item.onClick}
               title={item.label}
@@ -678,7 +667,9 @@ export const NavBar: React.FC<NavBarProps> = ({
                 </span>
               )}
               {dockShowLabels && (
-                <span className={styles['nbr-dock-item-label']}>{item.label}</span>
+                <span className={styles['nbr-dock-item-label']}>
+                  {item.label}
+                </span>
               )}
             </a>
           ))}
@@ -721,20 +712,20 @@ export const NavBar: React.FC<NavBarProps> = ({
   // Determine background class — transparent can upgrade to glass on scroll
   const bgClass =
     scrollEffect && transparency === 'transparent' && scrolled
-      ? cn(styles['nbr-bg-glass'],styles['nbr-scrolled'])
-      : styles[`nbr-bg-${transparency}`]
+      ? cn(styles['nbr-bg-glass'], styles['nbr-scrolled'])
+      : styles[`nbr-bg-${transparency}`];
 
   return (
     <>
       <nav
-      className={cn(
-        styles['nbr-root'],
-        posClass,
-        bgClass,
-        hidden && styles['nbr-hidden'],
-        'z-100 w-full',
-        className
-      )}
+        className={cn(
+          styles['nbr-root'],
+          posClass,
+          bgClass,
+          hidden && styles['nbr-hidden'],
+          'z-100 w-full',
+          className,
+        )}
         // className={`nbr-root ${posClass} ${bgClass} ${hidden ? 'nbr-hidden' : ''} z-100 w-full ${className}`}
         style={cssVars}
         aria-label='Navigation'
@@ -774,7 +765,7 @@ export const NavBar: React.FC<NavBarProps> = ({
             <button
               className={cn(
                 styles['nbr-hamburger'],
-                'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-280 md:hidden'
+                'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-280 md:hidden',
               )}
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
@@ -784,7 +775,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                 // className={`nbr-ham-icon${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
                 className={cn(
                   styles['nbr-ham-icon'],
-                  mobileOpen && styles['nbr-ham-icon--open']
+                  mobileOpen && styles['nbr-ham-icon--open'],
                 )}
                 // className={`nbr-ham-icon ${mobileOpen ? 'nbr-ham-icon--open' : ''}`}
               />
@@ -806,7 +797,7 @@ export const NavBar: React.FC<NavBarProps> = ({
                       <button
                         className={cn(
                           styles['nbr-mobile-item'],
-                          styles['nbr-mobile-item--has-sub']
+                          styles['nbr-mobile-item--has-sub'],
                         )}
                         onClick={() => setOpenMobileIdx(isOpen ? null : idx)}
                         aria-expanded={isOpen}
@@ -818,9 +809,10 @@ export const NavBar: React.FC<NavBarProps> = ({
                         )}
                         <span>{item.label}</span>
                         <span
-                        className={cn(styles['nbr-chevron'],
-                          isOpen && styles['nbr-chevron--open']
-                        )}
+                          className={cn(
+                            styles['nbr-chevron'],
+                            isOpen && styles['nbr-chevron--open'],
+                          )}
                         >
                           ▾
                         </span>

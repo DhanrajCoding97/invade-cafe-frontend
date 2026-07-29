@@ -1,22 +1,17 @@
 // booking-actions.tsx
 'use client';
+import { useState } from 'react';
 import { type BookingRow } from '@/types';
+import ManualBookingForm from '../(dashboard)/dashboard/staff/components/ManualBookingForm';
 import {
   useCancelBooking,
   useMarkPaid,
   useMarkRefunded,
 } from '@/hooks/use-booking-mutations';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
 
 export function BookingActions({ booking }: { booking: BookingRow }) {
-  console.log(
-    'status:',
-    JSON.stringify(booking.status),
-    'user_id:',
-    booking.user_id,
-    'payment_status:',
-    booking.payment_status,
-  );
-
   const cancelBooking = useCancelBooking();
   const markPaid = useMarkPaid();
   const markRefunded = useMarkRefunded();
@@ -80,6 +75,34 @@ export function BookingActions({ booking }: { booking: BookingRow }) {
         Cancel
       </button>
       {/* Edit opens a dialog/sheet — separate component */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <Button>Edit</Button>
+        </DialogTrigger>
+        <DialogContent className='w-full max-w-lg max-h-[90vh] overflow-y-auto'>
+          <ManualBookingForm
+            mode='edit'
+            bookingId={booking.id}
+            defaultValues={{
+              customerName: booking.customer_name ?? '',
+              customerPhone: booking.customer_phone ?? '',
+              device: booking.device,
+              stationId: booking.station_id,
+              date: new Date(booking.date),
+              startTime: booking.start_time,
+              duration: booking.duration_hours ?? 1,
+              players: booking.players,
+              paymentMethod:
+                booking.payment_method === 'razorpay' ||
+                booking.payment_method === null
+                  ? 'cash'
+                  : booking.payment_method,
+              amountOverride: booking.amount,
+              startNow: !!booking.session_started_at,
+            }}
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

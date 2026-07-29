@@ -1,8 +1,11 @@
 'use server';
 
 import { createClient } from '@/lib/supabase/server';
+import { format } from 'date-fns';
+import { getDisplayRate, calculateTotal } from '@/lib/pricing';
+import { requireRole } from '@/lib/auth/requrireRole';
+import { type ManualBookingValues } from '@/lib/schemas/ManualBookingFormSchema';
 import { revalidatePath } from 'next/cache';
-
 export async function startSession(bookingId: string) {
   const supabase = await createClient();
 
@@ -83,4 +86,180 @@ export async function extendSession(
   if (error) throw new Error(error.message);
   revalidatePath('/dashboard/staff');
   return { ok: true as const };
+}
+
+// async function createManualBooking(values: ManualBookingValues) {
+//   const supabase = createClient();
+//   const {
+//     data: { user },
+//   } = await supabase.auth.getUser();
+//   const computedTotal = values;
+//   const total =
+//     values.paymentMethod === 'complimentary'
+//       ? 0
+//       : (values.amountOverride ?? computedTotal);
+
+//   const { data, error } = await supabase
+//     .from('bookings')
+//     .insert({
+//       station_id: values.stationId,
+//       device: values.device,
+//       tier: values.tier ?? null,
+//       players: values.players,
+//       duration_hours: values.duration,
+//       date: format(values.date, 'yyyy-MM-dd'),
+//       start_time: values.startTime,
+//       amount: total,
+//       status: 'confirmed',
+//       user_id: null,
+//       staff_id: user?.id ?? null,
+//       customer_name: values.customerName,
+//       customer_phone: values.customerPhone,
+//       payment_method: values.paymentMethod,
+//       session_started_at: values.startNow ? new Date().toISOString() : null,
+//     })
+//     .select('id')
+//     .single();
+
+//   if (error) {
+//     if (
+//       error.code === '23505' ||
+//       error.message?.toLowerCase().includes('conflict')
+//     ) {
+//       throw new Error('That station was just booked — pick another one.');
+//     }
+//     throw new Error(error.message);
+//   }
+//   return data.id;
+// }
+export async function createManualBooking(values: ManualBookingValues) {
+  await requireRole(['owner', 'staff']);
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Fetch the station server-side — never trust a client-sent rate/total
+  const { data: station, error: stationError } = await supabase
+    .from('stations')
+    .select('hourly_rate')
+    .eq('id', values.stationId)
+    .single();
+
+  if (stationError || !station) {
+    throw new Error('Selected station not found.');
+  }
+
+  const rate = getDisplayRate({
+    device: values.device,
+    players: values.players,
+    tier: values.tier,
+    fallbackRate: station.hourly_rate,
+  });
+  const computedTotal = calculateTotal(rate, values.duration);
+
+  const total =
+    values.paymentMethod === 'complimentary'
+      ? 0
+      : (values.amountOverride ?? computedTotal);
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .insert({
+      station_id: values.stationId,
+      device: values.device,
+      tier: values.tier ?? null,
+      players: values.players,
+      duration_hours: values.duration,
+      date: format(values.date, 'yyyy-MM-dd'),
+      start_time: values.startTime,
+      amount: total,
+      status: 'confirmed',
+      user_id: null,
+      staff_id: user?.id ?? null,
+      customer_name: values.customerName,
+      customer_phone: values.customerPhone,
+      payment_method: values.paymentMethod,
+      session_started_at: values.startNow ? new Date().toISOString() : null,
+    })
+    .select('id')
+    .single();
+
+  if (error) {
+    if (
+      error.code === '23505' ||
+      error.message?.toLowerCase().includes('conflict')
+    ) {
+      throw new Error('That station was just booked — pick another one.');
+    }
+    throw new Error(error.message);
+  }
+
+  return data.id;
+}
+
+export async function updateManualBooking(
+  bookingId: string,
+  values: ManualBookingValues,
+) {
+  await requireRole(['owner', 'staff']);
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  // Fetch the station server-side — never trust a client-sent rate/total
+  const { data: station, error: stationError } = await supabase
+    .from('stations')
+    .select('hourly_rate')
+    .eq('id', values.stationId)
+    .single();
+
+  if (stationError || !station) {
+    throw new Error('Selected station not found.');
+  }
+
+  const rate = getDisplayRate({
+    device: values.device,
+    players: values.players,
+    tier: values.tier,
+    fallbackRate: station.hourly_rate,
+  });
+  const computedTotal = calculateTotal(rate, values.duration);
+
+  const total =
+    values.paymentMethod === 'complimentary'
+      ? 0
+      : (values.amountOverride ?? computedTotal);
+
+  const { error } = await supabase
+    .from('bookings')
+    .update({
+      station_id: values.stationId,
+      device: values.device,
+      tier: values.tier ?? null,
+      players: values.players,
+      duration_hours: values.duration,
+      date: format(values.date, 'yyyy-MM-dd'),
+      start_time: values.startTime,
+      amount: total,
+      customer_name: values.customerName,
+      customer_phone: values.customerPhone,
+      payment_method: values.paymentMethod,
+      // deliberately NOT touching status / session_started_at here —
+      // edit is for correcting booking details, not changing session lifecycle
+    })
+    .eq('id', bookingId);
+
+  if (error) {
+    if (
+      error.code === '23505' ||
+      error.message?.toLowerCase().includes('conflict')
+    ) {
+      throw new Error('That station was just booked — pick another one.');
+    }
+    throw new Error(error.message);
+  }
 }

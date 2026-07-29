@@ -178,7 +178,7 @@ export default function PaymentStep({
           tier: values.tier,
           players: values.players,
           duration: values.duration,
-          date: values.date,
+          date: format(values.date, 'yyyy-MM-dd'),
           startTime: values.startTime,
         }),
       });

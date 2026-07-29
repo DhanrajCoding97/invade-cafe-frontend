@@ -3,8 +3,22 @@ import { createClient } from '../supabase/client';
 
 export const stationKeys = {
   all: ['stations'] as const,
-  available: (device:string,date: string, startTime: string, duration: number) =>
-    ['stations', 'available', device, date, startTime, duration] as const,
+  available: (
+    device: string,
+    date: string,
+    startTime: string,
+    duration: number,
+    excludeBookingId?: string,
+  ) =>
+    [
+      'stations',
+      'available',
+      device,
+      date,
+      startTime,
+      duration,
+      excludeBookingId ?? null,
+    ] as const,
 };
 
 export async function fetchAllStations(): Promise<Station[]> {
@@ -22,13 +36,25 @@ export async function fetchAvailableStations({
   date,
   startTime,
   duration,
+  excludeBookingId,
 }: {
   device: string;
   date: string;
   startTime: string;
   duration: number;
+  excludeBookingId?: string;
 }): Promise<Station[]> {
   const supabase = createClient();
+
+  const bookingsQuery = supabase
+    .from('bookings')
+    .select('id, station_id, start_time, duration_hours, device')
+    .eq('date', date)
+    .in('status', ['pending', 'confirmed']);
+
+  if (excludeBookingId) {
+    bookingsQuery.neq('id', excludeBookingId);
+  }
 
   // VR uses a PS5 station
   const stationType = device === 'vr' ? 'ps5' : device;
@@ -43,11 +69,13 @@ export async function fetchAvailableStations({
       .eq('type', stationType)
       .neq('status', 'maintenance'),
 
-    supabase
-      .from('bookings')
-      .select('station_id, start_time, duration_hours, device')
-      .eq('date', date)
-      .eq('status', 'confirmed'),
+    // supabase
+    //   .from('bookings')
+    //   .select('station_id, start_time, duration_hours, device')
+    //   .eq('date', date)
+    //   .in('status', ['pending', 'confirmed']),
+
+    bookingsQuery,
   ]);
 
   if (stationsError) throw stationsError;

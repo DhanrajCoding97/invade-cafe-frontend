@@ -1,8 +1,5 @@
-//column def for tanstack table
-// columns.tsx
 'use client';
-import Badge from '@/app/components/neonblade-ui/badge';
-import { ColumnDef, RowExpanding } from '@tanstack/react-table';
+import { ColumnDef } from '@tanstack/react-table';
 import { type BookingRow } from '@/types';
 import { BookingActions } from '@/app/actions/booking-actions';
 import {

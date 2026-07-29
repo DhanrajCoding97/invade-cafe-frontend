@@ -15,19 +15,6 @@ export async function cancelBooking(bookingId: string) {
   if (error) throw new Error(error.message);
 }
 
-// export async function updatePaymentStatus(
-//   bookingId: string,
-//   status: string,
-//   method: string,
-// ) {
-//   await requireRole(['owner', 'staff']);
-//   const supabase = await createClient();
-//   const { error } = await supabase
-//     .from('bookings')
-//     .update({ payment_status: status, payment_method: method })
-//     .eq('id', bookingId);
-//   if (error) throw new Error(error.message);
-// }
 export async function updatePaymentStatus(
   bookingId: string,
   status: PaymentStatus,
@@ -44,3 +31,17 @@ export async function updatePaymentStatus(
     .eq('id', bookingId);
   if (error) throw new Error(error.message);
 }
+
+// export async function updatePaymentStatus(
+//   bookingId: string,
+//   status: string,
+//   method: string,
+// ) {
+//   await requireRole(['owner', 'staff']);
+//   const supabase = await createClient();
+//   const { error } = await supabase
+//     .from('bookings')
+//     .update({ payment_status: status, payment_method: method })
+//     .eq('id', bookingId);
+//   if (error) throw new Error(error.message);
+// }

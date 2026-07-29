@@ -31,7 +31,7 @@
 'use client';
 import { useQuery } from '@tanstack/react-query';
 import { fetchBookings, bookingKeys } from '@/lib/queries/bookings';
-import { bookingColumns } from '../../components/Columns';
+import { bookingColumns } from '../../components/columns/bookingColumns';
 import { BookingsTable } from '../../components/BookingsTable';
 import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
 

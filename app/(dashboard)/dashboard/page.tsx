@@ -3,7 +3,6 @@ import { getCurrentUserRole } from '@/lib/auth/getCurrentUserRole';
 
 export default async function DashboardPage() {
   const { role } = await getCurrentUserRole();
-  console.log(role);
 
   switch (role) {
     case 'owner':

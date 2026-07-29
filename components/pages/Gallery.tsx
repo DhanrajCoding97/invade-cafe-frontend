@@ -4,19 +4,29 @@ import dynamic from 'next/dynamic';
 import { useRef } from 'react';
 import LineReveal from '../gsap/LineReveal';
 import TextReveal from '../gsap/TextReveal';
-// import { VideoImageCarousel, type Slide } from '../carousel/VideoImageCarousel';
 import { GallerySkeleton } from '../skeletons/GallerySkeleton';
 import { type Slide } from '../carousel/VideoImageCarousel';
 const VideoImageCarousel = dynamic(
-  () => import('../carousel/VideoImageCarousel').then((mod) => ({ default: mod.VideoImageCarousel })),
+  () =>
+    import('../carousel/VideoImageCarousel').then((mod) => ({
+      default: mod.VideoImageCarousel,
+    })),
   { loading: () => <GallerySkeleton />, ssr: false },
 );
 const CarouselSlides: Slide[] = [
   { type: 'image', src: '/cafe-image-2.webp', alt: 'PS5 lounge setup' },
-  { type: 'video', src: '/videos/cafe-video-4.webm', poster:'/images/video-poster-1.webp' },
+  {
+    type: 'video',
+    src: '/videos/cafe-video-4.webm',
+    poster: '/images/video-poster-1.webp',
+  },
   { type: 'image', src: '/cafe-image-5.webp', alt: 'PS5 lounge setup' },
   { type: 'image', src: '/cafe-image-6.webp', alt: 'Racing sim rig' },
-  { type: 'video', src: '/videos/cafe-video-1.webm',poster:'/images/video-poster-2.webp' },
+  {
+    type: 'video',
+    src: '/videos/cafe-video-1.webm',
+    poster: '/images/video-poster-2.webp',
+  },
   { type: 'image', src: '/gallery5.webp', alt: 'Racing sim rig' },
   { type: 'image', src: '/gallery6.webp', alt: 'Racing sim rig' },
 ];
@@ -51,15 +61,15 @@ export default function GallerySection() {
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.75rem,2vw,1.125rem)] text-[#bcbcbc]'>
+          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
             Explore the atmosphere, gaming setups, racing simulators, VR
             stations, and unforgettable moments from our café.
           </p>
         </TextReveal>
         <LineReveal triggerRef={sectionRef} delay={0.75}>
-        <div className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
-          <VideoImageCarousel slides={CarouselSlides} />
-        </div>
+          <div className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
+            <VideoImageCarousel slides={CarouselSlides} />
+          </div>
         </LineReveal>
       </div>
     </section>

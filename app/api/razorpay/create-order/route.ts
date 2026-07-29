@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@/lib/supabase/server';
 import { getDisplayRate } from '@/lib/pricing';
-import { format } from 'date-fns';
+
 const keyId = process.env.RAZORPAY_KEY_ID;
 const keySecret = process.env.RAZORPAY_KEY_SECRET;
 
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       tier: tier ?? '',
       players: String(players ?? 1),
       duration: String(duration),
-      date: format(new Date(date), 'yyyy-MM-dd'),
+      date,
       startTime,
     },
   });

@@ -8,7 +8,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { string, z } from 'zod';
 import {
   Select,
   SelectTrigger,
@@ -41,6 +41,7 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Textarea } from '@/components/ui/textarea';
+import { createManualBooking, updateManualBooking } from '../actions';
 
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
@@ -65,17 +66,27 @@ function nowDateAndTime() {
 }
 
 interface ManualBookingFormProps {
-  onCreated?: (bookingId: string) => void;
+  mode: 'create' | 'edit';
+  bookingId?: string; // required when mode === 'edit'
+  defaultValues?: Partial<ManualBookingValues>;
+  isOnlineBooking?: boolean;
+  onSuccess?: (bookingId: string) => void;
 }
 
 export default function ManualBookingForm({
-  onCreated,
+  mode,
+  bookingId,
+  defaultValues,
+  isOnlineBooking,
+  onSuccess,
 }: ManualBookingFormProps) {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const { startTime: nowTime } = nowDateAndTime();
   const [open, setOpen] = useState(false);
+
+  const lockStructuralFields = mode === 'edit' && isOnlineBooking;
 
   const {
     register,
@@ -86,15 +97,15 @@ export default function ManualBookingForm({
     formState: { errors },
   } = useForm<ManualBookingValues>({
     resolver: zodResolver(manualBookingSchema),
-    defaultValues: {
+    defaultValues: defaultValues ?? {
       customerName: '',
       customerPhone: '',
       device: 'pc',
       duration: 1,
-      stationId:'',
+      stationId: '',
       players: 1,
       tier: 'single',
-      startNow: true,
+      startNow: mode === 'create',
       date: new Date(),
       startTime: nowTime,
       paymentMethod: 'cash',
@@ -138,13 +149,14 @@ export default function ManualBookingForm({
   const rawAmountOverride = watch('amountOverride');
 
   const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
-const watchedDevice = watch('device');
+  const watchedDevice = watch('device');
   const { data: stations = [], isLoading: stationsLoading } =
     useAvailableStations({
-    device: watchedDevice,
-    date: dateStr,
-    startTime: watchedStartTime,
-    duration: durationValue,
+      device: watchedDevice,
+      date: dateStr,
+      startTime: watchedStartTime,
+      duration: durationValue,
+      excludeBookingId: mode === 'edit' ? bookingId : undefined,
     });
 
   // Reset station selection when the availability set changes underneath it —
@@ -156,18 +168,16 @@ const watchedDevice = watch('device');
     }
   }, [stations, stationId, setValue]);
 
-
-
   const stationsForDevice = stations.filter((station) => {
     if (device === 'vr') {
       return station.type === 'ps5';
     }
 
-   return station.type === device;
+    return station.type === device;
   });
 
-  const noStationsAvailable = !stationsLoading && stationsForDevice.length === 0;
-
+  const noStationsAvailable =
+    !stationsLoading && stationsForDevice.length === 0;
 
   const selectedStation = stationsForDevice.find((s) => s.id === stationId);
   const rate = selectedStation
@@ -186,57 +196,75 @@ const watchedDevice = watch('device');
         ? rawAmountOverride
         : computedTotal;
 
+  // async function onSubmit(values: ManualBookingValues) {
+  //   setSubmitting(true);
+  //   setServerError(null);
+  //   try {
+  //     const supabase = createClient();
+  //     const {
+  //       data: { user },
+  //     } = await supabase.auth.getUser();
+
+  //     const total =
+  //       values.paymentMethod === 'complimentary'
+  //         ? 0
+  //         : (values.amountOverride ?? computedTotal);
+
+  //     const { data, error } = await supabase
+  //       .from('bookings')
+  //       .insert({
+  //         station_id: values.stationId,
+  //         device: values.device,
+  //         tier: values.tier ?? null,
+  //         players: values.players,
+  //         duration_hours: values.duration,
+  //         date: format(values.date, 'yyyy-MM-dd'),
+  //         start_time: values.startTime,
+  //         amount: total,
+  //         status: 'confirmed',
+  //         user_id: null,
+  //         staff_id: user?.id ?? null,
+  //         customer_name: values.customerName,
+  //         customer_phone: values.customerPhone,
+  //         payment_method: values.paymentMethod,
+  //         session_started_at: values.startNow ? new Date().toISOString() : null,
+  //       })
+  //       .select('id')
+  //       .single();
+
+  //     if (error) {
+  //       if (
+  //         error.code === '23505' ||
+  //         error.message?.toLowerCase().includes('conflict')
+  //       ) {
+  //         throw new Error('That station was just booked — pick another one.');
+  //       }
+  //       throw new Error(error.message);
+  //     }
+
+  //     toast.success(`Booking created for ${values.customerName}`);
+  //     queryClient.invalidateQueries({ queryKey: stationKeys.all });
+  //     queryClient.invalidateQueries({ queryKey: ['live-session-board'] });
+  //     onSuccess?.(data.id);
+  //   } catch (err) {
+  //     setServerError(
+  //       err instanceof Error ? err.message : 'Something went wrong',
+  //     );
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // }
   async function onSubmit(values: ManualBookingValues) {
     setSubmitting(true);
     setServerError(null);
-
     try {
-      const supabase = createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      const total =
-        values.paymentMethod === 'complimentary'
-          ? 0
-          : (values.amountOverride ?? computedTotal);
-
-      const { data, error } = await supabase
-        .from('bookings')
-        .insert({
-          station_id: values.stationId,
-          device: values.device,
-          tier: values.tier ?? null,
-          players: values.players,
-          duration_hours: values.duration,
-          date: format(values.date, 'yyyy-MM-dd'),
-          start_time: values.startTime,
-          amount: total,
-          status: 'confirmed',
-          user_id: null,
-          staff_id: user?.id ?? null,
-          customer_name: values.customerName,
-          customer_phone: values.customerPhone,
-          payment_method: values.paymentMethod,
-          session_started_at: values.startNow ? new Date().toISOString() : null,
-        })
-        .select('id')
-        .single();
-
-      if (error) {
-        if (
-          error.code === '23505' ||
-          error.message?.toLowerCase().includes('conflict')
-        ) {
-          throw new Error('That station was just booked — pick another one.');
-        }
-        throw new Error(error.message);
+      if (mode === 'create') {
+        const newId = await createManualBooking(values);
+        onSuccess?.(newId);
+      } else {
+        await updateManualBooking(bookingId!, values); // new update path
+        onSuccess?.(bookingId!);
       }
-
-      toast.success(`Booking created for ${values.customerName}`);
-      queryClient.invalidateQueries({ queryKey: stationKeys.all });
-      queryClient.invalidateQueries({ queryKey: ['live-session-board'] });
-      onCreated?.(data.id);
     } catch (err) {
       setServerError(
         err instanceof Error ? err.message : 'Something went wrong',
@@ -312,7 +340,11 @@ const watchedDevice = watch('device');
                 <Field data-invalid={fieldState.invalid}>
                   <FieldLabel htmlFor='device'>Select Device</FieldLabel>
 
-                  <Select value={field.value} onValueChange={field.onChange}>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    disabled={lockStructuralFields}
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder='Select device' />
                     </SelectTrigger>
@@ -421,7 +453,11 @@ const watchedDevice = watch('device');
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
                 <FieldLabel htmlFor='stationId'>Station</FieldLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={lockStructuralFields}
+                >
                   <SelectTrigger>
                     <SelectValue placeholder='Select a free station' />
                   </SelectTrigger>
@@ -434,12 +470,12 @@ const watchedDevice = watch('device');
                   </SelectContent>
                 </Select>
                 {noStationsAvailable && (
-                <p className="mt-2 text-xs text-amber-400">
-                  No {device === "vr" ? "VR" : device.toUpperCase()} station is
-                  available for the selected time.
-                  <br />
-                  Choose a different start time to make an advance booking.
-                 </p>
+                  <p className='mt-2 text-xs text-amber-400'>
+                    No {device === 'vr' ? 'VR' : device.toUpperCase()} station
+                    is available for the selected time.
+                    <br />
+                    Choose a different start time to make an advance booking.
+                  </p>
                 )}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -457,6 +493,7 @@ const watchedDevice = watch('device');
                 <Field data-invalid={fieldState.invalid}>
                   <div className='flex items-center gap-3'>
                     <Checkbox
+                      disabled={lockStructuralFields}
                       id='startNow'
                       checked={field.value}
                       onCheckedChange={(checked) => field.onChange(!!checked)}
@@ -651,6 +688,13 @@ const watchedDevice = watch('device');
           >
             {submitting ? 'Creating…' : 'Create Booking'}
           </CornerCutButton>
+          {lockStructuralFields && (
+            <p className='text-xs text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded px-3 py-2'>
+              This is a paid online booking. Station, device, date, time, and
+              duration are locked to protect the customer's payment record —
+              cancel and rebook if these need to change.
+            </p>
+          )}
         </div>
       </form>
     </div>

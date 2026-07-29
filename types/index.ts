@@ -86,7 +86,8 @@ export interface BookingRow {
   customer_phone: string | null;
 
   station_id: string;
-  device: 'pc' | 'ps5' | 'psvr' | 'racing';
+  device: 'pc' | 'ps5' | 'vr' | 'racing';
+  tier: 'single' | 'multiplayer' | null;
 
   date: string;
   start_time: string;
