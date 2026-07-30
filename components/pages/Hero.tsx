@@ -2,14 +2,14 @@
 import Badge from '@/app/components/neonblade-ui/badge';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { DatalinesWithGrid } from '@/app/components/neonblade-ui/datalines-with-grid';
-import { useLayoutEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 
 export default function HeroSection() {
   const [isMobile, setIsMobile] = useState(false);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 640);
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -30,7 +30,7 @@ export default function HeroSection() {
         shadowColor='#071F02'
         cellSize={isMobile ? 40 : 60}
         maxLines={isMobile ? 4 : 8}
-        baseSpeed={1.5}
+        baseSpeed={2}
         lineLength={isMobile ? 80 : 120}
         spawnProbability={isMobile ? 0.03 : 0.04}
         bgGridColor='rgba(0,255,102,0.06)'

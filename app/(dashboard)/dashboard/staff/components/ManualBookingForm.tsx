@@ -42,6 +42,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Textarea } from '@/components/ui/textarea';
 import { createManualBooking, updateManualBooking } from '../actions';
+import { cn } from '@/lib/utils';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
@@ -114,6 +116,7 @@ export default function ManualBookingForm({
 
   const startNow = watch('startNow');
   const stationId = watch('stationId');
+
   const device = watch('device');
   const tier = watch('tier');
   const paymentMethod = watch('paymentMethod');
@@ -162,11 +165,17 @@ export default function ManualBookingForm({
   // Reset station selection when the availability set changes underneath it —
   // e.g. staff picks PC-01 for a 1hr slot, then bumps duration to 3hrs and
   // PC-01 no longer qualifies; don't silently submit a stale selection.
-  useEffect(() => {
-    if (stationId && !stations.some((s) => s.id === stationId)) {
-      setValue('stationId', '');
-    }
-  }, [stations, stationId, setValue]);
+  // useEffect(() => {
+  //   if (stationId && !stations.some((s) => s.id === stationId)) {
+  //     setValue('stationId', '');
+  //   }
+  // }, [stations, stationId, setValue]);
+  // useEffect(() => {
+  //   if (stationsLoading) return; // don't evict based on an incomplete/loading list
+  //   if (stationId && !stations.some((s) => s.id === stationId)) {
+  //     setValue('stationId', '');
+  //   }
+  // }, [stations, stationId, stationsLoading, setValue]);
 
   const stationsForDevice = stations.filter((station) => {
     if (device === 'vr') {
@@ -175,6 +184,13 @@ export default function ManualBookingForm({
 
     return station.type === device;
   });
+
+  useEffect(() => {
+    if (stationsLoading) return;
+    if (stationId && !stationsForDevice.some((s) => s.id === stationId)) {
+      setValue('stationId', '');
+    }
+  }, [stationsForDevice, stationId, stationsLoading, setValue]);
 
   const noStationsAvailable =
     !stationsLoading && stationsForDevice.length === 0;
@@ -275,187 +291,197 @@ export default function ManualBookingForm({
   }
 
   return (
-    <div className='flex flex-col items-center justify-center'>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className='flex flex-col gap-4 rounded-xl border border-white/10 bg-white/3 p-5 w-full max-w-lg'
-      >
-        <h3 className='text-lg font-bold text-white'>Manual Walk-in Booking</h3>
-        <FieldGroup>
-          {/* Customer details */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className={cn(
+        'flex flex-col gap-4',
+        mode === 'create' &&
+          'rounded-xl border border-white/10 bg-white/3 p-5 w-full sm:max-w-3xl',
+      )}
+      // className='flex flex-col gap-4'
+      // className='flex flex-col gap-4 rounded-xl border border-white/10 bg-white/3 p-5 w-full max-w-lg'
+    >
+      <h3 className='text-lg font-bold text-white'>Manual Walk-in Booking</h3>
+      <FieldGroup>
+        {/* Customer details */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+          <Controller
+            name='customerName'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='customerName'>Customer name</FieldLabel>
+                <Input
+                  {...field}
+                  id='customerName'
+                  aria-invalid={fieldState.invalid}
+                  placeholder='John Doe'
+                  autoComplete='off'
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          {/* phone input */}
+          <Controller
+            name='customerPhone'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='customerPhone'>Customer Phone</FieldLabel>
+
+                <PhoneInput
+                  placeholder='8454994242'
+                  id='customerPhone'
+                  defaultCountry='IN'
+                  value={field.value}
+                  onChange={field.onChange}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                />
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
+
+        {/* Device / tier / players / duration */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+          <Controller
+            name='device'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='device'>Select Device</FieldLabel>
+
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={lockStructuralFields}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select device' />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {DEVICES.map((device) => (
+                      <SelectItem key={device.value} value={device.value}>
+                        {device.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          {/* if device is ps5 */}
+          {showPlayersSelect && (
             <Controller
-              name='customerName'
+              name='players'
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='customerName'>Customer name</FieldLabel>
-                  <Input
-                    {...field}
-                    id='customerName'
-                    aria-invalid={fieldState.invalid}
-                    placeholder='John Doe'
-                    autoComplete='off'
-                  />
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {/* phone input */}
-            <Controller
-              name='customerPhone'
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='customerPhone'>
-                    Customer Phone
-                  </FieldLabel>
-
-                  <PhoneInput
-                    placeholder='8454994242'
-                    id='customerPhone'
-                    defaultCountry='IN'
-                    value={field.value}
-                    onChange={field.onChange}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                  />
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
-
-          {/* Device / tier / players / duration */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-            <Controller
-              name='device'
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='device'>Select Device</FieldLabel>
-
+                  <FieldLabel htmlFor='players'>Number of players</FieldLabel>
                   <Select
-                    value={field.value}
-                    onValueChange={field.onChange}
-                    disabled={lockStructuralFields}
+                    value={String(field.value ?? 1)}
+                    onValueChange={(v) => field.onChange(Number(v))}
                   >
                     <SelectTrigger>
-                      <SelectValue placeholder='Select device' />
+                      <SelectValue placeholder='Select players' />
                     </SelectTrigger>
-
                     <SelectContent>
-                      {DEVICES.map((device) => (
-                        <SelectItem key={device.value} value={device.value}>
-                          {device.label}
+                      {[1, 2, 3, 4].map((n) => (
+                        <SelectItem key={n} value={String(n)}>
+                          {n} {n === 1 ? 'player' : 'players'}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
-
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
             />
-            {/* if device is ps5 */}
-            {showPlayersSelect && (
-              <Controller
-                name='players'
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor='players'>Number of players</FieldLabel>
-                    <Select
-                      value={String(field.value ?? 1)}
-                      onValueChange={(v) => field.onChange(Number(v))}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select players' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {[1, 2, 3, 4].map((n) => (
-                          <SelectItem key={n} value={String(n)}>
-                            {n} {n === 1 ? 'player' : 'players'}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            )}
-            {/* if device is racing Sim */}
-            {showTierSelect && (
-              <Controller
-                name='tier'
-                control={control}
-                render={({ field, fieldState }) => (
-                  <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor='tier'>Mode</FieldLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Select mode' />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value='single'>Singleplayer</SelectItem>
-                        <SelectItem value='multiplayer'>Multiplayer</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
-                    )}
-                  </Field>
-                )}
-              />
-            )}
+          )}
+          {/* if device is racing Sim */}
+          {showTierSelect && (
             <Controller
-              name='duration'
+              name='tier'
               control={control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='duration'>Duration</FieldLabel>
-
-                  <Input
-                    id='duration'
-                    type='number'
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.valueAsNumber;
-                      field.onChange(Number.isNaN(val) ? 0 : val);
-                    }}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                    ref={field.ref}
-                  />
-
+                  <FieldLabel htmlFor='tier'>Mode</FieldLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <SelectTrigger>
+                      <SelectValue placeholder='Select mode' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value='single'>Singleplayer</SelectItem>
+                      <SelectItem value='multiplayer'>Multiplayer</SelectItem>
+                    </SelectContent>
+                  </Select>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
                   )}
                 </Field>
               )}
             />
-          </div>
-
-          {/* Station */}
+          )}
           <Controller
-            name='stationId'
+            name='duration'
             control={control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='stationId'>Station</FieldLabel>
+                <FieldLabel htmlFor='duration'>Duration</FieldLabel>
+
+                <Input
+                  id='duration'
+                  type='number'
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.valueAsNumber;
+                    field.onChange(Number.isNaN(val) ? 0 : val);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  disabled={lockStructuralFields}
+                />
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+        </div>
+
+        {/* Station */}
+        <Controller
+          name='stationId'
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor='stationId'>Station</FieldLabel>
+              {stationsLoading ? (
+                <Skeleton className='h-10 w-full rounded-md' />
+              ) : (
                 <Select
                   value={field.value}
-                  onValueChange={field.onChange}
+                  onValueChange={(value) => {
+                    console.log('Selected:', value);
+                    field.onChange(value);
+                  }}
                   disabled={lockStructuralFields}
                 >
                   <SelectTrigger>
@@ -469,191 +495,175 @@ export default function ManualBookingForm({
                     ))}
                   </SelectContent>
                 </Select>
-                {noStationsAvailable && (
-                  <p className='mt-2 text-xs text-amber-400'>
-                    No {device === 'vr' ? 'VR' : device.toUpperCase()} station
-                    is available for the selected time.
-                    <br />
-                    Choose a different start time to make an advance booking.
-                  </p>
-                )}
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+              )}
+              {noStationsAvailable && (
+                <p className='mt-2 text-xs text-amber-400'>
+                  No {device === 'vr' ? 'VR' : device.toUpperCase()} station is
+                  available for the selected time.
+                  <br />
+                  Choose a different start time to make an advance booking.
+                </p>
+              )}
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
 
-          {/* Timing */}
-          <div className='flex flex-col gap-2'>
-            <Controller
-              name='startNow'
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <div className='flex items-center gap-3'>
-                    <Checkbox
-                      disabled={lockStructuralFields}
-                      id='startNow'
-                      checked={field.value}
-                      onCheckedChange={(checked) => field.onChange(!!checked)}
-                      className='
+        {/* Timing */}
+        <div className='flex flex-col gap-2'>
+          <Controller
+            name='startNow'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <div className='flex items-center gap-3'>
+                  <Checkbox
+                    disabled={lockStructuralFields}
+                    id='startNow'
+                    checked={field.value}
+                    onCheckedChange={(checked) => field.onChange(!!checked)}
+                    className='
                       border-[#28F1FF]/40
                       data-[state=checked]:bg-[#28F1FF]
                       data-[state=checked]:border-[#28F1FF]
                       data-[state=checked]:text-black
                       '
-                    />
-                    <FieldLabel
-                      htmlFor='startNow'
-                      className='cursor-pointer text-xs text-white/60'
-                    >
-                      Start session now
-                    </FieldLabel>
-                  </div>
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {!startNow && (
-              <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-                <Controller
-                  name='date'
-                  control={control}
-                  render={({ field, fieldState }) => (
-                    <Field data-invalid={fieldState.invalid}>
-                      <FieldLabel htmlFor='date' onClick={() => setOpen(true)}>
-                        Select date
-                      </FieldLabel>
-                      <Popover open={open} onOpenChange={setOpen}>
-                        <PopoverTrigger asChild>
-                          <Button
-                            type='button'
-                            variant='outline'
-                            className='w-full justify-start text-left font-normal bg-slate-950 text-[#dddddd]'
-                          >
-                            <CalendarIcon className='mr-2 h-4 w-4' />
-                            {field.value
-                              ? format(field.value, 'PPP')
-                              : 'Pick a date'}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className='w-auto p-0' align='start'>
-                          <Calendar
-                            mode='single'
-                            selected={field.value}
-                            onSelect={(d) => {
-                              field.onChange(d);
-                              setValue('startTime', ''); // reset time when date changes
-                            }}
-                            disabled={(d) =>
-                              d < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            autoFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
-                      )}
-                    </Field>
-                  )}
-                />
-                {/* start time */}
-                <Controller
-                  name='startTime'
-                  control={control}
-                  render={({ field }) => (
-                    <Field>
-                      <FieldLabel htmlFor='startTime'>Start Time</FieldLabel>
-                      <TimePicker
-                        id='startTime'
-                        {...field}
-                        className='w-full rounded-lg bg-black/40 border-white/10 text-white hover:bg-black/50 hover:text-white'
-                      />
-                    </Field>
-                  )}
-                />
-              </div>
-            )}
-          </div>
-
-          {/* Payment */}
-          <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
-            <Controller
-              name='paymentMethod'
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='device'>
-                    Select Payment method
-                  </FieldLabel>
-
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select method' />
-                    </SelectTrigger>
-
-                    <SelectContent>
-                      {PAYMENT_METHODS.map((method) => (
-                        <SelectItem key={method.value} value={method.value}>
-                          {method.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-            {/* amount field */}
-            <Controller
-              name='amountOverride'
-              control={control}
-              render={({ field, fieldState }) => (
-                <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor='amountOverride'>Amount</FieldLabel>
-
-                  <Input
-                    id='amountOverride'
-                    type='number'
-                    value={field.value ?? ''}
-                    onChange={(e) => {
-                      const val = e.target.valueAsNumber;
-                      field.onChange(Number.isNaN(val) ? 0 : val);
-                    }}
-                    onBlur={field.onBlur}
-                    name={field.name}
-                    ref={field.ref}
-                    disabled={paymentMethod === 'complimentary'}
-                    placeholder={String(computedTotal)}
                   />
+                  <FieldLabel
+                    htmlFor='startNow'
+                    className='cursor-pointer text-xs text-white/60'
+                  >
+                    Start session now
+                  </FieldLabel>
+                </div>
 
-                  {fieldState.invalid && (
-                    <FieldError errors={[fieldState.error]} />
-                  )}
-                </Field>
-              )}
-            />
-          </div>
-          {/* Notes */}
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          {!startNow && (
+            <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
+              <Controller
+                name='date'
+                control={control}
+                render={({ field, fieldState }) => (
+                  <Field data-invalid={fieldState.invalid}>
+                    <FieldLabel htmlFor='date' onClick={() => setOpen(true)}>
+                      Select date
+                    </FieldLabel>
+                    <Popover open={open} onOpenChange={setOpen}>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type='button'
+                          variant='outline'
+                          className='w-full justify-start text-left font-normal bg-slate-950 text-[#dddddd]'
+                          disabled={lockStructuralFields}
+                        >
+                          <CalendarIcon className='mr-2 h-4 w-4' />
+                          {field.value
+                            ? format(field.value, 'PPP')
+                            : 'Pick a date'}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className='w-auto p-0' align='start'>
+                        <Calendar
+                          mode='single'
+                          selected={field.value}
+                          onSelect={(d) => {
+                            field.onChange(d);
+                            setValue('startTime', ''); // reset time when date changes
+                          }}
+                          disabled={(d) =>
+                            d < new Date(new Date().setHours(0, 0, 0, 0))
+                          }
+                          autoFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    {fieldState.invalid && (
+                      <FieldError errors={[fieldState.error]} />
+                    )}
+                  </Field>
+                )}
+              />
+              {/* start time */}
+              <Controller
+                name='startTime'
+                control={control}
+                render={({ field }) => (
+                  <Field>
+                    <FieldLabel htmlFor='startTime'>Start Time</FieldLabel>
+                    <TimePicker
+                      id='startTime'
+                      {...field}
+                      className='w-full rounded-lg bg-black/40 border-white/10 text-white hover:bg-black/50 hover:text-white'
+                      disabled={lockStructuralFields}
+                    />
+                  </Field>
+                )}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Payment */}
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
           <Controller
-            name='notes'
+            name='paymentMethod'
             control={control}
             render={({ field, fieldState }) => (
               <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='notes'>Notes</FieldLabel>
-                <Textarea
-                  placeholder='add notes here..'
-                  id='notes'
-                  cols={4}
-                  className='resize-none'
+                <FieldLabel htmlFor='device'>Select Payment method</FieldLabel>
+
+                <Select
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  disabled={lockStructuralFields}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select method' />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {PAYMENT_METHODS.map((method) => (
+                      <SelectItem key={method.value} value={method.value}>
+                        {method.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          {/* amount field */}
+          <Controller
+            name='amountOverride'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='amountOverride'>Amount</FieldLabel>
+
+                <Input
+                  id='amountOverride'
+                  type='number'
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.valueAsNumber;
+                    field.onChange(Number.isNaN(val) ? 0 : val);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  disabled={
+                    paymentMethod === 'complimentary' || lockStructuralFields
+                  }
+                  placeholder={String(computedTotal)}
                 />
 
                 {fieldState.invalid && (
@@ -662,41 +672,65 @@ export default function ManualBookingForm({
               </Field>
             )}
           />
-        </FieldGroup>
-        {serverError && <p className='text-sm text-red-400'>{serverError}</p>}
-        <div className='flex flex-col gap-5'>
-          {/* total display */}
-          <div className='mt-2 rounded-xl border border-[#28F1FF]/20 bg-[#28F1FF]/5 px-4 py-4'>
-            <div className='flex items-center justify-between'>
-              <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF] uppercase tracking-wider'>
-                Total
-              </span>
-
-              <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF]'>
-                ₹{displayTotal}
-              </span>
-            </div>
-          </div>
-          <CornerCutButton
-            type='submit'
-            disabled={submitting}
-            color='cyan'
-            variant='outline'
-            hoverEffect='scan'
-            fullWidthOnMobile={true}
-            className='ml-auto'
-          >
-            {submitting ? 'Creating…' : 'Create Booking'}
-          </CornerCutButton>
-          {lockStructuralFields && (
-            <p className='text-xs text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded px-3 py-2'>
-              This is a paid online booking. Station, device, date, time, and
-              duration are locked to protect the customer's payment record —
-              cancel and rebook if these need to change.
-            </p>
-          )}
         </div>
-      </form>
-    </div>
+        {/* Notes */}
+        <Controller
+          name='notes'
+          control={control}
+          render={({ field, fieldState }) => (
+            <Field data-invalid={fieldState.invalid}>
+              <FieldLabel htmlFor='notes'>Notes</FieldLabel>
+              <Textarea
+                placeholder='add notes here..'
+                id='notes'
+                cols={4}
+                className='resize-none'
+              />
+
+              {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
+            </Field>
+          )}
+        />
+      </FieldGroup>
+      {serverError && <p className='text-sm text-red-400'>{serverError}</p>}
+      <div className='flex flex-col gap-5'>
+        {/* total display */}
+        <div className='mt-2 rounded-xl border border-[#28F1FF]/20 bg-[#28F1FF]/5 px-4 py-4'>
+          <div className='flex items-center justify-between'>
+            <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF] uppercase tracking-wider'>
+              Total
+            </span>
+
+            <span className='text-lg sm:text-xl lg:text-3xl font-bold text-[#28F1FF]'>
+              ₹{displayTotal}
+            </span>
+          </div>
+        </div>
+        {lockStructuralFields && (
+          <p className='text-xs text-amber-500/80 bg-amber-500/10 border border-amber-500/20 rounded px-3 py-2'>
+            This is a paid online booking. Station, device, date, time, and
+            duration are locked to protect the customer's payment record —
+            cancel and rebook if these need to change.
+          </p>
+        )}
+        <CornerCutButton
+          type='submit'
+          disabled={submitting}
+          color='cyan'
+          variant='outline'
+          hoverEffect='scan'
+          fullWidthOnMobile={true}
+          className='ml-auto'
+        >
+          {submitting
+            ? mode === 'create'
+              ? 'Creating...'
+              : 'Saving...'
+            : mode === 'create'
+              ? 'Create Booking'
+              : 'Save Changes'}
+        </CornerCutButton>
+      </div>
+    </form>
   );
 }

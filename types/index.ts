@@ -121,6 +121,22 @@ export interface BookingRow {
   } | null;
 }
 
+export type DueCheckBooking = {
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  session_started_at: string | null;
+  date: string;
+  start_time: string;
+};
+
+export type DueSessionBooking = {
+  id: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  session_started_at: string | null;
+  date: string;
+  start_time: string;
+  customer_name: string | null;
+};
+
 export type PaymentMethod =
   'cash' | 'upi_manual' | 'razorpay' | 'complimentary';
 

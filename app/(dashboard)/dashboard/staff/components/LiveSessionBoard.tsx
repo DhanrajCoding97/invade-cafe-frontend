@@ -20,6 +20,9 @@ import {
 import { Button } from '@/components/ui/button';
 // import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
+import { useDueSessions } from '@/hooks/use-due-session';
+import { isSessionDue, minutesOverdue } from '@/lib/helpers/session-due';
+import { markNoShow } from '@/app/actions/bookings';
 // app/dashboard/staff/LiveSessionBoard.tsx
 type Booking = {
   id: string;
@@ -37,105 +40,6 @@ type Booking = {
 
 type Station = { id: string; name: string; type: string };
 
-// function StationCard({
-//   station,
-//   booking,
-// }: {
-//   station: Station;
-//   booking?: Booking;
-// }) {
-//   const isActive = !!booking?.session_started_at && !booking?.session_ended_at;
-//   const isBooked = !!booking && !isActive;
-
-//   let timeLeft: number | null = null;
-//   if (isActive && booking?.session_started_at) {
-//     const actualEnd = new Date(booking.session_started_at);
-//     actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
-//     const end = booking.extended_until ?? actualEnd.toISOString();
-//     timeLeft = getTimeLeft(end);
-//   }
-
-//   return (
-//     <div
-//       className={`rounded-xl border p-4 flex flex-col gap-2 ${
-//         isActive
-//           ? 'border-cyan-400 bg-cyan-400/10'
-//           : isBooked
-//             ? 'border-fuchsia-500/50 bg-fuchsia-500/5'
-//             : 'border-neutral-800 bg-neutral-900'
-//       }`}
-//     >
-//       <div className='flex justify-between items-center'>
-//         <span className='font-semibold text-sm'>{station.name}</span>
-//         <span
-//           className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
-//             isActive
-//               ? 'bg-cyan-400 text-black'
-//               : isBooked
-//                 ? 'bg-fuchsia-500 text-black'
-//                 : 'bg-neutral-700 text-neutral-300'
-//           }`}
-//         >
-//           {isActive ? 'Active' : isBooked ? 'Booked' : 'Free'}
-//         </span>
-//       </div>
-
-//       {booking ? (
-//         <>
-//           <p className='text-sm text-neutral-300'>
-//             {booking.profiles?.full_name ?? booking.customer_name ?? 'Guest'}
-//           </p>
-//           <p className='text-xs text-neutral-500'>
-//             {booking.start_time.slice(0, 5)}
-//           </p>
-//           {timeLeft !== null && (
-//             <p
-//               className={`text-xs font-mono ${timeLeft <= 5 ? 'text-red-400' : 'text-cyan-300'}`}
-//             >
-//               {timeLeft} min left
-//             </p>
-//           )}
-
-//           <div className='flex gap-2 mt-2'>
-//             {isBooked && (
-//               <button
-//                 onClick={() => startSession(booking.id)}
-//                 className='text-xs px-3 py-1.5 rounded-md bg-cyan-400 text-black font-medium'
-//               >
-//                 Start
-//               </button>
-//             )}
-//             {isActive && (
-//               <>
-//                 <button
-//                   onClick={() => endSession(booking.id)}
-//                   className='text-xs px-3 py-1.5 rounded-md bg-red-500/80 text-white font-medium'
-//                 >
-//                   End
-//                 </button>
-//                 <button
-//                   onClick={async () => {
-//                     const res = await extendSession(booking.id, station.id, 30);
-//                     if (!res.ok)
-//                       toast.message(
-//                         'Station is booked right after — cannot extend.',
-//                       );
-//                   }}
-//                   className='text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium'
-//                 >
-//                   +30m
-//                 </button>
-//               </>
-//             )}
-//           </div>
-//         </>
-//       ) : (
-//         <p className='text-xs text-neutral-500'>No booking</p>
-//       )}
-//     </div>
-//   );
-// }
-
 function StationCard({
   station,
   booking,
@@ -149,7 +53,7 @@ function StationCard({
   pendingIds: Set<string>;
   onStart: (booking: Booking) => void;
   onEnd: (booking: Booking) => void;
-  onExtend: (booking: Booking, stationId: string) => void;
+  onExtend: (booking: Booking, stationId: string, minutes: number) => void;
 }) {
   const isActive = !!booking?.session_started_at && !booking?.session_ended_at;
   const isBooked = !!booking && !isActive;
@@ -163,28 +67,85 @@ function StationCard({
     timeLeft = getTimeLeft(end);
   }
 
+  const isDue = isBooked && !!booking && isSessionDue(booking); // reuse the same check from useDueSessions
+  const overdueMinutes =
+    isBooked && booking
+      ? Math.max(
+          0,
+          Math.floor(
+            (Date.now() -
+              new Date(`${booking.date}T${booking.start_time}`).getTime()) /
+              60000,
+          ),
+        )
+      : 0;
+
+  const bookingStatus = !booking
+    ? 'free'
+    : isActive
+      ? 'active'
+      : overdueMinutes >= 30
+        ? 'no-show'
+        : overdueMinutes >= 15
+          ? 'late'
+          : overdueMinutes > 0
+            ? 'due'
+            : 'booked';
+
+  const [selected, setSelected] = useState<number>(30);
+  const [customMinutes, setCustomMinutes] = useState('');
+
+  const options = [
+    { label: '30 min', value: 30 },
+    { label: '1 hour', value: 60 },
+    { label: '2 hours', value: 120 },
+  ];
+
+  const finalMinutes = selected === -1 ? Number(customMinutes) || 0 : selected;
+
   return (
     <div
-      className={`rounded-xl border p-4 flex flex-col gap-2 ${
-        isActive
+      className={`rounded-xl border p-4 flex flex-col gap-2 max-h-fit ${
+        bookingStatus === 'active'
           ? 'border-cyan-400 bg-cyan-400/10'
-          : isBooked
-            ? 'border-fuchsia-500/50 bg-fuchsia-500/5'
-            : 'border-neutral-800 bg-neutral-900'
+          : bookingStatus === 'due'
+            ? 'border-amber-400 bg-amber-400/10 animate-pulse'
+            : bookingStatus === 'late'
+              ? 'border-orange-400 bg-orange-400/10'
+              : bookingStatus === 'no-show'
+                ? 'border-red-500 bg-red-500/10'
+                : bookingStatus === 'booked'
+                  ? 'border-fuchsia-500/50 bg-fuchsia-500/5'
+                  : 'border-neutral-800 bg-neutral-900'
       }`}
     >
       <div className='flex justify-between items-center'>
         <span className='font-semibold text-sm'>{station.name}</span>
         <span
           className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
-            isActive
+            bookingStatus === 'active'
               ? 'bg-cyan-400 text-black'
-              : isBooked
-                ? 'bg-fuchsia-500 text-black'
-                : 'bg-neutral-700 text-neutral-300'
+              : bookingStatus === 'due'
+                ? 'bg-amber-400 text-black'
+                : bookingStatus === 'late'
+                  ? 'bg-orange-400 text-black'
+                  : bookingStatus === 'no-show'
+                    ? 'bg-red-500 text-white'
+                    : bookingStatus === 'booked'
+                      ? 'bg-fuchsia-500 text-black'
+                      : 'bg-neutral-700 text-neutral-300'
           }`}
         >
-          {isActive ? 'Active' : isBooked ? 'Booked' : 'Free'}
+          {
+            {
+              active: 'Active',
+              due: 'Due',
+              late: 'Late',
+              'no-show': 'No Show',
+              booked: 'Booked',
+              free: 'Free',
+            }[bookingStatus]
+          }
         </span>
       </div>
 
@@ -194,7 +155,11 @@ function StationCard({
             {booking.profiles?.full_name ?? booking.customer_name ?? 'Guest'}
           </p>
           <p className='text-xs text-neutral-500'>
-            {booking.start_time.slice(0, 5)}
+            {bookingStatus === 'due' ||
+            bookingStatus === 'late' ||
+            bookingStatus === 'no-show'
+              ? `${overdueMinutes} min overdue`
+              : booking.start_time.slice(0, 5)}
           </p>
           {timeLeft !== null && (
             <p
@@ -204,27 +169,64 @@ function StationCard({
             </p>
           )}
 
-          <div className='flex gap-2 mt-2'>
-            {isBooked && (
-              <button
-                onClick={() => onStart(booking)}
-                disabled={isPending}
-                className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-cyan-400 text-black font-medium disabled:opacity-60'
-              >
-                {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
-                Start
-              </button>
-            )}
-            {isActive && (
-              <>
-                {/* <button
-                  onClick={() => onEnd(booking)}
+          <div className='flex flex-col gap-2 mt-2'>
+            {/* <p className='text-xs text-neutral-500'>
+              {isDue
+                ? `${overdueMinutes} min overdue`
+                : booking.start_time.slice(0, 5)}
+            </p> */}
+            <div className='flex items-center gap-2'>
+              {isBooked && (
+                <Button
+                  onClick={() => onStart(booking)}
                   disabled={isPending}
-                  className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-red-500/80 text-white font-medium disabled:opacity-60'
+                  className='flex items-center gap-1.5 bg-cyan-400 px-3 py-1.5 text-xs font-medium text-black hover:bg-cyan-300 disabled:opacity-60'
                 >
                   {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
-                  End
-                </button> */}
+
+                  {bookingStatus === 'booked' ? 'Start' : 'Start Now'}
+                </Button>
+              )}
+
+              {bookingStatus === 'no-show' && (
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant='destructive'>Cancel / No Show</Button>
+                  </AlertDialogTrigger>
+
+                  <AlertDialogContent size='sm'>
+                    <AlertDialogHeader>
+                      <AlertDialogMedia className='bg-destructive/10 text-destructive dark:bg-destructive/20'>
+                        <Trash2Icon />
+                      </AlertDialogMedia>
+
+                      <AlertDialogTitle>Mark as No Show?</AlertDialogTitle>
+
+                      <AlertDialogDescription>
+                        The customer did not arrive within the grace period.
+                        This booking will be marked as <strong>No Show</strong>.
+                        No refund will be issued.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant='ghost'>
+                        Keep Booking
+                      </AlertDialogCancel>
+
+                      <AlertDialogAction
+                        variant='destructive'
+                        onClick={() => markNoShow(booking.id)}
+                      >
+                        Mark No Show
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              )}
+            </div>
+            {isActive && (
+              <div className='flex gap-3'>
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button variant='destructive'>End Session</Button>
@@ -253,15 +255,87 @@ function StationCard({
                     </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>
-                <button
+                {/* extend session */}
+                {/* <button
                   onClick={() => onExtend(booking, station.id)}
                   disabled={isPending}
                   className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium disabled:opacity-60'
                 >
                   {isPending && <Loader2 className='h-3 w-3 animate-spin' />}
                   +30m
-                </button>
-              </>
+                </button> */}
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <button
+                      disabled={isPending}
+                      className='flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md bg-neutral-700 text-white font-medium disabled:opacity-60'
+                    >
+                      {isPending && (
+                        <Loader2 className='h-3 w-3 animate-spin' />
+                      )}
+                      Extend
+                    </button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent size='sm'>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Extend session</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Choose how much extra time to add.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+
+                    <div className='flex flex-col gap-2 py-2'>
+                      {options.map((opt) => (
+                        <button
+                          key={opt.value}
+                          onClick={() => setSelected(opt.value)}
+                          className={`text-left px-3 py-2 rounded-md text-sm border ${
+                            selected === opt.value
+                              ? 'border-cyan-400 bg-cyan-400/10'
+                              : 'border-neutral-700'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      ))}
+                      <button
+                        onClick={() => setSelected(-1)}
+                        className={`text-left px-3 py-2 rounded-md text-sm border ${
+                          selected === -1
+                            ? 'border-cyan-400 bg-cyan-400/10'
+                            : 'border-neutral-700'
+                        }`}
+                      >
+                        Custom
+                      </button>
+                      {selected === -1 && (
+                        <input
+                          type='number'
+                          min={1}
+                          placeholder='Minutes'
+                          value={customMinutes}
+                          onChange={(e) => setCustomMinutes(e.target.value)}
+                          className='px-3 py-2 rounded-md text-sm bg-neutral-800 border border-neutral-700'
+                        />
+                      )}
+                    </div>
+
+                    <AlertDialogFooter>
+                      <AlertDialogCancel variant='ghost'>
+                        Cancel
+                      </AlertDialogCancel>
+                      <AlertDialogAction
+                        disabled={finalMinutes <= 0}
+                        onClick={() =>
+                          onExtend(booking, station.id, finalMinutes)
+                        }
+                      >
+                        Extend by {finalMinutes || 0} min
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
             )}
           </div>
         </>
@@ -297,7 +371,19 @@ export default function LiveSessionBoard({
   const [bookings, setBookings] = useState(initialBookings);
   const [activeType, setActiveType] = useState<StationType>('pc');
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const supabase = createClient();
+
+  useDueSessions(bookings);
+
+  function unlockAudio() {
+    const audio = new Audio('/sounds/session-due.mp3');
+    audio.volume = 0;
+    audio
+      .play()
+      .then(() => setAudioUnlocked(true))
+      .catch(() => {});
+  }
 
   function addPending(id: string) {
     setPendingIds((prev) => new Set(prev).add(id));
@@ -321,33 +407,6 @@ export default function LiveSessionBoard({
         err instanceof Error ? err.message : 'Failed to start session',
     });
   }
-
-  // function handleEnd(booking: Booking) {
-  //   addPending(booking.id);
-  //   const promise = endSession(booking.id).finally(() =>
-  //     removePending(booking.id),
-  //   );
-  //   toast.promise(promise, {
-  //     loading: 'Ending session…',
-  //     success: 'Session ended',
-  //     error: (err) =>
-  //       err instanceof Error ? err.message : 'Failed to end session',
-  //   });
-  // }
-  // async function handleEnd(booking: Booking) {
-  //   addPending(booking.id);
-
-  //   try {
-  //     await toast.promise(endSession(booking.id), {
-  //       loading: 'Ending session...',
-  //       success: 'Session ended',
-  //       error: (err) =>
-  //         err instanceof Error ? err.message : 'Failed to end session',
-  //     });
-  //   } finally {
-  //     removePending(booking.id);
-  //   }
-  // }
 
   async function handleEnd(booking: Booking) {
     addPending(booking.id);
@@ -381,34 +440,12 @@ export default function LiveSessionBoard({
     });
   }
 
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel('bookings-live')
-  //     .on(
-  //       'postgres_changes',
-  //       { event: '*', schema: 'public', table: 'bookings' },
-  //       (payload) => {
-  //         setBookings((prev) => {
-  //           if (payload.eventType === 'INSERT')
-  //             return [...prev, payload.new as Booking];
-  //           if (payload.eventType === 'UPDATE')
-  //             return prev.map((b) =>
-  //               b.id === payload.new.id
-  //                 ? ({ ...b, ...payload.new } as Booking)
-  //                 : b,
-  //             );
-  //           if (payload.eventType === 'DELETE')
-  //             return prev.filter((b) => b.id !== payload.old.id);
-  //           return prev;
-  //         });
-  //       },
-  //     )
-  //     .subscribe();
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, []);
 
-  //   return () => {
-  //     supabase.removeChannel(channel);
-  //   };
-  // }, [supabase]);
   useEffect(() => {
     const channel = supabase
       .channel('bookings-live')
