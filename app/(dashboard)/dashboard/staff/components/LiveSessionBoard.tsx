@@ -2,7 +2,11 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { startSession, endSession, extendSession } from '../actions';
+import {
+  startSession,
+  endSession,
+  extendSession,
+} from '../actions/booking-action';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import {

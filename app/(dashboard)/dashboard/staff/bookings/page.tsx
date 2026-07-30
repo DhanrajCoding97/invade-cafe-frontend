@@ -54,13 +54,5 @@ export default function BookingsPage() {
     return <div>Failed to load bookings.</div>;
   }
 
-  return (
-    <div className='space-y-4'>
-      <h1 className='text-2xl font-bold'>Bookings</h1>
-      <p className='text-sm text-muted-foreground'>
-        Total bookings: {bookings?.length}
-      </p>
-      <BookingsTable columns={bookingColumns} data={bookings ?? []} />
-    </div>
-  );
+  return <BookingsTable columns={bookingColumns} data={bookings ?? []} />;
 }

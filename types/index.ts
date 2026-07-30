@@ -141,3 +141,15 @@ export type PaymentMethod =
   'cash' | 'upi_manual' | 'razorpay' | 'complimentary';
 
 export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
+
+export type UserRole = 'owner' | 'staff' | 'customer';
+
+export interface CustomerRow {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  role: UserRole;
+  created_at: string;
+  booking_count: number;
+}

@@ -41,7 +41,10 @@ import { PhoneInput } from '@/components/ui/phone-input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { TimePicker } from '@/components/ui/time-picker';
 import { Textarea } from '@/components/ui/textarea';
-import { createManualBooking, updateManualBooking } from '../actions';
+import {
+  createManualBooking,
+  updateManualBooking,
+} from '../actions/booking-action';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 

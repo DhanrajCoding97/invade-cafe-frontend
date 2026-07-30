@@ -235,24 +235,24 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
   ];
 
   const management = [
-    {
-      name: 'Payments',
-      url: '/dashboard/staff/payments',
-      icon: Wallet,
-    },
-    {
-      name: 'Customers',
-      url: '/dashboard/staff/customers',
-      icon: Users,
-    },
+    // {
+    //   name: 'Payments',
+    //   url: '/dashboard/staff/payments',
+    //   icon: Wallet,
+    // },
   ];
 
   if (role === 'owner') {
     management.push(
+      // {
+      //   name: 'Pricing',
+      //   url: '/dashboard/staff/pricing',
+      //   icon: IndianRupee,
+      // },
       {
-        name: 'Pricing',
-        url: '/dashboard/staff/pricing',
-        icon: IndianRupee,
+        name: 'Customers',
+        url: '/dashboard/staff/customers',
+        icon: Users,
       },
       {
         name: 'Settings',
