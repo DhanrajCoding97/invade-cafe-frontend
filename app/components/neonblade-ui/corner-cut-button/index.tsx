@@ -3,7 +3,7 @@ import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 // import './corner-cut-button.css';
 import styles from './corner-cut-button.module.css';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
+// import Link from 'next/link';
 // ---- Types -------------------------------------------------
 
 /** Named color presets or any valid CSS color string (e.g. "#ff4400", "hsl(180,100%,50%)") */
@@ -168,26 +168,26 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
   textColor?: CCBColor;
 }
 
-interface CornerCutLinkProps
-  extends
-    React.ComponentProps<typeof Link>,
-    Omit<CornerCutButtonProps, 'onClick' | 'type' | 'asChild'> {}
+// interface CornerCutLinkProps
+//   extends
+//     React.ComponentProps<typeof Link>,
+//     Omit<CornerCutButtonProps, 'onClick' | 'type' | 'asChild'> {}
 
-export function CornerCutLink({
-  href,
-  children,
-  ...props
-}: CornerCutLinkProps) {
-  return (
-    <div className='...same wrapper...'>
-      <Link href={href} className='...same button classes...'>
-        {/* shine */}
-        {/* scan */}
-        {/* content */}
-      </Link>
-    </div>
-  );
-}
+// export function CornerCutLink({
+//   href,
+//   children,
+//   ...props
+// }: CornerCutLinkProps) {
+//   return (
+//     <div className='...same wrapper...'>
+//       <Link href={href} className='...same button classes...'>
+//         {/* shine */}
+//         {/* scan */}
+//         {/* content */}
+//       </Link>
+//     </div>
+//   );
+// }
 
 // ---- Component ---------------------------------------------
 
