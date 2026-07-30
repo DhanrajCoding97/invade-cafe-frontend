@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useRef } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import {
   CalendarDays,
   History,
@@ -64,7 +65,7 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
   const canCancel = booking.status === 'confirmed' && hrsLeft >= 2;
 
   return (
-    <Card>
+    <Card className='bg-[#0C0C0D]'>
       <CardHeader>
         <CardTitle>Upcoming Booking</CardTitle>
         <CardDescription>Your next gaming session</CardDescription>
@@ -160,7 +161,9 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
           // </AlertDialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button disabled={!canCancel}>Cancel Booking</Button>
+              <Button disabled={!canCancel} variant='destructive'>
+                Cancel Booking
+              </Button>
             </AlertDialogTrigger>
 
             <AlertDialogContent>
@@ -178,6 +181,7 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
 
                 <AlertDialogAction
                   onClick={() => cancelMutation.mutate(booking.id)}
+                  variant='destructive'
                 >
                   Cancel Booking
                 </AlertDialogAction>
@@ -210,7 +214,7 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
 
 function EmptyUpcoming() {
   return (
-    <Card>
+    <Card className='bg-[#0C0C0D]'>
       <CardContent className='py-20 text-center'>
         <Gamepad2 className='mx-auto mb-3 h-10 w-10 text-muted-foreground' />
         <p className='font-medium'>No upcoming bookings</p>
@@ -219,7 +223,7 @@ function EmptyUpcoming() {
         </p>
         <Link
           href='/#booking'
-          className='inline-block rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
+          className='inline-block rounded-tl-none rounded-tr-none rounded-bl-none rounded-br-lg bg-cyan-500 px-5 py-2 font-semibold text-black border-t'
         >
           Book Session
         </Link>
@@ -249,8 +253,10 @@ function StatCard({
 }
 
 export default function CustomerDashboard() {
+  const router = useRouter();
   const { data: profile } = useMyProfile();
   const { data: bookings, isLoading, error } = useMyBookings();
+
   const { upcoming, history, stats } = useMemo(() => {
     const list = bookings ?? [];
     const now = Date.now();
@@ -359,11 +365,11 @@ export default function CustomerDashboard() {
           )}
         </TabsContent>
 
-        <TabsContent value='history' className='mt-4'>
+        <TabsContent value='history' className='mt-4 '>
           {history.length ? (
             <div className='space-y-4'>
               {history.map((booking) => (
-                <Card key={booking.id}>
+                <Card key={booking.id} className='bg-[#0C0C0D] p-'>
                   <CardHeader className='pb-3'>
                     <div className='flex items-center justify-between'>
                       <div>
@@ -540,7 +546,11 @@ export default function CustomerDashboard() {
           <Button
             variant='outline'
             className='w-full gap-2'
-            onClick={handleSignOut}
+            onClick={async () => {
+              await handleSignOut();
+              router.push('/');
+              router.refresh();
+            }}
           >
             <LogOut size={18} />
             Sign Out
