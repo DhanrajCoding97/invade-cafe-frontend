@@ -38,6 +38,65 @@ interface DataTableProps<TData> {
   error?: string | null;
   onRetry?: () => void;
 }
+
+function exportBookingsToCSV(rows: any[]) {
+  if (rows.length === 0) return;
+
+  const headers = [
+    'Customer',
+    'Phone',
+    'Device',
+    'Date',
+    'Start Time',
+    'Duration (hrs)',
+    'Players',
+    'Amount',
+    'Payment Method',
+    'Payment Status',
+    'Status',
+  ];
+
+  const csvRows = rows.map((row) => [
+    row.customer_name ?? row.profiles?.full_name ?? '',
+    row.customer_phone ?? row.profiles?.phone ?? '',
+    row.device ?? '',
+    row.date ?? '',
+    row.start_time ?? '',
+    row.duration_hours ?? '',
+    row.players ?? '',
+    row.amount ?? '',
+    row.payment_method ?? '',
+    row.payment_status ?? '',
+    row.status ?? '',
+  ]);
+
+  // Escape commas/quotes/newlines so Excel doesn't misparse names or notes
+  const escapeCell = (val: any) => {
+    const str = String(val ?? '');
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const csvContent = [headers, ...csvRows]
+    .map((row) => row.map(escapeCell).join(','))
+    .join('\n');
+
+  // BOM prefix so Excel renders ₹ and other non-ASCII characters correctly
+  const blob = new Blob(['\uFEFF' + csvContent], {
+    type: 'text/csv;charset=utf-8;',
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+
+  const today = new Date().toISOString().slice(0, 10);
+  link.download = `bookings-${today}.csv`;
+  link.click();
+  URL.revokeObjectURL(url);
+}
+
 export function BookingsTable<TData>({
   columns,
   data,
@@ -132,7 +191,21 @@ export function BookingsTable<TData>({
       ) : (
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col justify-center gap-3'>
-            <h1 className='text-2xl font-bold'>Bookings Table</h1>
+            <div className='flex items-center justify-between'>
+              <h1 className='text-2xl font-bold'>Bookings Table</h1>
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={() =>
+                  exportBookingsToCSV(
+                    table.getFilteredRowModel().rows.map((r) => r.original),
+                  )
+                }
+                disabled={table.getFilteredRowModel().rows.length === 0}
+              >
+                Export CSV
+              </Button>
+            </div>
             <p className='text-sm text-muted-foreground'>
               Total bookings: {table.getFilteredRowModel().rows.length}
             </p>

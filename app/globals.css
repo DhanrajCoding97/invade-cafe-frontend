@@ -246,9 +246,9 @@
   --sidebar-foreground: oklch(0.8771 0.1492 201.187);
   --sidebar-primary: oklch(0.8771 0.1492 201.187);
   --sidebar-primary-foreground: oklch(0 0 0);
-  --sidebar-accent: oklch(0.2348 0.0379 269.959);
+  --sidebar-accent: oklch(17.609% 0.02782 270.331);
   --sidebar-accent-foreground: oklch(0.7857 0.0472 233.2239);
-  --sidebar-border: oklch(0.2398 0.0485 259.8811);
+  --sidebar-border: oklch(19.107% 0.03356 260.231);
   --sidebar-ring: oklch(0.7354 0.1217 218.8801);
   --font-sans: Orbitron, ui-sans-serif, sans-serif, system-ui;
   --font-serif: Orbitron, ui-sans-serif, sans-serif, system-ui;

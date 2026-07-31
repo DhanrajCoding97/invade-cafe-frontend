@@ -372,17 +372,17 @@ export default function DateTimeStep() {
                           : 'Want a different time? Pick exact time'}
                       </button>
                     </PopoverTrigger>
-
                     <PopoverContent
                       align='start'
-                      className='w-70 border-cyan-400/40 bg-[#121C1D] p-3'
+                      className='w-70 border-cyan-400/40 bg-[#121C1D] p-3 touch-pan-y'
                     >
                       <div className='flex flex-col gap-2'>
-                        <WheelTimePicker
-                          value={customTime}
-                          onChange={setCustomTime}
-                        />
-
+                        <div className='max-h-80 overflow-y-auto overscroll-contain'>
+                          <WheelTimePicker
+                            value={customTime}
+                            onChange={setCustomTime}
+                          />
+                        </div>
                         <button
                           type='button'
                           disabled={!customTimeValid}

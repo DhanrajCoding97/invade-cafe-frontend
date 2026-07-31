@@ -36,6 +36,7 @@ type Booking = {
   session_ended_at: string | null;
   extended_until: string | null;
   customer_name: string | null;
+  device: string;
   profiles: { full_name: string } | null;
 };
 
@@ -121,7 +122,14 @@ function StationCard({
       }`}
     >
       <div className='flex justify-between items-center'>
-        <span className='font-semibold text-sm'>{station.name}</span>
+        <span className='font-semibold text-sm flex items-center gap-1.5'>
+          {station.name}
+          {booking?.device === 'vr' && (
+            <span className='text-[9px] px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30'>
+              VR
+            </span>
+          )}
+        </span>
         <span
           className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full ${
             bookingStatus === 'active'
@@ -176,7 +184,7 @@ function StationCard({
                 ? `${overdueMinutes} min overdue`
                 : booking.start_time.slice(0, 5)}
             </p> */}
-            <div className='flex items-center gap-2'>
+            <div className='flex items-center gap-2 flex-wrap'>
               {isBooked && (
                 <Button
                   onClick={() => onStart(booking)}
@@ -192,17 +200,12 @@ function StationCard({
               {bookingStatus === 'no-show' && (
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
-                    <Button variant='destructive'>Cancel / No Show</Button>
+                    <Button variant='destructive'>No Show</Button>
                   </AlertDialogTrigger>
 
                   <AlertDialogContent size='sm'>
                     <AlertDialogHeader>
-                      <AlertDialogMedia className='bg-destructive/10 text-destructive dark:bg-destructive/20'>
-                        <Trash2Icon />
-                      </AlertDialogMedia>
-
                       <AlertDialogTitle>Mark as No Show?</AlertDialogTitle>
-
                       <AlertDialogDescription>
                         The customer did not arrive within the grace period.
                         This booking will be marked as <strong>No Show</strong>.
@@ -326,6 +329,7 @@ function StationCard({
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
+                        className='whitespace-normal wrap-break text-center'
                         disabled={finalMinutes <= 0}
                         onClick={() =>
                           onExtend(booking, station.id, finalMinutes)
@@ -497,6 +501,14 @@ export default function LiveSessionBoard({
 
   return (
     <div>
+      {!audioUnlocked && (
+        <button
+          onClick={unlockAudio}
+          className='mb-4 flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-300'
+        >
+          🔊 Click to enable sound alerts for due sessions
+        </button>
+      )}
       <h2 className='text-lg font-semibold mb-3'>Live Sessions Board</h2>
 
       {/* Mobile: tab switcher instead of scrolling through everything */}
