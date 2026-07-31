@@ -46,17 +46,18 @@ export async function fetchAvailableStations({
 }): Promise<Station[]> {
   const supabase = createClient();
 
-  const bookingsQuery = supabase
+  let bookingsQuery = supabase
     .from('bookings')
-    .select('id, station_id, start_time, duration_hours, device')
+    .select(
+      'id, station_id, start_time, duration_hours, extended_until, device',
+    )
     .eq('date', date)
-    .in('status', ['pending', 'confirmed']);
+    .in('status', ['confirmed']); // see note below on 'pending'
 
   if (excludeBookingId) {
-    bookingsQuery.neq('id', excludeBookingId);
+    bookingsQuery = bookingsQuery.neq('id', excludeBookingId);
   }
 
-  // VR uses a PS5 station
   const stationType = device === 'vr' ? 'ps5' : device;
 
   const [
@@ -68,13 +69,6 @@ export async function fetchAvailableStations({
       .select('id, name, type, hourly_rate, status')
       .eq('type', stationType)
       .neq('status', 'maintenance'),
-
-    // supabase
-    //   .from('bookings')
-    //   .select('station_id, start_time, duration_hours, device')
-    //   .eq('date', date)
-    //   .in('status', ['pending', 'confirmed']),
-
     bookingsQuery,
   ]);
 
@@ -85,37 +79,35 @@ export async function fetchAvailableStations({
   const requestedEnd = new Date(requestedStart);
   requestedEnd.setHours(requestedEnd.getHours() + duration);
 
-  // -------------------------------------------------------
-  // VR HEADSET CHECK
-  // Only one PSVR exists. If another VR booking overlaps,
-  // don't allow any VR booking during that time.
-  // -------------------------------------------------------
+  function getBookingEnd(b: {
+    start_time: string;
+    duration_hours: number;
+    extended_until: string | null;
+  }) {
+    const bStart = new Date(`${date}T${b.start_time}`); // `date` closes over the outer param, unchanged
+    const scheduledEnd = new Date(bStart);
+    scheduledEnd.setHours(scheduledEnd.getHours() + Number(b.duration_hours));
+    const extendedEnd = b.extended_until ? new Date(b.extended_until) : null;
+    return extendedEnd && extendedEnd > scheduledEnd
+      ? extendedEnd
+      : scheduledEnd;
+  }
+
   if (device === 'vr') {
     const vrAlreadyBooked = (dayBookings ?? []).some((b) => {
       if (b.device !== 'vr') return false;
-
       const bStart = new Date(`${date}T${b.start_time}`);
-      const bEnd = new Date(bStart);
-      bEnd.setHours(bEnd.getHours() + Number(b.duration_hours));
-
+      const bEnd = getBookingEnd(b);
       return requestedStart < bEnd && bStart < requestedEnd;
     });
-
-    if (vrAlreadyBooked) {
-      return [];
-    }
+    if (vrAlreadyBooked) return [];
   }
 
-  // -------------------------------------------------------
-  // Find stations that already have overlapping bookings
-  // -------------------------------------------------------
   const conflictingStationIds = new Set(
     (dayBookings ?? [])
       .filter((b) => {
         const bStart = new Date(`${date}T${b.start_time}`);
-        const bEnd = new Date(bStart);
-        bEnd.setHours(bEnd.getHours() + Number(b.duration_hours));
-
+        const bEnd = getBookingEnd(b);
         return requestedStart < bEnd && bStart < requestedEnd;
       })
       .map((b) => b.station_id),

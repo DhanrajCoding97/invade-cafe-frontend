@@ -1,5 +1,6 @@
 // components/BookingForm/steps/DateTimeStep.tsx
 'use client';
+import { useState } from 'react';
 import { Zap } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
@@ -17,28 +18,8 @@ import { createClient } from '@/lib/supabase/client';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import Link from 'next/link';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
+import { WheelTimePicker } from '@/components/wheel-picker-time-input';
 
-// / Conflict check now needs minute precision, not just hour precision,
-// since "Play Now" can start at e.g. 17:40
-// function hasConflictMinutes(
-//   startTime: string,
-//   durationHours: number,
-//   date: string,
-//   bookings: ExistingBooking[],
-// ): boolean {
-//   const [sh, sm] = startTime.split(':').map(Number);
-//   const startMinutes = sh * 60 + sm;
-//   const endMinutes = startMinutes + durationHours * 60;
-
-//   return bookings.some((b) => {
-//     const [bh, bm] = b.start_time.split(':').map(Number);
-//     const bStartMinutes = bh * 60 + bm;
-//     const bEndMinutes = bStartMinutes + b.duration_hours * 60;
-//     return startMinutes < bEndMinutes && endMinutes > bStartMinutes;
-//   });
-// }
-
-//date-time step
 const OPEN_HOUR = 10; // 10:00 AM
 const CLOSE_HOUR = 23; // 11:00 PM
 const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
@@ -49,17 +30,16 @@ interface ExistingBooking {
   extended_until: string | null;
 }
 
+//updated fetch to get realtime data
 async function fetchBookingsForDate(
   stationId: string,
   date: string,
 ): Promise<ExistingBooking[]> {
   const supabase = createClient();
-  const { data, error } = await supabase
-    .from('bookings')
-    .select('start_time, duration_hours,extended_until')
-    .eq('station_id', stationId)
-    .eq('date', date)
-    .in('status', ['pending', 'confirmed']);
+  const { data, error } = await supabase.rpc('get_bookings_for_availability', {
+    p_date: date,
+    p_station_id: stationId,
+  });
   if (error) throw error;
   return data ?? [];
 }
@@ -105,6 +85,8 @@ function hasConflictMinutes(
 }
 
 export default function DateTimeStep() {
+  const [showCustomTime, setShowCustomTime] = useState(false);
+  const [customTime, setCustomTime] = useState('');
   useRealtimeBookingSync();
   const { control, watch, setValue } = useFormContext<BookingFormValues>();
   const stationId = watch('stationId');
@@ -116,7 +98,10 @@ export default function DateTimeStep() {
     queryKey: ['bookings', stationId, dateKey],
     queryFn: () => fetchBookingsForDate(stationId, dateKey!),
     enabled: !!stationId && !!dateKey,
-    staleTime: 10_000,
+    staleTime: 0,
+    refetchInterval: 10_000,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   const today = isToday(date);
@@ -126,6 +111,33 @@ export default function DateTimeStep() {
   const OPEN_MINUTES = OPEN_HOUR * 60;
   const CLOSE_MINUTES = CLOSE_HOUR * 60;
   const PLAY_NOW_BUFFER = 10; // minutes of operational slack before close
+
+  //custom time slots
+  const customTimeConflict =
+    customTime && dateKey
+      ? hasConflictMinutes(customTime, duration, dateKey, bookings)
+      : false;
+
+  const customTimeInPast =
+    today && customTime
+      ? (() => {
+          const [ch, cm] = customTime.split(':').map(Number);
+          return ch * 60 + cm <= nowMinutes;
+        })()
+      : false;
+
+  const customTimeFitsBeforeClose = customTime
+    ? (() => {
+        const [ch, cm] = customTime.split(':').map(Number);
+        return ch * 60 + cm + duration * 60 <= CLOSE_MINUTES;
+      })()
+    : true;
+
+  const customTimeValid =
+    !!customTime &&
+    !customTimeConflict &&
+    !customTimeInPast &&
+    customTimeFitsBeforeClose;
 
   const availableSlots = Array.from(
     { length: CLOSE_HOUR - OPEN_HOUR },
@@ -296,7 +308,117 @@ export default function DateTimeStep() {
                     );
                   })}
                 </div>
+                {/* below the availableSlots grid */}
+                {/* <div className='mt-3'>
+                  {!showCustomTime ? (
+                    <button
+                      type='button'
+                      onClick={() => setShowCustomTime(true)}
+                      className='text-xs text-cyan-400 underline underline-offset-2'
+                    >
+                      Want a different time? Pick exact time
+                    </button>
+                  ) : (
+                    <div className='flex flex-col gap-2'>
+                      <WheelTimePicker
+                        value={customTime}
+                        onChange={setCustomTime}
+                      />
 
+                      <button
+                        type='button'
+                        disabled={!customTimeValid}
+                        onClick={() => field.onChange(customTime)}
+                        className={[
+                          'rounded-lg px-4 py-2 text-sm font-medium',
+                          customTimeValid
+                            ? 'bg-cyan-400 text-black'
+                            : 'bg-neutral-800 text-neutral-500 cursor-not-allowed',
+                        ].join(' ')}
+                      >
+                        Use this time
+                      </button>
+
+                      {customTime && customTimeConflict && (
+                        <p className='text-xs text-red-400'>
+                          This time overlaps an existing booking.
+                        </p>
+                      )}
+                      {customTime && customTimeInPast && (
+                        <p className='text-xs text-red-400'>
+                          That time has already passed today.
+                        </p>
+                      )}
+                      {customTime && !customTimeFitsBeforeClose && (
+                        <p className='text-xs text-red-400'>
+                          Session would run past closing time.
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div> */}
+                <div className='mt-3'>
+                  <Popover
+                    open={showCustomTime}
+                    onOpenChange={setShowCustomTime}
+                  >
+                    <PopoverTrigger asChild>
+                      <button
+                        type='button'
+                        className='text-xs text-cyan-400 underline underline-offset-2'
+                      >
+                        {customTime
+                          ? `Custom time: ${customTime} — change?`
+                          : 'Want a different time? Pick exact time'}
+                      </button>
+                    </PopoverTrigger>
+
+                    <PopoverContent
+                      align='start'
+                      className='w-70 border-cyan-400/40 bg-[#121C1D] p-3'
+                    >
+                      <div className='flex flex-col gap-2'>
+                        <WheelTimePicker
+                          value={customTime}
+                          onChange={setCustomTime}
+                        />
+
+                        <button
+                          type='button'
+                          disabled={!customTimeValid}
+                          onClick={() => {
+                            field.onChange(customTime);
+                            setShowCustomTime(false); // close popover once confirmed
+                          }}
+                          className={[
+                            'rounded-lg px-4 py-2 text-sm font-medium',
+                            customTimeValid
+                              ? 'bg-cyan-400 text-black'
+                              : 'bg-neutral-800 text-neutral-500 cursor-not-allowed',
+                          ].join(' ')}
+                        >
+                          Use this time
+                        </button>
+
+                        {customTime && customTimeConflict && (
+                          <p className='text-xs text-red-400'>
+                            This time overlaps an existing booking.
+                          </p>
+                        )}
+                        {customTime && customTimeInPast && (
+                          <p className='text-xs text-red-400'>
+                            That time has already passed today.
+                          </p>
+                        )}
+                        {customTime && !customTimeFitsBeforeClose && (
+                          <p className='text-xs text-red-400'>
+                            Session would run past closing time.
+                          </p>
+                        )}
+                      </div>
+                    </PopoverContent>
+                  </Popover>
+                </div>
                 {availableSlots.length === 0 && !canPlayNow && (
                   <div className='flex flex-col '>
                     <p className='mt-2 text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>

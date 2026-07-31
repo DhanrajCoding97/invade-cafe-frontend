@@ -1,4 +1,3 @@
-// app/dashboard/staff/LiveSessionBoard.tsx
 'use client';
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
@@ -22,12 +21,10 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
-// import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
 import { useDueSessions } from '@/hooks/use-due-session';
 import { isSessionDue, minutesOverdue } from '@/lib/helpers/session-due';
 import { markNoShow } from '@/app/actions/bookings';
-// app/dashboard/staff/LiveSessionBoard.tsx
 type Booking = {
   id: string;
   station_id: string;

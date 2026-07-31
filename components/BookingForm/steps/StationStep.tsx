@@ -8,145 +8,31 @@ import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { getDisplayRate } from '@/lib/pricing';
 import StationStepSkeleton from '@/components/skeletons/StationStepSkeleton';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
+import { format } from 'date-fns';
 
-// interface Station {
-//   id: string;
-//   name: string;
-//   specs: Record<string, string> | null;
-//   hourly_rate: number;
-//   status: 'available' | 'booked' | 'maintenance';
-//   activeUntil: string | null;
-// }
-
-// async function fetchStations(
-//   device: string,
-//   tier?: string,
-// ): Promise<Station[]> {
-//   const supabase = createClient();
-//   let query = supabase
-//     .from('stations')
-//     .select('id, name, specs, hourly_rate, max_players, status')
-//     .eq('type', device === 'vr' ? 'ps5' : device); // vr books a ps5 slot, handled separately below
-
-//   if (device === 'racing' && tier === 'multiplayer') {
-//     query = query.gte('max_players', 2);
-//   }
-
-//   const { data, error } = await query;
-//   if (error) throw error;
-//   return data ?? [];
-// }
-
-// export default function StationStep() {
-//   const { control, watch } = useFormContext<BookingFormValues>();
-//   const device = watch('device');
-//   const players = watch('players');
-//   const tier = watch('tier');
-
-//   const {
-//     data: stations = [],
-//     isLoading,
-//     error,
-//   } = useQuery({
-//     queryKey: ['stations', device, tier],
-//     queryFn: () => fetchStations(device!, tier),
-//     enabled: !!device,
-//     staleTime: 30_000, // stations don't change every second — 30s cache is plenty
-//   });
-
-//   if (isLoading)
-//     // return <p className='text-sm text-white/50'>Loading stations…</p>;
-//     return <StationStepSkeleton />;
-//   if (error)
-//     return <p className='text-sm text-red-400'>Couldn't load stations</p>;
-
-//   const STATUS_LABEL: Record<Station['status'], string> = {
-//     available: 'Available',
-//     booked: 'Booked',
-//     maintenance: 'Under maintenance',
-//   };
-//   const STATUS_COLOR: Record<Station['status'], string> = {
-//     available: 'text-green-400',
-//     booked: 'text-amber-400',
-//     maintenance: 'text-red-600',
-//   };
-
-//   return (
-//     <Controller
-//       name='stationId'
-//       control={control}
-//       render={({ field, fieldState }) => (
-//         <Field data-invalid={fieldState.invalid}>
-//           <FieldLabel>Choose your preferred station</FieldLabel>
-//           <div className='space-y-2'>
-//             {stations.map((station) => {
-//               const selected = field.value === station.id;
-//               const disabled = station.status !== 'available';
-//               const rate = getDisplayRate({
-//                 device,
-//                 players,
-//                 tier,
-//                 fallbackRate: station.hourly_rate,
-//               });
-
-//               return (
-//                 <button
-//                   key={station.id}
-//                   type='button'
-//                   disabled={disabled}
-//                   onClick={() => field.onChange(station.id)}
-//                   className={[
-//                     'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors',
-//                     selected
-//                       ? 'border-cyan-400 bg-cyan-400/10 text-white'
-//                       : 'border-cyan-400/40 text-cyan-300',
-//                     disabled
-//                       ? 'cursor-not-allowed opacity-40'
-//                       : 'hover:border-cyan-400',
-//                   ].join(' ')}
-//                 >
-//                   <div>
-//                     <p className='text-sm font-semibold text-white'>
-//                       {station.name}
-//                     </p>
-//                     {station.specs && (
-//                       <p className='text-xs text-white/50'>
-//                         {Object.values(station.specs).join(' · ')}
-//                       </p>
-//                     )}
-//                   </div>
-//                   <div className='text-right'>
-//                     <p className='text-sm font-bold text-cyan-400'>
-//                       ₹{rate}/hr
-//                     </p>
-//                     <p className={`text-xs ${STATUS_COLOR[station.status]}`}>
-//                       {STATUS_LABEL[station.status]}
-//                     </p>
-//                   </div>
-//                 </button>
-//               );
-//             })}
-//           </div>
-//           {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
-//         </Field>
-//       )}
-//     />
-//   );
-// }
-
-//booking-form/station-step
 interface Station {
   id: string;
   name: string;
   specs: Record<string, string> | null;
   hourly_rate: number;
   status: 'available' | 'maintenance';
-  activeUntil: string | null; // ISO string if currently in-use, else null
+  conflictUntil: string | null;
+}
+
+function formatTime(iso: string): string {
+  return new Date(iso).toLocaleTimeString('en-IN', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  });
 }
 
 async function fetchStations(
   device: string,
-  tier?: string,
+  tier: string | undefined,
+  date: Date,
+  startTime: string,
+  duration: number,
 ): Promise<Station[]> {
   const supabase = createClient();
 
@@ -164,46 +50,58 @@ async function fetchStations(
   if (!stations || stations.length === 0) return [];
 
   const stationIds = stations.map((s) => s.id);
+  const dateStr = format(date, 'yyyy-MM-dd');
 
-  // currently active sessions on these stations — started, not yet ended
-  const { data: activeSessions, error: sessionsError } = await supabase
-    .from('bookings')
-    .select('station_id, session_started_at, duration_hours, extended_until')
-    .in('station_id', stationIds)
-    .in('status', ['pending', 'confirmed'])
-    .not('session_started_at', 'is', null)
-    .is('session_ended_at', null);
+  const { data, error: conflictsError } = await supabase.rpc(
+    'get_station_conflicts_for_slot',
+    {
+      p_station_ids: stationIds,
+      p_date: dateStr,
+      p_start_time: startTime,
+      p_duration_hours: duration,
+    },
+  );
 
-  if (sessionsError) throw sessionsError;
+  if (conflictsError) throw conflictsError;
 
-  const activeUntilByStation = new Map<string, string>();
-  const now = Date.now();
+  const conflictUntilByStation = new Map<string, string>();
+  const conflicts = (data ?? []) as {
+    station_id: string;
+    conflict_end: string;
+  }[];
 
-  (activeSessions ?? []).forEach((s) => {
-    if (!s.session_started_at) return;
-    const start = new Date(s.session_started_at);
-    const scheduledEnd = new Date(start);
-    scheduledEnd.setHours(scheduledEnd.getHours() + Number(s.duration_hours));
-    const end = s.extended_until ? new Date(s.extended_until) : scheduledEnd;
-
-    // only treat it as "currently active" if the computed end is still in the future —
-    // a session that ran past its time but staff hasn't hit "End" yet shouldn't
-    // show a negative/zero countdown
-    if (end.getTime() > now) {
-      activeUntilByStation.set(s.station_id, end.toISOString());
-    }
+  conflicts.forEach((c) => {
+    conflictUntilByStation.set(c.station_id, c.conflict_end);
   });
+
+  // VR-specific check: only one headset, shared across all PS5s
+  if (device === 'vr') {
+    const { data: vrData, error: vrError } = await supabase.rpc(
+      'get_vr_conflict_for_slot',
+      { p_date: dateStr, p_start_time: startTime, p_duration_hours: duration },
+    );
+    if (vrError) throw vrError;
+
+    const vrConflictEnd = vrData?.[0]?.conflict_end ?? null;
+    if (vrConflictEnd) {
+      // headset is booked for this slot — every PS5 is effectively blocked for VR use
+      return stations.map((s) => ({
+        ...s,
+        conflictUntil: vrConflictEnd,
+      })) as Station[];
+    }
+  }
 
   return stations.map((s) => ({
     ...s,
-    activeUntil: activeUntilByStation.get(s.id) ?? null,
+    conflictUntil: conflictUntilByStation.get(s.id) ?? null,
   })) as Station[];
 }
 
 function getMinutesLeft(iso: string): number {
   return Math.max(
-    0,
-    Math.round((new Date(iso).getTime() - Date.now()) / 60_000),
+    1,
+    Math.ceil((new Date(iso).getTime() - Date.now()) / 60_000),
   );
 }
 
@@ -213,17 +111,22 @@ export default function StationStep() {
   const device = watch('device');
   const players = watch('players');
   const tier = watch('tier');
+  const date = watch('date');
+  const startTime = watch('startTime');
+  const duration = watch('duration');
 
   const {
     data: stations = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ['stations', device, tier],
-    queryFn: () => fetchStations(device!, tier),
-    enabled: !!device,
-    staleTime: 30_000,
-    refetchInterval: 60_000, // keep the "in X min" countdown roughly fresh
+    queryKey: ['stations', device, tier, date, startTime, duration],
+    queryFn: () => fetchStations(device!, tier, date, startTime, duration),
+    enabled: !!device && !!date && !!startTime && !!duration,
+    staleTime: 0,
+    refetchInterval: 10_000,
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
   });
 
   if (isLoading) return <StationStepSkeleton />;
@@ -240,7 +143,7 @@ export default function StationStep() {
           <div className='space-y-2'>
             {stations.map((station) => {
               const selected = field.value === station.id;
-              const isMaintenance = station.status === 'maintenance';
+              // const isMaintenance = station.status === 'maintenance';
               const rate = getDisplayRate({
                 device,
                 players,
@@ -248,32 +151,35 @@ export default function StationStep() {
                 fallbackRate: station.hourly_rate,
               });
 
+              const isMaintenance = station.status === 'maintenance';
+              const isBookedForSlot = !!station.conflictUntil;
+              const isDisabled = isMaintenance || isBookedForSlot;
+
               const statusLabel = isMaintenance
                 ? 'Under maintenance'
-                : station.activeUntil
-                  ? `Available in ${getMinutesLeft(station.activeUntil)} min`
+                : isBookedForSlot
+                  ? `Booked until ${formatTime(station.conflictUntil!)}`
                   : 'Available';
 
-              const statusColor = isMaintenance
-                ? 'text-red-600'
-                : station.activeUntil
-                  ? 'text-amber-400'
+              const statusColor =
+                isMaintenance || isBookedForSlot
+                  ? 'text-red-500'
                   : 'text-green-400';
 
               return (
                 <button
                   key={station.id}
                   type='button'
-                  disabled={isMaintenance}
+                  disabled={isDisabled}
                   onClick={() => field.onChange(station.id)}
                   className={[
                     'flex w-full items-center justify-between rounded-xl border p-3 text-left transition-colors',
                     selected
                       ? 'border-cyan-400 bg-cyan-400/10 text-white'
                       : 'border-cyan-400/40 text-cyan-300',
-                    isMaintenance
-                      ? 'cursor-not-allowed opacity-40'
-                      : 'hover:border-cyan-400',
+                    isDisabled
+                      ? 'cursor-not-allowed opacity-50 border-white/10 bg-white/5'
+                      : 'hover:border-cyan-400 hover:bg-cyan-400/5',
                   ].join(' ')}
                 >
                   <div>
@@ -290,7 +196,20 @@ export default function StationStep() {
                     <p className='text-sm font-bold text-cyan-400'>
                       ₹{rate}/hr
                     </p>
-                    <p className={`text-xs ${statusColor}`}>{statusLabel}</p>
+                    {/* <p className={`text-xs ${statusColor}`}>{statusLabel}</p> */}
+                    <div
+                      className={`flex items-center justify-end gap-1 text-xs ${statusColor}`}
+                    >
+                      <span
+                        className={[
+                          'h-2 w-2 rounded-full',
+                          isMaintenance || isBookedForSlot
+                            ? 'bg-red-500'
+                            : 'bg-green-400',
+                        ].join(' ')}
+                      />
+                      <span>{statusLabel}</span>
+                    </div>
                   </div>
                 </button>
               );

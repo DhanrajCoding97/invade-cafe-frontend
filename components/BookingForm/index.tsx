@@ -28,12 +28,13 @@ import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { useQueryClient } from '@tanstack/react-query';
+import { format } from 'date-fns';
 
 export const STEPS = [
   'device',
   'options',
-  'station',
   'datetime',
+  'station',
   'summary',
   'payment',
   'confirmed',
@@ -69,7 +70,7 @@ export default function () {
   const tierParam = searchParams.get('tier')?.toLowerCase();
   const deviceFromUrl = deviceParam ? DEVICE_MAP[deviceParam] : undefined;
 
-  const initialStep: Step = deviceFromUrl ? 'station' : 'device';
+  const initialStep: Step = deviceFromUrl ? 'datetime' : 'device';
   const [stepIndex, setStepIndex] = useState(STEPS.indexOf(initialStep));
   const [session, setSession] = useState<{ id: string } | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -121,7 +122,8 @@ export default function () {
       (device === 'ps5' && !!playersParam) ||
       (device === 'racing' && !!tierParam);
 
-    const target = needsOptionsStep(device) && !hasOptions ? 'device' : 'station';
+    const target =
+      needsOptionsStep(device) && !hasOptions ? 'device' : 'datetime';
     setStepIndex(STEPS.indexOf(target));
     setDirection(1);
 
@@ -213,21 +215,29 @@ export default function () {
   const deviceTweenAddedRef = useRef(false);
   const hasRevealedDeviceStep = useRef(false);
 
-  useGSAP(() => {
-    if (!cardRef.current) return;
-    gsap.fromTo(
-      cardRef.current,
-      { autoAlpha: 0, y: 40 },
-      {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.8,
-        ease: 'power4.out',
-        scrollTrigger: { trigger: cardRef.current, start: 'top 85%', once: true },
-      },
-    );
-  }, { scope: cardRef });
+  useGSAP(
+    () => {
+      if (!cardRef.current) return;
+      gsap.fromTo(
+        cardRef.current,
+        { autoAlpha: 0, y: 40 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power4.out',
+          scrollTrigger: {
+            trigger: cardRef.current,
+            start: 'top 85%',
+            once: true,
+          },
+        },
+      );
+    },
+    { scope: cardRef },
+  );
 
+  const isConfirmed = STEPS[stepIndex] === 'confirmed';
 
   function revealNextButton() {
     if (!buttonContainerRef.current) return;
@@ -238,6 +248,7 @@ export default function () {
       ease: 'power4.out',
     });
   }
+
   return (
     <div
       ref={cardRef}
@@ -251,13 +262,15 @@ export default function () {
               {currentDevice === 'ps5' &&
                 form.watch('players') &&
                 ` · ${form.watch('players')} player${form.watch('players') !== 1 ? 's' : ''}`}
-              <button
-                type='button'
-                onClick={() => setStepIndex(STEPS.indexOf('device'))}
-                className='text-cyan-400'
-              >
-                change
-              </button>
+              {!isConfirmed && (
+                <button
+                  type='button'
+                  onClick={() => setStepIndex(STEPS.indexOf('device'))}
+                  className='text-cyan-400'
+                >
+                  change
+                </button>
+              )}
             </div>
           )}
           {isRestoring ? (
@@ -266,16 +279,17 @@ export default function () {
             <StepTransition stepKey={step} direction={direction}>
               {step === 'device' && (
                 <DeviceStep
-                formCardRef={cardRef} isFirstReveal={!hasRevealedDeviceStep.current}
+                  formCardRef={cardRef}
+                  isFirstReveal={!hasRevealedDeviceStep.current}
                 />
               )}
               {step === 'options' && <OptionsStep />}
-              {step === 'station' && <StationStep />}
-              {step === 'datetime' && conflictMessage && (
+              {step === 'station' && conflictMessage && (
                 <div className='mb-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-300'>
                   {conflictMessage}
                 </div>
               )}
+              {step === 'station' && <StationStep />}
               {step === 'datetime' && <DateTimeStep />}
               {step === 'summary' && (
                 <SummaryStep
@@ -286,21 +300,55 @@ export default function () {
                 />
               )}
               {step === 'payment' && (
+                // <PaymentStep
+                //   onPaymentSuccess={(id) => {
+                //     setBookingId(id);
+                //     setStepIndex((i) => i + 1); // advance to confirmation
+                //     setDirection(1);
+                //   }}
+                //   onSlotConflict={(message) => {
+                //     setDirection(-1);
+                //     setStepIndex(STEPS.indexOf('datetime'));
+                //     form.setValue('startTime', '');
+                //     form.setValue('stationId', '');
+                //     setConflictMessage(message);
+                //     queryClient.invalidateQueries({
+                //       queryKey: ['bookings', form.getValues('stationId')],
+                //     });
+                //     queryClient.invalidateQueries({ queryKey: ['stations'] });
+                //   }}
+                // />
                 <PaymentStep
                   onPaymentSuccess={(id) => {
                     setBookingId(id);
-                    setStepIndex((i) => i + 1); // advance to confirmation
                     setDirection(1);
+                    setStepIndex((i) => i + 1);
                   }}
                   onSlotConflict={(message) => {
+                    // Keep all booking details except the station
+                    form.setValue('stationId', '');
+
+                    // Go back to Station selection
                     setDirection(-1);
-                    setStepIndex(STEPS.indexOf('datetime'));
-                    form.setValue('startTime', '');
+                    setStepIndex(STEPS.indexOf('station'));
+
                     setConflictMessage(message);
+
+                    // Refresh station availability for the selected date/time
                     queryClient.invalidateQueries({
-                      queryKey: ['bookings', form.getValues('stationId')],
+                      queryKey: [
+                        'stations',
+                        form.getValues('device'),
+                        form.getValues('tier'),
+                      ],
                     });
-                    queryClient.invalidateQueries({ queryKey: ['stations'] });
+
+                    queryClient.invalidateQueries({
+                      queryKey: [
+                        'bookings',
+                        format(form.getValues('date'), 'yyyy-MM-dd'),
+                      ],
+                    });
                   }}
                 />
               )}
@@ -325,7 +373,6 @@ export default function () {
                       type='button'
                       onClick={goNext}
                       className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
-                      
                     >
                       Next
                     </button>

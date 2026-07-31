@@ -6,9 +6,10 @@ import { format } from 'date-fns';
 import { useFormContext } from 'react-hook-form';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
-import { useQuery } from '@tanstack/react-query';
+import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import { stationKeys } from '@/lib/queries/stations';
 declare global {
   interface Window {
     Razorpay: any;
@@ -51,6 +52,8 @@ export default function PaymentStep({
   const [error, setError] = useState<string | null>(null);
 
   const values = watch();
+
+  const queryClient = useQueryClient();
 
   const { data: stationName, isLoading: stationLoading } = useQuery({
     queryKey: ['station-name', values.stationId],
@@ -216,12 +219,23 @@ export default function PaymentStep({
             const body = await verifyRes.json().catch(() => null);
 
             if (body?.code === 'SLOT_CONFLICT') {
+              await Promise.all([
+                queryClient.refetchQueries({
+                  queryKey: ['stations', values.device, values.tier],
+                }),
+                queryClient.refetchQueries({
+                  queryKey: [
+                    'bookings',
+                    values.stationId,
+                    format(values.date, 'yyyy-MM-dd'),
+                  ],
+                }),
+              ]);
               setError(body.error);
               setLoading(false);
               onSlotConflict?.(body.error);
               return;
             }
-
             setError(
               body?.error ??
                 'Payment succeeded but confirmation failed. Contact support.',

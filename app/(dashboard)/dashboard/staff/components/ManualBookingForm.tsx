@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Field,
@@ -8,7 +8,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { string, z } from 'zod';
+import { z } from 'zod';
 import {
   Select,
   SelectTrigger,
@@ -22,12 +22,9 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { createClient } from '@/lib/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import { useAvailableStations } from '@/hooks/UseAvailableStation';
-import { stationKeys } from '@/lib/queries/stations';
-import { toast } from 'sonner'; // swap for your actual toast lib if different
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import {
   manualBookingSchema,
@@ -47,7 +44,8 @@ import {
 } from '../actions/booking-action';
 import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
-
+import { WheelTimePicker } from '@/components/wheel-picker-time-input';
+import { useDebouncedValue } from '@/hooks/use-debounced-value';
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
 
@@ -72,7 +70,7 @@ function nowDateAndTime() {
 
 interface ManualBookingFormProps {
   mode: 'create' | 'edit';
-  bookingId?: string; // required when mode === 'edit'
+  bookingId?: string;
   defaultValues?: Partial<ManualBookingValues>;
   isOnlineBooking?: boolean;
   onSuccess?: (bookingId: string) => void;
@@ -125,27 +123,7 @@ export default function ManualBookingForm({
   const paymentMethod = watch('paymentMethod');
   const watchedDate = watch('date');
   const watchedStartTime = watch('startTime');
-
-  // Keep date/time pinned to "now" while startNow is checked
-  useEffect(() => {
-    if (startNow) {
-      const { date, startTime } = nowDateAndTime();
-      setValue('date', date);
-      setValue('startTime', startTime);
-    }
-  }, [startNow, setValue]);
-
-  useEffect(() => {
-    if (device === 'ps5') {
-      setValue('tier', undefined);
-    } else if (device === 'racing') {
-      setValue('players', 1);
-    } else {
-      // pc or vr
-      setValue('players', 1);
-      setValue('tier', undefined);
-    }
-  }, [device, setValue]);
+  const debouncedStartTime = useDebouncedValue(watchedStartTime, 400);
 
   const showPlayersSelect = device === 'ps5';
   const showTierSelect = device === 'racing';
@@ -160,40 +138,18 @@ export default function ManualBookingForm({
     useAvailableStations({
       device: watchedDevice,
       date: dateStr,
-      startTime: watchedStartTime,
+      startTime: debouncedStartTime,
       duration: durationValue,
       excludeBookingId: mode === 'edit' ? bookingId : undefined,
     });
 
-  // Reset station selection when the availability set changes underneath it —
-  // e.g. staff picks PC-01 for a 1hr slot, then bumps duration to 3hrs and
-  // PC-01 no longer qualifies; don't silently submit a stale selection.
-  // useEffect(() => {
-  //   if (stationId && !stations.some((s) => s.id === stationId)) {
-  //     setValue('stationId', '');
-  //   }
-  // }, [stations, stationId, setValue]);
-  // useEffect(() => {
-  //   if (stationsLoading) return; // don't evict based on an incomplete/loading list
-  //   if (stationId && !stations.some((s) => s.id === stationId)) {
-  //     setValue('stationId', '');
-  //   }
-  // }, [stations, stationId, stationsLoading, setValue]);
-
-  const stationsForDevice = stations.filter((station) => {
-    if (device === 'vr') {
-      return station.type === 'ps5';
-    }
-
-    return station.type === device;
-  });
-
-  useEffect(() => {
-    if (stationsLoading) return;
-    if (stationId && !stationsForDevice.some((s) => s.id === stationId)) {
-      setValue('stationId', '');
-    }
-  }, [stationsForDevice, stationId, stationsLoading, setValue]);
+  const stationsForDevice = useMemo(
+    () =>
+      stations.filter((station) =>
+        device === 'vr' ? station.type === 'ps5' : station.type === device,
+      ),
+    [stations, device],
+  );
 
   const noStationsAvailable =
     !stationsLoading && stationsForDevice.length === 0;
@@ -215,64 +171,6 @@ export default function ManualBookingForm({
         ? rawAmountOverride
         : computedTotal;
 
-  // async function onSubmit(values: ManualBookingValues) {
-  //   setSubmitting(true);
-  //   setServerError(null);
-  //   try {
-  //     const supabase = createClient();
-  //     const {
-  //       data: { user },
-  //     } = await supabase.auth.getUser();
-
-  //     const total =
-  //       values.paymentMethod === 'complimentary'
-  //         ? 0
-  //         : (values.amountOverride ?? computedTotal);
-
-  //     const { data, error } = await supabase
-  //       .from('bookings')
-  //       .insert({
-  //         station_id: values.stationId,
-  //         device: values.device,
-  //         tier: values.tier ?? null,
-  //         players: values.players,
-  //         duration_hours: values.duration,
-  //         date: format(values.date, 'yyyy-MM-dd'),
-  //         start_time: values.startTime,
-  //         amount: total,
-  //         status: 'confirmed',
-  //         user_id: null,
-  //         staff_id: user?.id ?? null,
-  //         customer_name: values.customerName,
-  //         customer_phone: values.customerPhone,
-  //         payment_method: values.paymentMethod,
-  //         session_started_at: values.startNow ? new Date().toISOString() : null,
-  //       })
-  //       .select('id')
-  //       .single();
-
-  //     if (error) {
-  //       if (
-  //         error.code === '23505' ||
-  //         error.message?.toLowerCase().includes('conflict')
-  //       ) {
-  //         throw new Error('That station was just booked — pick another one.');
-  //       }
-  //       throw new Error(error.message);
-  //     }
-
-  //     toast.success(`Booking created for ${values.customerName}`);
-  //     queryClient.invalidateQueries({ queryKey: stationKeys.all });
-  //     queryClient.invalidateQueries({ queryKey: ['live-session-board'] });
-  //     onSuccess?.(data.id);
-  //   } catch (err) {
-  //     setServerError(
-  //       err instanceof Error ? err.message : 'Something went wrong',
-  //     );
-  //   } finally {
-  //     setSubmitting(false);
-  //   }
-  // }
   async function onSubmit(values: ManualBookingValues) {
     setSubmitting(true);
     setServerError(null);
@@ -281,7 +179,7 @@ export default function ManualBookingForm({
         const newId = await createManualBooking(values);
         onSuccess?.(newId);
       } else {
-        await updateManualBooking(bookingId!, values); // new update path
+        await updateManualBooking(bookingId!, values);
         onSuccess?.(bookingId!);
       }
     } catch (err) {
@@ -293,6 +191,35 @@ export default function ManualBookingForm({
     }
   }
 
+  // Keep date/time pinned to "now" while startNow is checked
+  useEffect(() => {
+    if (startNow) {
+      const { date, startTime } = nowDateAndTime();
+      setValue('date', date);
+      setValue('startTime', startTime);
+    }
+  }, [startNow, setValue]);
+
+  //device → reset tier/players
+  useEffect(() => {
+    if (device === 'ps5') {
+      setValue('tier', undefined);
+    } else if (device === 'racing') {
+      setValue('players', 1);
+    } else {
+      // pc or vr
+      setValue('players', 1);
+      setValue('tier', undefined);
+    }
+  }, [device, setValue]);
+
+  useEffect(() => {
+    if (stationsLoading) return;
+    if (stationId && !stationsForDevice.some((s) => s.id === stationId)) {
+      setValue('stationId', '');
+    }
+  }, [stationsForDevice, stationId, stationsLoading, setValue]);
+
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
@@ -301,8 +228,6 @@ export default function ManualBookingForm({
         mode === 'create' &&
           'rounded-xl border border-white/10 bg-white/3 p-5 w-full sm:max-w-3xl',
       )}
-      // className='flex flex-col gap-4'
-      // className='flex flex-col gap-4 rounded-xl border border-white/10 bg-white/3 p-5 w-full max-w-lg'
     >
       <h3 className='text-lg font-bold text-white'>Manual Walk-in Booking</h3>
       <FieldGroup>
@@ -595,17 +520,36 @@ export default function ManualBookingForm({
               <Controller
                 name='startTime'
                 control={control}
-                render={({ field }) => (
-                  <Field>
-                    <FieldLabel htmlFor='startTime'>Start Time</FieldLabel>
-                    <TimePicker
-                      id='startTime'
-                      {...field}
-                      className='w-full rounded-lg bg-black/40 border-white/10 text-white hover:bg-black/50 hover:text-white'
-                      disabled={lockStructuralFields}
-                    />
-                  </Field>
-                )}
+                render={({ field }) => {
+                  const [open, setOpen] = useState(false);
+
+                  return (
+                    <Field>
+                      <FieldLabel htmlFor='startTime'>Start Time</FieldLabel>
+                      <Popover open={open} onOpenChange={setOpen}>
+                        <PopoverTrigger asChild>
+                          <Button
+                            type='button'
+                            id='startTime'
+                            disabled={lockStructuralFields}
+                            variant='outline'
+                            onBlur={field.onBlur}
+                            className='w-full justify-start text-left font-normal bg-slate-950 text-[#dddddd]'
+                          >
+                            {field.value || 'Select start time'}
+                          </Button>
+                        </PopoverTrigger>
+
+                        <PopoverContent align='start' className='p-0'>
+                          <WheelTimePicker
+                            value={field.value}
+                            onChange={field.onChange}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </Field>
+                  );
+                }}
               />
             </div>
           )}

@@ -3,6 +3,12 @@ import crypto from 'crypto';
 import Razorpay from 'razorpay';
 import { createClient } from '@/lib/supabase/server';
 
+function getConflictMessage(stationName: string, refunded: boolean) {
+  return refunded
+    ? `${stationName} was just booked by another customer. Your payment has been refunded. Please choose another station for the same time slot.`
+    : `${stationName} was just booked by another customer. Your refund is being processed manually. Our team has been notified.`;
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } =
@@ -39,6 +45,14 @@ export async function POST(req: NextRequest) {
     const {
       data: { user },
     } = await supabase.auth.getUser();
+
+    const { data: station } = await supabase
+      .from('stations')
+      .select('name')
+      .eq('id', notes.stationId)
+      .single();
+
+    const stationName = station?.name ?? 'The selected station';
 
     if (!user) {
       return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
@@ -84,6 +98,7 @@ export async function POST(req: NextRequest) {
       });
 
       let refunded = false;
+
       try {
         await razorpay.payments.refund(razorpay_payment_id, {
           amount: Number(order.amount),
@@ -113,9 +128,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json(
         {
-          error: refunded
-            ? 'This slot was just booked by someone else. You have been refunded.'
-            : 'This slot was just booked by someone else. Refund is being processed manually — our team has been notified.',
+          error: getConflictMessage(stationName, refunded),
           code: 'SLOT_CONFLICT',
           refunded,
         },
@@ -179,9 +192,7 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json(
           {
-            error: refunded
-              ? 'This slot was just booked by someone else. You have been refunded.'
-              : 'This slot was just booked by someone else. Refund is being processed manually.',
+            error: getConflictMessage(stationName, refunded),
             code: 'SLOT_CONFLICT',
             refunded,
           },
