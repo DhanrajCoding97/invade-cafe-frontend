@@ -391,8 +391,11 @@ html {
 .line-inner {
   display: inline-block;
   animation: lineReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform: translateZ(0);
 }
-
 @keyframes lineReveal {
   from {
     transform: translateY(100%);

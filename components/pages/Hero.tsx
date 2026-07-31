@@ -21,7 +21,7 @@ export default function HeroSection() {
   return (
     <section
       id='hero'
-      className='relative min-h-[94vh] w-full overflow-hidden bg-black sm:min-h-screen'
+      className='relative min-h-[94dvh] w-full overflow-hidden bg-black sm:min-h-dvh'
     >
       <div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
       <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />

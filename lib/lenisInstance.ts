@@ -159,6 +159,10 @@ export function getLenisInstance() {
     lenis = new Lenis({
       duration: 1.2,
       smoothWheel: true,
+
+      prevent: (node) => {
+        return !!node.closest('[data-lenis-prevent]');
+      },
     });
 
     lenis.on('scroll', () => ScrollTrigger.update());

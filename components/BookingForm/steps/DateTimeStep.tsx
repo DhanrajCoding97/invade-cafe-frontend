@@ -6,6 +6,9 @@ import { Controller, useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { Calendar } from '@/components/ui/calendar';
+
+import { useEffect } from 'react';
+import { getLenisInstance } from '@/lib/lenisInstance';
 import {
   Popover,
   PopoverContent,
@@ -164,6 +167,20 @@ export default function DateTimeStep() {
   );
 
   const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
+
+  useEffect(() => {
+    const lenis = getLenisInstance();
+
+    if (!lenis) return;
+
+    if (showCustomTime) {
+      lenis.stop();
+    } else {
+      lenis.start();
+    }
+
+    return () => lenis.start();
+  }, [showCustomTime]);
 
   return (
     <div className='space-y-6'>
@@ -373,6 +390,7 @@ export default function DateTimeStep() {
                       </button>
                     </PopoverTrigger>
                     <PopoverContent
+                      data-lenis-prevent
                       align='start'
                       className='w-70 border-cyan-400/40 bg-[#121C1D] p-3 touch-pan-y'
                     >

@@ -15,7 +15,7 @@
 
 //   useEffect(() => {
 //      const isTouch = isTouchDevice();
-    
+
 //     if (isTouch) {
 //       const normalizer = ScrollTrigger.normalizeScroll({
 //         allowNestedScroll: true,
@@ -49,7 +49,11 @@
 import { useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { getLenisInstance, destroyLenis, isTouchDevice } from "@/lib/lenisInstance"
+import {
+  getLenisInstance,
+  destroyLenis,
+  isTouchDevice,
+} from '@/lib/lenisInstance';
 
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.config({ ignoreMobileResize: true });
