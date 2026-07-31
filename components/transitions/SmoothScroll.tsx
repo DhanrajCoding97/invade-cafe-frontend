@@ -67,7 +67,7 @@ export default function SmoothScroll({
     if (isTouchDevice()) {
       const normalizer = ScrollTrigger.normalizeScroll({
         allowNestedScroll: true,
-        ignore: '.embla__root',
+        ignore: '.embla__root,.wheel-picker-wrapper',
       });
       return () => normalizer?.kill();
     }

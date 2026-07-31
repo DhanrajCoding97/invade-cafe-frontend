@@ -82,6 +82,9 @@ export const WheelTimePicker = forwardRef<HTMLDivElement, WheelTimePickerProps>(
         id={id}
         ref={ref}
         onBlur={onBlur}
+        onTouchStart={(e) => e.stopPropagation()}
+        onTouchMove={(e) => e.stopPropagation()}
+        onWheel={(e) => e.stopPropagation()}
         className={[
           '',
           disabled ? 'pointer-events-none opacity-50' : '',
