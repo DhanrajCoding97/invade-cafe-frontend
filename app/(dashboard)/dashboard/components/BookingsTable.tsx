@@ -191,7 +191,7 @@ export function BookingsTable<TData>({
       ) : (
         <div className='flex flex-col gap-4'>
           <div className='flex flex-col justify-center gap-3'>
-            <div className='flex items-center justify-between'>
+            <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
               <h1 className='text-2xl font-bold'>Bookings Table</h1>
               <Button
                 variant='outline'
