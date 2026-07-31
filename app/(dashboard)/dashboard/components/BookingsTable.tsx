@@ -1,4 +1,5 @@
 'use client';
+import { ArrowUp, ArrowDown } from "lucide-react";
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { type DateRange } from 'react-day-picker';
@@ -274,19 +275,24 @@ export function BookingsTable<TData>({
                 {table.getHeaderGroups().map((headerGroup) => (
                   <tr key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <th
-                        key={header.id}
-                        onClick={header.column.getToggleSortingHandler()}
-                        className='cursor-pointer select-none px-4 py-2 text-left font-medium'
-                      >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {{ asc: ' ↑', desc: ' ↓' }[
-                          header.column.getIsSorted() as string
-                        ] ?? ''}
-                      </th>
+                     <th
+  key={header.id}
+  onClick={header.column.getToggleSortingHandler()}
+  className="cursor-pointer select-none px-4 py-2 text-left font-medium min-w-[120px]"
+>
+  <div className="flex items-center gap-1 whitespace-nowrap">
+    {flexRender(
+      header.column.columnDef.header,
+      header.getContext(),
+    )}
+    <span className="shrink-0">
+      {{
+        asc: "↑",
+        desc: "↓",
+      }[header.column.getIsSorted() as string] ?? ""}
+    </span>
+  </div>
+</th>
                     ))}
                   </tr>
                 ))}
