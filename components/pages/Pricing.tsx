@@ -46,13 +46,10 @@ export default function PricingSection() {
         y: 0,
         duration: 0.4,
         ease: 'power4.out',
-        onComplete() {
-          console.log(cards[0].getAttribute('style'));
-        },
         stagger: 0.15,
         clearProps: 'transform',
         scrollTrigger: {
-          trigger: triggerRef?.current ?? containerRef.current,
+          trigger: cardsRef.current,
           start: 'top 80%',
           once: true,
         },

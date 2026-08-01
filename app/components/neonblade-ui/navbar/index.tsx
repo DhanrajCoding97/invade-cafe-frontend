@@ -1,31 +1,10 @@
 'use client';
+import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { getLenisInstance } from '@/lib/lenisInstance';
 import { cn } from '@/lib/utils';
 import styles from './navbar.module.css';
 
-function scrollToSection(href?: string): boolean {
-  if (!href) {
-    return false;
-  }
-
-  const hashIndex = href.indexOf('#');
-  if (hashIndex === -1) {
-    return false;
-  }
-
-  const hash = href.slice(hashIndex); // '#services', regardless of any path prefix
-
-  const lenis = getLenisInstance();
-
-  if (lenis && typeof lenis.scrollTo === 'function') {
-    lenis.scrollTo(hash, { offset: 20 });
-  } else {
-    document.querySelector(hash)?.scrollIntoView({ behavior: 'smooth' });
-  }
-
-  return true;
-}
 /** Named color presets or any valid CSS color string */
 export type NavBarColor = 'cyan' | 'pink' | 'green' | (string & {});
 
@@ -283,6 +262,34 @@ function SubMenuDropdown({
   color: string;
   align?: DropdownAlign;
 }) {
+  const pathname = usePathname();
+
+  function scrollToSection(href?: string): boolean {
+    if (!href) return false;
+
+    const hashIndex = href.indexOf('#');
+    if (hashIndex === -1) return false;
+
+    // Not on the landing page?
+    // Don't intercept the click.
+    if (pathname !== '/') {
+      return false;
+    }
+
+    const hash = href.slice(hashIndex);
+
+    const lenis = getLenisInstance();
+
+    if (lenis) {
+      lenis.scrollTo(hash, { offset: 20 });
+    } else {
+      document.querySelector(hash)?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+
+    return true;
+  }
   const alignClass =
     align === 'left'
       ? styles['nbr-submenu--left']
@@ -343,6 +350,34 @@ function NavDesktopItem({
 }) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  function scrollToSection(href?: string): boolean {
+    if (!href) return false;
+
+    const hashIndex = href.indexOf('#');
+    if (hashIndex === -1) return false;
+
+    // Not on the landing page?
+    // Don't intercept the click.
+    if (pathname !== '/') {
+      return false;
+    }
+
+    const hash = href.slice(hashIndex);
+
+    const lenis = getLenisInstance();
+
+    if (lenis) {
+      lenis.scrollTo(hash, { offset: 20 });
+    } else {
+      document.querySelector(hash)?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+
+    return true;
+  }
 
   useEffect(() => {
     if (!open) return;
@@ -554,22 +589,34 @@ export const NavBar: React.FC<NavBarProps> = ({
   const resolvedColor = COLOR_PRESETS[color] ?? color;
   const cssVars = { '--nbr-color': resolvedColor } as React.CSSProperties;
 
-  // Scroll effect
-  // useEffect(() => {
-  //   if (!scrollEffect || variant === "dock") return
-  //   const onScroll = () => setScrolled(window.scrollY > scrollThreshold)
-  //   window.addEventListener("scroll", onScroll, { passive: true })
-  //   return () => window.removeEventListener("scroll", onScroll)
-  // }, [scrollEffect, scrollThreshold, variant])
+  const pathname = usePathname();
 
-  // // Close mobile menu on desktop resize
-  // useEffect(() => {
-  //   const onResize = () => {
-  //     if (window.innerWidth >= 768) setMobileOpen(false)
-  //   }
-  //   window.addEventListener("resize", onResize)
-  //   return () => window.removeEventListener("resize", onResize)
-  // }, [])
+  function scrollToSection(href?: string): boolean {
+    if (!href) return false;
+
+    const hashIndex = href.indexOf('#');
+    if (hashIndex === -1) return false;
+
+    // Not on the landing page?
+    // Don't intercept the click.
+    if (pathname !== '/') {
+      return false;
+    }
+
+    const hash = href.slice(hashIndex);
+
+    const lenis = getLenisInstance();
+
+    if (lenis) {
+      lenis.scrollTo(hash, { offset: 20 });
+    } else {
+      document.querySelector(hash)?.scrollIntoView({
+        behavior: 'smooth',
+      });
+    }
+
+    return true;
+  }
   useEffect(() => {
     if (variant === 'dock') return;
     if (!scrollEffect && !hideOnScroll) return;

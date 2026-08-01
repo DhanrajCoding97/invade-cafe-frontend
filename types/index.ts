@@ -153,3 +153,32 @@ export interface CustomerRow {
   created_at: string;
   booking_count: number;
 }
+
+// Games section types
+export type Category = 'all' | 'ps5' | 'pc' | 'vr' | 'racing';
+
+export interface Game {
+  id: string;
+  title: string;
+  category: Exclude<Category, 'all'>;
+  image: string;
+  tags?: string[];
+  featured?: boolean;
+}
+
+export const CATEGORIES: { value: Category; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'ps5', label: 'PS5' },
+  { value: 'pc', label: 'PC' },
+  { value: 'racing', label: 'Racing' },
+  { value: 'vr', label: 'VR' },
+];
+
+export interface Game {
+  id: string;
+  title: string;
+  category: Exclude<Category, 'all'>;
+  image: string;
+  tags?: string[];
+  featured?: boolean;
+}

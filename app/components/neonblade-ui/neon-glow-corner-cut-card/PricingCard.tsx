@@ -116,7 +116,6 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       ? (playerPriceMap?.[players] ?? pricePerPlayer * players)
       : (price ?? 0);
 
-
   const handleDecrease = () => setPlayers((p) => Math.max(minPlayers, p - 1));
   const handleIncrease = () => setPlayers((p) => Math.min(maxPlayers, p + 1));
 
@@ -125,7 +124,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
       className={cn(
         styles['pricing-card'],
         'relative flex h-full flex-col overflow-visible rounded-2xl',
-        className
+        className,
       )}
       // style={
       //   {

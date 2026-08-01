@@ -1,8 +1,7 @@
-
 import dynamic from 'next/dynamic';
 import HeroSection from '@/components/pages/Hero';
+import GamesCatalogSection from '@/components/pages/GamesCatalogSection';
 import ServicesSection from '@/components/pages/Services';
-// import ReviewsSection from "@/components/Reviews"
 import TestimonialSection from '@/components/pages/Reviews';
 import PricingSection from '@/components/pages/Pricing';
 import GallerySection from '@/components/pages/Gallery';
@@ -18,9 +17,9 @@ export default async function Page() {
   return (
     <>
       <HeroSection />
-      <div className="min-h-screen w-full bg-black relative">
+      <div className='min-h-screen w-full bg-black relative'>
         <div
-          className="pointer-events-none absolute inset-0 z-0"
+          className='pointer-events-none absolute inset-0 z-0'
           style={{
             backgroundImage: `
               linear-gradient(to right, rgba(255,255,255,0.05) 0.5px, transparent 0.5px),
@@ -31,6 +30,7 @@ export default async function Page() {
             backgroundSize: '50px 50px, 50px 50px, 100% 100%, 100% 100%',
           }}
         />
+        <GamesCatalogSection />
         <ServicesSection />
         <PricingSection />
         <GallerySection />

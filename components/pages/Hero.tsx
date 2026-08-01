@@ -1,6 +1,5 @@
 // 'use client';
 import Badge from '@/app/components/neonblade-ui/badge';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import GridLinesBackground from '../grid-lines-background';
 import HeroCtas from '../hero-ctas';
 import Image from 'next/image';
@@ -13,18 +12,6 @@ export default function HeroSection() {
     >
       <div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
       <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />
-      {/* <DatalinesWithGrid
-        lineColor='#38FA14'
-        shadowColor='#071F02'
-        cellSize={isMobile ? 40 : 60}
-        maxLines={isMobile ? 4 : 8}
-        baseSpeed={2}
-        lineLength={isMobile ? 80 : 120}
-        spawnProbability={isMobile ? 0.03 : 0.04}
-        bgGridColor='rgba(0,255,102,0.06)'
-        overlay
-        isMobile={isMobile}
-      /> */}
       <GridLinesBackground />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
         <div className='hero-badge '>
@@ -75,40 +62,6 @@ export default function HeroSection() {
             </span>
           </span>
         </div>
-        {/* <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
-          <CornerCutButton
-            className=' hero-cta-book-now'
-            onClick={() => {
-              document.querySelector('#booking')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-            color='cyan'
-            variant='solid'
-            showArrow
-            hoverEffect='shift'
-            fullWidthOnMobile={true}
-          >
-            Book Now
-          </CornerCutButton>
-          <CornerCutButton
-            className=' hero-cta-pricing'
-            onClick={() => {
-              document.querySelector('#pricing')?.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start',
-              });
-            }}
-            color='green'
-            variant='ghost'
-            hoverEffect='pulse'
-            glowIntensity='high'
-            fullWidthOnMobile={true}
-          >
-            View Pricing
-          </CornerCutButton>
-        </div> */}
         <HeroCtas />
       </div>
     </section>
