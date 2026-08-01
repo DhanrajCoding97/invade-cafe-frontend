@@ -40,6 +40,7 @@ import {
   Monitor,
   Wallet,
   Users,
+  GamepadDirectional,
   IndianRupee,
   Settings2,
   BadgeCheck,
@@ -235,11 +236,11 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
   ];
 
   const management = [
-    // {
-    //   name: 'Payments',
-    //   url: '/dashboard/staff/payments',
-    //   icon: Wallet,
-    // },
+    {
+      name: 'Games',
+      url: '/dashboard/staff/games',
+      icon: GamepadDirectional,
+    },
   ];
 
   if (role === 'owner') {

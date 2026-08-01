@@ -1,40 +1,53 @@
-// components/games/GameCard.tsx
+import type { GameRow } from '@/types';
 import Image from 'next/image';
-import { type Game } from '@/types';
+import { Badge } from './ui/badge';
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game }: { game: GameRow }) {
   return (
     <div
       className={[
-        'group relative aspect-3/4 overflow-hidden rounded-2xl border transition-colors',
+        'group relative aspect-[3/4] overflow-hidden rounded-2xl border transition-all duration-300',
         game.featured
-          ? 'border-cyan-400 shadow-[0_0_24px_-4px_rgba(0,243,255,0.4)]'
-          : 'border-cyan-400/20 hover:border-cyan-400/50',
+          ? 'border-cyan-400 shadow-[0_0_24px_-4px_rgba(0,243,255,0.45)]'
+          : 'border-cyan-400/20 hover:border-cyan-400/60',
       ].join(' ')}
     >
       <Image
-        src={game.image}
+        src={game.image_url}
         alt={game.title}
         fill
-        className='object-cover transition-transform duration-300 group-hover:scale-105'
+        sizes='(max-width: 640px) 180px, (max-width: 1024px) 33vw, 25vw'
+        className='object-cover transition-transform duration-500 group-hover:scale-105'
       />
-      <div className='absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent' />
 
-      {game.tags && game.tags.length > 0 && (
-        <div className='absolute top-3 left-3 flex flex-wrap gap-1.5'>
-          {game.tags.map((tag) => (
-            <span
-              key={tag}
-              className='rounded bg-cyan-400 px-1.5 py-0.5 text-[10px] font-bold text-black'
-            >
-              {tag}
-            </span>
-          ))}
+      {/* Dark gradient */}
+      <div className='absolute inset-0 bg-gradient-to-t from-black via-black/35 to-transparent' />
+
+      {/* Featured pill */}
+      {game.featured && (
+        <div className='absolute right-3 top-3 bg-black/45  rounded-full border border-cyan-200 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-200 backdrop-blur'>
+          Featured
         </div>
       )}
 
-      <div className='absolute bottom-0 left-0 right-0 p-3'>
-        <p className='text-sm font-bold text-white'>{game.title}</p>
+      {/* Bottom content */}
+      <div className='absolute inset-x-0 bottom-0 p-4'>
+        <h3 className='line-clamp-2 text-base font-bold text-white drop-shadow'>
+          {game.title}
+        </h3>
+
+        {game.tags?.length > 0 && (
+          <div className='mt-2 flex flex-wrap gap-1.5'>
+            {game.tags.slice(0, 3).map((tag, index) => (
+              <Badge
+                key={index}
+                className='rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-cyan-200 backdrop-blur-sm'
+              >
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

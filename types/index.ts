@@ -155,30 +155,31 @@ export interface CustomerRow {
 }
 
 // Games section types
-export type Category = 'all' | 'ps5' | 'pc' | 'vr' | 'racing';
+export type GameCategory = 'all' | 'ps5' | 'pc' | 'vr' | 'racing';
 
-export interface Game {
-  id: string;
+export interface GameInput {
   title: string;
-  category: Exclude<Category, 'all'>;
-  image: string;
-  tags?: string[];
-  featured?: boolean;
+  category: GameCategory;
+  image_url: string;
+  tags: string[];
+  featured: boolean;
 }
 
-export const CATEGORIES: { value: Category; label: string }[] = [
+export interface GameRow {
+  id: string;
+  title: string;
+  category: Exclude<GameCategory, 'all'>;
+  image_url: string;
+  tags: string[];
+  featured: boolean;
+  display_order: number;
+  created_at: string;
+}
+
+export const CATEGORIES: { value: GameCategory; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'ps5', label: 'PS5' },
   { value: 'pc', label: 'PC' },
   { value: 'racing', label: 'Racing' },
   { value: 'vr', label: 'VR' },
 ];
-
-export interface Game {
-  id: string;
-  title: string;
-  category: Exclude<Category, 'all'>;
-  image: string;
-  tags?: string[];
-  featured?: boolean;
-}

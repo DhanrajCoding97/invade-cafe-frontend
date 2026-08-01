@@ -1,121 +1,33 @@
-// app/games/page.tsx
 'use client';
 
 import { useMemo, useState } from 'react';
 import { Search } from 'lucide-react';
 import GameCard from '@/components/gameCard';
-import { CATEGORIES, type Category, type Game } from '@/types/index';
-
-const GAMES: Game[] = [
-  {
-    id: 'gta5',
-    title: 'GTA V',
-    category: 'ps5',
-    image: '/games/gta.jpg',
-    tags: ['Adventure', 'Open World'],
-  },
-  {
-    id: 'jumpForce',
-    title: 'Jump Force',
-    category: 'ps5',
-    image: '/games/jumpforce.jpg',
-    tags: ['Action', 'Fighting'],
-  },
-  {
-    id: 'fc26',
-    title: 'FC 26',
-    category: 'ps5',
-    image: '/games/fc.jpg',
-    tags: ['Sports'],
-  },
-  {
-    id: 'cricket24',
-    title: 'Cricket 24',
-    category: 'ps5',
-    image: '/games/cricket24.jpg',
-    tags: ['Sports'],
-  },
-  {
-    id: 'wukong',
-    title: 'Black Myth: Wukong',
-    category: 'ps5',
-    image: '/games/wukong.jpg',
-    featured: true,
-    tags: ['NEW', 'RPG', 'Adventure'],
-  },
-  {
-    id: 'UnchartedLL',
-    title: 'Uncharted Lost Legacy',
-    category: 'ps5',
-    image: '/games/unchartedLL.webp',
-    tags: ['Open World', 'Adventure'],
-  },
-  {
-    id: 'ac-bf',
-    title: "Assassin's Creed Black Flag Resynced",
-    category: 'ps5',
-    image: '/games/acbf.webp',
-    tags: ['NEW', 'RPG', 'Open World'],
-  },
-  {
-    id: 'mortalKombat',
-    title: 'Mortal Kombat',
-    category: 'ps5',
-    image: '/games/mortalkombat.jpg',
-    tags: ['Action', 'Fighting'],
-  },
-  {
-    id: 'spidey2',
-    title: 'Spider-Man 2',
-    category: 'ps5',
-    image: '/games/spiderman2.jpg',
-  },
-  { id: 'cs2', title: 'CS 2', category: 'pc', image: '/games/cs2.jpg' },
-  {
-    id: 'fortnite',
-    title: 'Fortnite',
-    category: 'pc',
-    image: '/games/fortnite.jpg',
-  },
-  {
-    id: 'valorant',
-    title: 'Valorant',
-    category: 'pc',
-    image: '/games/valo.jpg',
-  },
-  {
-    id: 'gt7',
-    title: 'Gran Turismo 7',
-    category: 'racing',
-    image: '/games/granturismo7.jpg',
-  },
-  {
-    id: 'forza',
-    title: 'Forza Horizon 6',
-    category: 'racing',
-    image: '/games/forzahorizon6.jpg',
-    tags: ['New', 'racing'],
-  },
-  {
-    id: 'astrobot',
-    title: 'Astro Bot',
-    category: 'vr',
-    image: '/games/astrobot.webp',
-    tags: ['Open World'],
-  },
-];
+import { CATEGORIES, type GameCategory } from '@/types/index';
+import { useQuery } from '@tanstack/react-query';
+import { fetchGames, gameKeys } from '@/lib/queries/games';
+import { GameCardSkeleton } from '@/components/skeletons/GameSkeleton';
 
 export default function GamesPage() {
-  const [active, setActive] = useState<Category>('all');
+  const [active, setActive] = useState<GameCategory>('all');
   const [query, setQuery] = useState('');
 
+  const { data: games = [], isLoading } = useQuery({
+    queryKey: gameKeys.all,
+    queryFn: fetchGames,
+  });
+
   const filtered = useMemo(() => {
+    if (isLoading) return [];
+
     const byCategory =
-      active === 'all' ? GAMES : GAMES.filter((g) => g.category === active);
+      active === 'all' ? games : games.filter((g) => g.category === active);
+
     if (!query.trim()) return byCategory;
+
     const q = query.trim().toLowerCase();
     return byCategory.filter((g) => g.title.toLowerCase().includes(q));
-  }, [active, query]);
+  }, [games, active, query, isLoading]);
 
   return (
     <main className='min-h-screen px-6 pb-24 pt-32'>
@@ -126,11 +38,11 @@ export default function GamesPage() {
         </div>
 
         <h1 className='mb-3 bg-linear-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-5xl font-extrabold text-transparent'>
-          The Vault
+          Our Games Catalogue
         </h1>
 
         <p className='mb-8 max-w-xl text-white/60'>
-          {GAMES.length} titles across PC, PS5, VR, and racing sims. Search or
+          {games.length} titles across PC, PS5, VR, and racing sims. Search or
           filter to find yours.
         </p>
 
@@ -163,8 +75,26 @@ export default function GamesPage() {
             />
           </div>
         </div>
-
-        {filtered.length === 0 ? (
+        {/* {isLoading ? (
+          <GamesPageSkeleton />
+        ) : filtered.length === 0 ? (
+          <div className='flex flex-col items-center justify-center rounded-2xl border border-white/10 py-24 text-center'>
+            <p className='text-white/60'>No games match your search.</p>
+          </div>
+        ) : (
+          <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+            {filtered.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))}
+          </div>
+        )} */}
+        {isLoading ? (
+          <div className='grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5'>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <GameCardSkeleton key={i} />
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
           <div className='flex flex-col items-center justify-center rounded-2xl border border-white/10 py-24 text-center'>
             <p className='text-white/60'>No games match your search.</p>
           </div>
