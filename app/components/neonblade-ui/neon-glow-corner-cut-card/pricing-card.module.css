@@ -6,7 +6,7 @@
 }
 
 .pricing-card:hover {
-  transform: translateY(-6px);
+  transform: translateY(-8px);
   border-color: var(--accent);
   box-shadow:
     0 0 28px 0 color-mix(in srgb, var(--accent) 35%, transparent),

@@ -32,16 +32,8 @@ export default function PricingSection() {
   };
 
   const sectionRef = useRef<HTMLElement>(null);
-  const eyebrowLineRef = useRef<HTMLDivElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
   const cardsRef = useRef<HTMLDivElement>(null);
-  const tlRef = useRef<gsap.core.Timeline>(gsap.timeline({ paused: true }));
-
-  const linesRef = useRef<{
-    eyebrowText?: HTMLElement[];
-    heading?: HTMLElement[];
-    desc?: HTMLElement[];
-  }>({});
 
   useGSAP(
     () => {
@@ -54,9 +46,13 @@ export default function PricingSection() {
         y: 0,
         duration: 0.4,
         ease: 'power4.out',
+        onComplete() {
+          console.log(cards[0].getAttribute('style'));
+        },
         stagger: 0.15,
+        clearProps: 'transform',
         scrollTrigger: {
-          trigger: cardsRef.current,
+          trigger: triggerRef?.current ?? containerRef.current,
           start: 'top 80%',
           once: true,
         },

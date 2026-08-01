@@ -1,23 +1,11 @@
-'use client';
+// 'use client';
 import Badge from '@/app/components/neonblade-ui/badge';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
-import { DatalinesWithGrid } from '@/app/components/neonblade-ui/datalines-with-grid';
-import { useEffect, useState } from 'react';
-
+import GridLinesBackground from '../grid-lines-background';
+import HeroCtas from '../hero-ctas';
 import Image from 'next/image';
 
 export default function HeroSection() {
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 640);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => {
-      window.removeEventListener('resize', checkMobile);
-    };
-  }, []);
-
   return (
     <section
       id='hero'
@@ -25,7 +13,7 @@ export default function HeroSection() {
     >
       <div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
       <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />
-      <DatalinesWithGrid
+      {/* <DatalinesWithGrid
         lineColor='#38FA14'
         shadowColor='#071F02'
         cellSize={isMobile ? 40 : 60}
@@ -36,7 +24,8 @@ export default function HeroSection() {
         bgGridColor='rgba(0,255,102,0.06)'
         overlay
         isMobile={isMobile}
-      />
+      /> */}
+      <GridLinesBackground />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
         <div className='hero-badge '>
           <Badge
@@ -47,6 +36,7 @@ export default function HeroSection() {
             glow={false}
           >
             <Image
+              priority
               alt='controller icon'
               src={'/headerIcon.svg'}
               height={24}
@@ -85,7 +75,7 @@ export default function HeroSection() {
             </span>
           </span>
         </div>
-        <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
+        {/* <div className=' mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
           <CornerCutButton
             className=' hero-cta-book-now'
             onClick={() => {
@@ -118,7 +108,8 @@ export default function HeroSection() {
           >
             View Pricing
           </CornerCutButton>
-        </div>
+        </div> */}
+        <HeroCtas />
       </div>
     </section>
   );

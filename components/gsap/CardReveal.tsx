@@ -1,6 +1,6 @@
 'use client';
 
-import React,{ useRef } from 'react';
+import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -45,7 +45,6 @@ export default function CardsReveal({
         autoAlpha: 0,
         y,
       });
-
       gsap.to(cards, {
         autoAlpha: 1,
         y: 0,
@@ -53,6 +52,7 @@ export default function CardsReveal({
         stagger,
         delay,
         ease: 'power4.out',
+        clearProps: 'transform', // <-- strips inline transform once tween completes
         scrollTrigger: {
           trigger: triggerRef?.current ?? containerRef.current,
           start,
@@ -67,23 +67,23 @@ export default function CardsReveal({
   );
 
   return React.cloneElement(children, {
-  ref: containerRef,
-  className: [children.props.className, 'opacity-0']
-    .filter(Boolean)
-    .join(' '),
-});
+    ref: containerRef,
+    className: [children.props.className, 'opacity-0']
+      .filter(Boolean)
+      .join(' '),
+  });
 
-//   return children.type
-//     ? children &&
-//         ({
-//           ...children,
-//           props: {
-//             ...children.props,
-//             ref: containerRef,
-//             className: [children.props.className, 'opacity-0']
-//               .filter(Boolean)
-//               .join(' '),
-//           },
-//         } as React.ReactElement)
-//     : children;
+  //   return children.type
+  //     ? children &&
+  //         ({
+  //           ...children,
+  //           props: {
+  //             ...children.props,
+  //             ref: containerRef,
+  //             className: [children.props.className, 'opacity-0']
+  //               .filter(Boolean)
+  //               .join(' '),
+  //           },
+  //         } as React.ReactElement)
+  //     : children;
 }

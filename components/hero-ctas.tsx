@@ -1,0 +1,41 @@
+'use client';
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+
+export default function HeroCtas() {
+  return (
+    <div className='mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
+      <CornerCutButton
+        className='hero-cta-book-now'
+        onClick={() => {
+          document.querySelector('#booking')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }}
+        color='cyan'
+        variant='solid'
+        showArrow
+        hoverEffect='shift'
+        fullWidthOnMobile={true}
+      >
+        Book Now
+      </CornerCutButton>
+      <CornerCutButton
+        className='hero-cta-pricing'
+        onClick={() => {
+          document.querySelector('#pricing')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+          });
+        }}
+        color='green'
+        variant='ghost'
+        hoverEffect='pulse'
+        glowIntensity='high'
+        fullWidthOnMobile={true}
+      >
+        View Pricing
+      </CornerCutButton>
+    </div>
+  );
+}
