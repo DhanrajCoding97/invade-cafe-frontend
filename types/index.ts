@@ -183,3 +183,30 @@ export const CATEGORIES: { value: GameCategory; label: string }[] = [
   { value: 'racing', label: 'Racing' },
   { value: 'vr', label: 'VR' },
 ];
+
+// station types
+export type StationType = 'pc' | 'ps5' | 'racing' | 'vr';
+export type BookingStatus = 'free' | 'booked';
+export type OperationalStatus = 'active' | 'maintenance' | 'offline';
+
+export interface PcSpecs {
+  cpu?: string;
+  gpu?: string;
+  ram?: string;
+  storage?: string;
+}
+
+export interface StationRow {
+  id: string;
+  type: StationType;
+  name: string;
+  specs: PcSpecs | null;
+  hourly_rate: number;
+  cafe_location: string;
+  status: BookingStatus;
+  operational_status: OperationalStatus;
+  admin_note: string | null;
+  max_players: number;
+  display_order: number;
+  created_at: string;
+}

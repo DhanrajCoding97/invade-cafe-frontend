@@ -1,4 +1,4 @@
-import { type Station } from '@/types';
+import { type Station, type StationRow } from '@/types';
 import { createClient } from '../supabase/client';
 
 export const stationKeys = {
@@ -27,6 +27,17 @@ export async function fetchAllStations(): Promise<Station[]> {
     .from('stations')
     .select('id, name, type, hourly_rate, status')
     .order('name');
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function fetchAdminStations(): Promise<StationRow[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from('stations')
+    .select('*')
+    .order('type', { ascending: true })
+    .order('display_order', { ascending: true });
   if (error) throw error;
   return data ?? [];
 }
@@ -68,7 +79,7 @@ export async function fetchAvailableStations({
       .from('stations')
       .select('id, name, type, hourly_rate, status')
       .eq('type', stationType)
-      .neq('status', 'maintenance'),
+      .eq('operational_status', 'active'),
     bookingsQuery,
   ]);
 

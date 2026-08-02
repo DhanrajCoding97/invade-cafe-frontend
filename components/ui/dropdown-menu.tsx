@@ -65,10 +65,12 @@ function DropdownMenuItem({
   className,
   inset,
   variant = 'default',
+  // onClick,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean;
   variant?: 'default' | 'destructive';
+  // onClick?: () => void;
 }) {
   return (
     <DropdownMenuPrimitive.Item

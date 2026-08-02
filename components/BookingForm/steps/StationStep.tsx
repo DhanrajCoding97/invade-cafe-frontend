@@ -15,7 +15,7 @@ interface Station {
   name: string;
   specs: Record<string, string> | null;
   hourly_rate: number;
-  status: 'available' | 'maintenance';
+  operational_status: 'active' | 'maintenance' | 'offline'; // renamed from status
   conflictUntil: string | null;
 }
 
@@ -38,8 +38,9 @@ async function fetchStations(
 
   let query = supabase
     .from('stations')
-    .select('id, name, specs, hourly_rate, max_players, status')
-    .eq('type', device === 'vr' ? 'ps5' : device);
+    .select('id, name, specs, hourly_rate, max_players,  operational_status')
+    .eq('type', device === 'vr' ? 'ps5' : device)
+    .eq('operational_status', 'active');
 
   if (device === 'racing' && tier === 'multiplayer') {
     query = query.gte('max_players', 2);
@@ -151,7 +152,8 @@ export default function StationStep() {
                 fallbackRate: station.hourly_rate,
               });
 
-              const isMaintenance = station.status === 'maintenance';
+              const isMaintenance =
+                station.operational_status === 'maintenance';
               const isBookedForSlot = !!station.conflictUntil;
               const isDisabled = isMaintenance || isBookedForSlot;
 

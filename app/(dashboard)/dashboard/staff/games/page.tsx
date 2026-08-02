@@ -4,10 +4,14 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { Plus, Pencil, Trash2 } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
+import { Plus, Pencil, Trash2, MoreHorizontal } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import GameForm from '../../components/games/GameForm';
-import { deleteGame } from '../actions/games';
 import { useGameMutations } from '@/hooks/use-games-mutation';
 import type { GameRow } from '@/types/index';
 import {
@@ -16,6 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { fetchGames, gameKeys } from '@/lib/queries/games';
 import { GameCardSkeleton } from '@/components/skeletons/GameSkeleton';
@@ -68,7 +73,7 @@ export default function AdminGamesPage() {
   }
 
   return (
-    <div className='p-6'>
+    <>
       <div className='mb-6 flex items-center justify-between'>
         <h1 className='text-2xl font-bold text-white'>Games</h1>
         <button
@@ -89,7 +94,7 @@ export default function AdminGamesPage() {
         <div className='grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-6'>
           {games.map((game) => (
             <div key={game.id} className='group relative'>
-              <div className='relative aspect-[3/4] overflow-hidden rounded-xl border border-cyan-400/20'>
+              <div className='relative aspect-3/4 overflow-hidden rounded-xl border border-cyan-400/20'>
                 <Image
                   src={game.image_url}
                   alt={game.title}
@@ -97,8 +102,36 @@ export default function AdminGamesPage() {
                   sizes='(max-width: 640px) 180px, (max-width: 1024px) 33vw, 25vw'
                   className='object-cover'
                 />
-                <div className='absolute inset-0 flex items-center justify-center gap-2 bg-black/60 opacity-0 transition-opacity group-hover:opacity-100'>
-                  <button
+                <div className='absolute right-0 flex items-center justify-center gap-2 '>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        variant='icon-plain'
+                        size='icon-sm'
+                        className='group absolute top-3 right-3 rounded-full border border-cyan-200 bg-[#18292A] text-white/80 hover:bg-black hover:text-white hover:border-cyan-400/50 hover:shadow-[0_0_16px_rgba(34,211,238,.25)] transition-all duration-200 ease-in-out '
+                      >
+                        <MoreHorizontal
+                          className='h-5 w-5 group-hover:motion-preset-pulse-sm'
+                          color='#FFF'
+                        />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={() => openEdit(game)}>
+                        <Pencil />
+                        Edit
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
+                        variant='destructive'
+                        onClick={() => handleDelete(game)}
+                      >
+                        <Trash2 />
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  {/* <button
                     onClick={() => openEdit(game)}
                     className='rounded-full bg-cyan-400 p-2 text-black hover:bg-cyan-300'
                   >
@@ -109,7 +142,7 @@ export default function AdminGamesPage() {
                     className='rounded-full bg-red-500 p-2 text-white hover:bg-red-400'
                   >
                     <Trash2 className='h-4 w-4' />
-                  </button>
+                  </button> */}
                 </div>
               </div>
               <p className='mt-1.5 truncate text-xs text-white/70'>
@@ -130,6 +163,6 @@ export default function AdminGamesPage() {
           <GameForm game={editingGame} onSuccess={handleFormSuccess} />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }
