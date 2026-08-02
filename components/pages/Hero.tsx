@@ -10,9 +10,7 @@ export default function HeroSection() {
       id='hero'
       className='relative min-h-[94dvh] w-full overflow-hidden bg-black sm:min-h-dvh'
     >
-      <div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
-      <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />
-      <GridLinesBackground />
+    <GridLinesBackground />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
         <div className='hero-badge '>
           <Badge
@@ -34,14 +32,19 @@ export default function HeroSection() {
           </Badge>
         </div>
         <div className='relative mt-8 max-w-3xl text-center '>
-          {/* Text-safety scrim — sits behind heading+subtext only */}
-          <div
+          {/* Text-safety scrim — sits behind heading+subtext only
+<div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
+      <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />
+ <div
             className='pointer-events-none absolute inset-0 -z-10 rounded-[3rem] blur-2xl'
             style={{
               background:
                 'radial-gradient(ellipse 100% 80% at center, rgba(0,0,0,0.65) 0%, transparent 75%)',
             }}
           />
+
+ */}
+         
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='line-mask'>
               <span
