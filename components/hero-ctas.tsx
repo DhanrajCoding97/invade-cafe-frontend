@@ -21,7 +21,7 @@ export default function HeroCtas() {
         Book Now
       </CornerCutButton>
       <CornerCutButton
-        className='hero-cta-pricing'
+        className='hero-cta-pricing min-h-13.5 text-[15px] font-semibold tracking-[0.08em]'
         onClick={() => {
           document.querySelector('#pricing')?.scrollIntoView({
             behavior: 'smooth',

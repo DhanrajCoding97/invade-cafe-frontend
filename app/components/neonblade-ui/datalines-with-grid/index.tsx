@@ -59,11 +59,11 @@ function DatalinesCanvas({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const prefersReducedMotion = window.matchMedia(
-      '(prefers-reduced-motion: reduce)',
-    ).matches;
+    // const prefersReducedMotion = window.matchMedia(
+    //   '(prefers-reduced-motion: reduce)',
+    // ).matches;
 
-    if (prefersReducedMotion) return;
+    // if (prefersReducedMotion) return;
 
     const deviceMemory = (navigator as any).deviceMemory;
     const isLowEnd = typeof deviceMemory === 'number' && deviceMemory <= 4;

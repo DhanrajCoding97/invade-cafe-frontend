@@ -1,27 +1,23 @@
 // 'use client';
 import Badge from '@/app/components/neonblade-ui/badge';
-import GridLinesBackground from '../grid-lines-background';
+import HeroBackground from '../hero-background';
 import HeroCtas from '../hero-ctas';
 import Image from 'next/image';
-
 export default function HeroSection() {
   return (
     <section
       id='hero'
-      className='relative min-h-[100dvh] w-full overflow-hidden bg-black sm:min-h-dvh'
+      className='relative min-h-dvh w-full overflow-hidden bg-black sm:min-h-dvh'
     >
-      {/* <div
+      <div
         className='absolute inset-0 z-0'
         style={{
-          background: '#000000',
-          backgroundImage: `
-        linear-gradient(to right, rgba(75, 85, 99, 0.4) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(75, 85, 99, 0.4) 1px, transparent 1px)
-      `,
-          backgroundSize: '40px 40px',
+          background:
+            'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(226, 232, 240, 0.15), transparent 70%), #000000',
         }}
-      /> */}
-      <GridLinesBackground />
+      />
+      <HeroBackground />
+
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
         <div className='hero-badge '>
           <Badge
@@ -30,6 +26,7 @@ export default function HeroSection() {
             variant='outline'
             dot='pulse'
             glow={false}
+            className='text-[11px] tracking-[0.08em] font-semibold'
           >
             <Image
               priority
@@ -42,21 +39,8 @@ export default function HeroSection() {
             Console Rentals Now Available
           </Badge>
         </div>
-        <div className='relative mt-8 max-w-3xl text-center '>
-          {/* Text-safety scrim — sits behind heading+subtext only
-<div className='pointer-events-none absolute -top-40 -left-40 z-0 h-125 w-125 rounded-full bg-cyan-500/20 blur-[120px]' />
-      <div className='pointer-events-none absolute -right-40 -bottom-40 z-0 h-150 w-150 rounded-full bg-fuchsia-500/20 blur-[130px]' />
- <div
-            className='pointer-events-none absolute inset-0 -z-10 rounded-[3rem] blur-2xl'
-            style={{
-              background:
-                'radial-gradient(ellipse 100% 80% at center, rgba(0,0,0,0.65) 0%, transparent 75%)',
-            }}
-          />
-
- */}
-
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+        <div className='relative mt:6 sm:mt-7 min-w-[90dvw] sm:max-w-3xl text-center'>
+          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold w-full'>
             <span className='line-mask'>
               <span
                 className='line-inner bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent'
@@ -68,7 +52,7 @@ export default function HeroSection() {
           </h1>
           <span className='line-mask'>
             <span
-              className='line-inner text-white  text-[clamp(0.8rem,2vw,1.125rem)]'
+              className='line-inner mx-auto mt-5 text-[15px] leading-5 font-medium text-white/75'
               style={{ animationDelay: '0.4s' }}
             >
               Laid-back hangout featuring PC and PlayStation games, plus racing

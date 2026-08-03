@@ -26,8 +26,12 @@ import { handleOAuthLogin } from '@/lib/auth/oauth';
 import { StepTransition } from './steps/StepTransition';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, useGSAP);
 
 export const STEPS = [
   'device',
@@ -99,6 +103,7 @@ export default function () {
   //url params form step skip
   const appliedDeviceParamRef = useRef<string | null>(null);
   const formTopRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
 
   useEffect(() => {
     if (!deviceParam) return;
@@ -161,14 +166,24 @@ export default function () {
 
   //set scroll to formTop
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
     if (!formTopRef.current) return;
+
     const headerOffset = 80; // px — match your sticky header height
-    const top =
-      formTopRef.current.getBoundingClientRect().top +
-      window.scrollY -
-      headerOffset;
-    window.scrollTo({ top, behavior: 'smooth' });
+
+    gsap.to(window, {
+      duration: 0.6,
+      ease: 'power2.out',
+      scrollTo: {
+        y: formTopRef.current,
+        offsetY: headerOffset,
+      },
+    });
   }, [stepIndex]);
+
   async function goNext() {
     if (step === 'options') {
       const device = form.getValues('device');
