@@ -8,9 +8,20 @@ export default function HeroSection() {
   return (
     <section
       id='hero'
-      className='relative min-h-[94dvh] w-full overflow-hidden bg-black sm:min-h-dvh'
+      className='relative min-h-[100dvh] w-full overflow-hidden bg-black sm:min-h-dvh'
     >
-    <GridLinesBackground />
+      {/* <div
+        className='absolute inset-0 z-0'
+        style={{
+          background: '#000000',
+          backgroundImage: `
+        linear-gradient(to right, rgba(75, 85, 99, 0.4) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(75, 85, 99, 0.4) 1px, transparent 1px)
+      `,
+          backgroundSize: '40px 40px',
+        }}
+      /> */}
+      <GridLinesBackground />
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
         <div className='hero-badge '>
           <Badge
@@ -44,7 +55,7 @@ export default function HeroSection() {
           />
 
  */}
-         
+
           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='line-mask'>
               <span

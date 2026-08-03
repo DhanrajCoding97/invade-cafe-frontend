@@ -18,7 +18,7 @@ export default async function Page() {
     <>
       <HeroSection />
       <div className='min-h-screen w-full bg-black relative'>
-        <div
+        {/* <div
           className='pointer-events-none absolute inset-0 z-0'
           style={{
             backgroundImage: `
@@ -28,6 +28,19 @@ export default async function Page() {
               radial-gradient(ellipse 50% 40% at 80% 80%, rgba(254,17,255,0.04) 0%, transparent 70%)
             `,
             backgroundSize: '50px 50px, 50px 50px, 100% 100%, 100% 100%',
+          }}
+        /> */}
+        <div
+          className='pointer-events-none absolute inset-0 z-0'
+          style={{
+            backgroundColor: '#000',
+            backgroundImage: `
+      linear-gradient(to right, rgba(0,243,255,0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0,243,255,0.06) 1px, transparent 1px),
+      radial-gradient(ellipse 60% 50% at 50% 30%, rgba(0,212,255,0.06) 0%, transparent 70%),
+      radial-gradient(ellipse 50% 40% at 80% 80%, rgba(254,17,255,0.04) 0%, transparent 70%)
+    `,
+            backgroundSize: '60px 50px, 50px 50px, 100% 100%, 100% 100%',
           }}
         />
         <GamesCatalogSection />

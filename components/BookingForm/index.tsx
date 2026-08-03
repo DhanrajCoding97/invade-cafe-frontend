@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { BookingFormSkeleton } from '../skeletons/BookingSkeleton';
 import { useForm } from 'react-hook-form';
@@ -24,7 +24,6 @@ import {
 } from '@/lib/schemas/BookingFormSchema';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
 import { StepTransition } from './steps/StepTransition';
-import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { useQueryClient } from '@tanstack/react-query';
@@ -99,6 +98,7 @@ export default function () {
 
   //url params form step skip
   const appliedDeviceParamRef = useRef<string | null>(null);
+  const formTopRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!deviceParam) return;
@@ -159,6 +159,16 @@ export default function () {
     return () => sub.subscription.unsubscribe();
   }, [supabase]);
 
+  //set scroll to formTop
+  useEffect(() => {
+    if (!formTopRef.current) return;
+    const headerOffset = 80; // px — match your sticky header height
+    const top =
+      formTopRef.current.getBoundingClientRect().top +
+      window.scrollY -
+      headerOffset;
+    window.scrollTo({ top, behavior: 'smooth' });
+  }, [stepIndex]);
   async function goNext() {
     if (step === 'options') {
       const device = form.getValues('device');
@@ -181,7 +191,6 @@ export default function () {
 
     setStepIndex(next);
     setDirection(1);
-    setStepIndex(next);
   }
 
   function goBack() {
@@ -254,7 +263,10 @@ export default function () {
       ref={cardRef}
       className='mt-8 md:mt-10 lg:mt-12 w-full rounded-lg animate-rotate-border bg-conic/[from_var(--border-angle)] from-[#860f6c] via-[#2FF0FF] to-black p-px'
     >
-      <div className='p-4 sm:p-6 lg:p-8 rounded-lg bg-[radial-gradient(ellipse_at_top_left,rgba(0,212,255,0.08),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(254,17,255,0.06),transparent_60%)] bg-[#05070A]'>
+      <div
+        ref={formTopRef}
+        className='p-4 sm:p-6 lg:p-8 rounded-lg bg-[radial-gradient(ellipse_at_top_left,rgba(0,212,255,0.08),transparent_60%),radial-gradient(ellipse_at_bottom_right,rgba(254,17,255,0.06),transparent_60%)] bg-[#05070A]'
+      >
         <FormProvider {...form}>
           {deviceFromUrl && step !== 'device' && (
             <div className='mb-4 inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-sm text-white/70'>

@@ -63,7 +63,7 @@ export default function Contact() {
         <div className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-6 md:grid-cols-[0.9fr_1.1fr]'>
           {/* Info column */}
           <CardsReveal triggerRef={sectionRef} delay={1.05} stagger={0.4}>
-            <div className='order-2 flex flex-col gap-4 md:order-1'>
+            <div className='order-2 flex flex-col gap-4 md:order-1 z-1'>
               {/* social links card */}
               <InfoCard label='Get in touch'>
                 <div className='flex flex-col gap-2.5'>

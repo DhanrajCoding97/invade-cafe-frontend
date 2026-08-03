@@ -2,8 +2,6 @@
 import { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 
-// dynamic(..., { ssr: false }) is only legal inside a Client Component file —
-// that's why this lives here and not in hero-section.tsx.
 const DatalinesWithGrid = dynamic(
   () =>
     import('@/app/components/neonblade-ui/datalines-with-grid').then(
@@ -31,7 +29,7 @@ export default function GridLinesBackground() {
 
   return (
     <DatalinesWithGrid
-      lineColor='#38FA14'
+      lineColor='#FFF'
       shadowColor='#071F02'
       cellSize={isMobile ? 40 : 60}
       maxLines={isMobile ? 4 : 8}

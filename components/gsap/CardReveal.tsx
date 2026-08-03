@@ -52,7 +52,7 @@ export default function CardsReveal({
         stagger,
         delay,
         ease: 'power4.out',
-        clearProps: 'transform', // <-- strips inline transform once tween completes
+        clearProps: 'transform',
         scrollTrigger: {
           trigger: triggerRef?.current ?? containerRef.current,
           start,
