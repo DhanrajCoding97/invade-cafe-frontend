@@ -1,7 +1,3 @@
-// app/dashboard/staff/page.tsx
-// import { createClient } from '@/lib/supabase/server';
-// import { requireRole } from '@/lib/auth/requrireRole';
-// import LiveSessionBoard from './components/LiveSessionBoard';
 import { getDashboardData } from '@/lib/queries/dashboard';
 import { KpiCard } from '../components/KpiCard';
 import { RevenueChart } from '../components/charts/RevenueChart';

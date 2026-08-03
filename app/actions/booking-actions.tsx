@@ -1,6 +1,4 @@
 'use client';
-import { getCurrentUserRole } from '@/lib/auth/getCurrentUserRole';
-import { useState } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,20 +22,13 @@ import {
 import { type BookingRow } from '@/types';
 import ManualBookingForm from '../(dashboard)/dashboard/staff/components/ManualBookingForm';
 import {
-  useCancelBooking,
-  useMarkPaid,
-  useMarkRefunded,
-} from '@/hooks/use-booking-mutations';
-import {
   Tooltip,
   TooltipTrigger,
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogTrigger, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Trash2Icon, WalletIcon } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchMyProfile, profileKeys } from '@/lib/queries/profile';
 import { useBookingActionState } from '@/hooks/use-booking-action-state';
 import {
   DropdownMenu,
@@ -87,57 +78,6 @@ export function BookingActions({
       <TooltipContent>Mark this booking as paid</TooltipContent>
     </Tooltip>
   );
-
-  // const editDialog = canEdit && (
-  //   <Dialog open={editOpen} onOpenChange={setEditOpen}>
-  //     <Tooltip>
-  //       <TooltipTrigger asChild>
-  //         <DialogTrigger asChild>
-  //           {layout === 'compact' ? (
-  //             <DropdownMenuItem onSelect={(e) => e.preventDefault()} asChild>
-  //               <button className='flex w-full items-center'>
-  //                 <Pencil size={14} className='mr-2' /> Edit
-  //               </button>
-  //             </DropdownMenuItem>
-  //           ) : (
-  //             <Button variant='action'>
-  //               <Pencil className='size-5 transition-all duration-300 ease-in group-hover:text-blue-300' />
-  //             </Button>
-  //           )}
-  //         </DialogTrigger>
-  //       </TooltipTrigger>
-  //       {layout === 'row' && <TooltipContent>Edit Booking</TooltipContent>}
-  //     </Tooltip>
-
-  //     <DialogContent className='max-h-[90vh] overflow-y-auto p-6 sm:max-w-3xl'>
-  //       <ManualBookingForm
-  //         mode='edit'
-  //         bookingId={booking.id}
-  //         isOnlineBooking={booking.payment_method === 'razorpay'}
-  //         defaultValues={{
-  //           customerName:
-  //             booking.profiles?.full_name ?? booking.customer_name ?? '',
-  //           customerPhone:
-  //             booking.profiles?.phone ?? booking.customer_phone ?? '',
-  //           device: booking.device,
-  //           stationId: booking.station_id,
-  //           date: new Date(booking.date),
-  //           startTime: booking.start_time,
-  //           duration: booking.duration_hours ?? 1,
-  //           players: booking.players,
-  //           paymentMethod:
-  //             booking.payment_method === 'razorpay' ||
-  //             booking.payment_method === null
-  //               ? 'cash'
-  //               : booking.payment_method,
-  //           amountOverride: booking.amount,
-  //           startNow: !!booking.session_started_at,
-  //         }}
-  //         onSuccess={() => setEditOpen(false)}
-  //       />
-  //     </DialogContent>
-  //   </Dialog>
-  // );
 
   const editDialog = canEdit && (
     <>
@@ -327,193 +267,3 @@ export function BookingActions({
     </div>
   );
 }
-
-// if (booking.status === 'cancelled') return null;
-
-// const role = profile?.role;
-
-// const cancelBooking = useCancelBooking();
-// const markPaid = useMarkPaid();
-// const markRefunded = useMarkRefunded();
-
-// if (booking.status === 'cancelled') return null;
-
-// const canMarkPaid =
-//   booking.payment_status === 'pending' &&
-//   booking.payment_method !== 'razorpay';
-
-// const canCancel =
-//   booking.status !== 'completed' && booking.status !== 'no_show';
-
-// const canEdit =
-//   booking.status !== 'completed' && booking.status !== 'no_show';
-
-// const canRefund =
-//   (booking.status === 'completed' || booking.status === 'no_show') &&
-//   !!booking.user_id &&
-//   booking.payment_status === 'paid' &&
-//   booking.payment_method === 'razorpay' &&
-//   !!booking.razorpay_payment_id;
-
-//   return (
-//     <div className='flex gap-2'>
-//       {/* Mark Paid */}
-//       {canMarkPaid && (
-//         <Tooltip>
-//           <TooltipTrigger asChild>
-//             <Button
-//               onClick={() =>
-//                 markPaid.mutate({
-//                   bookingId: booking.id,
-//                   method: booking.payment_method ?? 'cash',
-//                 })
-//               }
-//               disabled={markPaid.isPending}
-//               variant='action'
-//             >
-//               <BadgeCheck className='group-hover:text-green-500 transition-all duration-300 ease-in size-5' />
-//             </Button>
-//           </TooltipTrigger>
-//           <TooltipContent>Mark this booking as paid</TooltipContent>
-//         </Tooltip>
-//       )}
-
-//       {/* Cancel */}
-//       {canCancel && (
-//         <AlertDialog>
-//           <Tooltip>
-//             <TooltipTrigger asChild>
-//               <AlertDialogTrigger asChild>
-//                 <Button disabled={cancelBooking.isPending} variant='action'>
-//                   <Ban className='group-hover:text-[#FF6060] transition-all duration-300 ease-in size-5' />
-//                 </Button>
-//               </AlertDialogTrigger>
-//             </TooltipTrigger>
-
-//             <TooltipContent>Cancel Booking</TooltipContent>
-//           </Tooltip>
-
-//           <AlertDialogContent size='default'>
-//             <AlertDialogHeader>
-//               <AlertDialogMedia className='bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'>
-//                 <Trash2Icon />
-//               </AlertDialogMedia>
-
-//               <AlertDialogTitle>Cancel this booking?</AlertDialogTitle>
-
-//               <AlertDialogDescription>
-//                 This will permanently cancel the booking. This action cannot be
-//                 undone.
-//               </AlertDialogDescription>
-//             </AlertDialogHeader>
-
-//             <AlertDialogFooter>
-//               <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-
-//               <AlertDialogAction
-//                 disabled={cancelBooking.isPending}
-//                 onClick={() => cancelBooking.mutate(booking.id)}
-//               >
-//                 {cancelBooking.isPending ? 'Processing...' : 'Cancel booking'}
-//               </AlertDialogAction>
-//             </AlertDialogFooter>
-//           </AlertDialogContent>
-//         </AlertDialog>
-//       )}
-
-//       {/* Edit */}
-//       {canEdit && (
-//         <Dialog open={open} onOpenChange={setOpen}>
-//           <Tooltip>
-//             <TooltipTrigger asChild>
-//               <DialogTrigger asChild>
-//                 <Button variant='action'>
-//                   <Pencil className='group-hover:text-blue-300 transition-all duration-300 ease-in size-5' />
-//                 </Button>
-//               </DialogTrigger>
-//             </TooltipTrigger>
-
-//             <TooltipContent>Edit Booking</TooltipContent>
-//           </Tooltip>
-
-//           <DialogContent className='sm:max-w-3xl max-h-[90vh] overflow-y-auto p-6'>
-//             <ManualBookingForm
-//               mode='edit'
-//               bookingId={booking.id}
-//               isOnlineBooking={booking.payment_method === 'razorpay'}
-//               defaultValues={{
-//                 customerName:
-//                   booking.profiles?.full_name ?? booking.customer_name ?? '',
-//                 customerPhone:
-//                   booking.profiles?.phone ?? booking.customer_phone ?? '',
-//                 device: booking.device,
-//                 stationId: booking.station_id,
-//                 date: new Date(booking.date),
-//                 startTime: booking.start_time,
-//                 duration: booking.duration_hours ?? 1,
-//                 players: booking.players,
-//                 paymentMethod:
-//                   booking.payment_method === 'razorpay' ||
-//                   booking.payment_method === null
-//                     ? 'cash'
-//                     : booking.payment_method,
-//                 amountOverride: booking.amount,
-//                 startNow: !!booking.session_started_at,
-//               }}
-//               onSuccess={() => {
-//                 setOpen(false);
-//               }}
-//             />
-//           </DialogContent>
-//         </Dialog>
-//       )}
-
-//       {/* Refund */}
-//       {role === 'owner' && canRefund && (
-//         <AlertDialog>
-//           <Tooltip>
-//             <TooltipTrigger asChild>
-//               <AlertDialogTrigger asChild>
-//                 <Button disabled={markRefunded.isPending} variant='action'>
-//                   <Wallet className='group-hover:text-green-600 transition-all duration-300 ease-in size-5' />
-//                 </Button>
-//               </AlertDialogTrigger>
-//             </TooltipTrigger>
-
-//             <TooltipContent>Issue a refund through Razorpay</TooltipContent>
-//           </Tooltip>
-
-//           <AlertDialogContent size='default'>
-//             <AlertDialogHeader>
-//               <AlertDialogMedia className='bg-orange-500/10 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400'>
-//                 <WalletIcon />
-//               </AlertDialogMedia>
-
-//               <AlertDialogTitle>Issue Refund?</AlertDialogTitle>
-
-//               <AlertDialogDescription>
-//                 This will immediately initiate a refund through Razorpay. This
-//                 action cannot be undone.
-//               </AlertDialogDescription>
-//             </AlertDialogHeader>
-
-//             <AlertDialogFooter>
-//               <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-
-//               <AlertDialogAction
-//                 disabled={markRefunded.isPending}
-//                 onClick={() =>
-//                   markRefunded.mutate({
-//                     paymentId: booking.razorpay_payment_id!,
-//                   })
-//                 }
-//               >
-//                 {markRefunded.isPending ? 'Processing...' : 'Issue Refund'}
-//               </AlertDialogAction>
-//             </AlertDialogFooter>
-//           </AlertDialogContent>
-//         </AlertDialog>
-//       )}
-//     </div>
-//   );
-// }
