@@ -1,5 +1,5 @@
 'use client';
-import { ArrowUp, ArrowDown } from "lucide-react";
+import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { type DateRange } from 'react-day-picker';
@@ -31,6 +31,14 @@ import {
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Filter, Download } from 'lucide-react';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/components/ui/collapsible';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { BookingCard } from './BookingCard';
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -105,6 +113,7 @@ export function BookingsTable<TData>({
   error = null,
   onRetry,
 }: DataTableProps<TData>) {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -113,6 +122,8 @@ export function BookingsTable<TData>({
     pageSize: 5,
   });
 
+  const isMobile = useIsMobile();
+  const router = useRouter();
   // default to today
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
@@ -191,7 +202,7 @@ export function BookingsTable<TData>({
         </div>
       ) : (
         <div className='flex flex-col gap-4'>
-          <div className='flex flex-col justify-center gap-3'>
+          {/* <div className='flex flex-col justify-center gap-3'>
             <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
               <h1 className='text-2xl font-bold'>Bookings Table</h1>
               <Button
@@ -268,62 +279,199 @@ export function BookingsTable<TData>({
                 </Button>
               )}
             </div>
+          </div> */}
+          <div className='space-y-5'>
+            {/* Header */}
+            <div className='flex items-start justify-between gap-3'>
+              <div>
+                <h1 className='text-2xl font-bold'>Bookings</h1>
+
+                <p className='mt-1 text-sm text-muted-foreground'>
+                  {table.getFilteredRowModel().rows.length} bookings
+                </p>
+              </div>
+
+              {/* Desktop only */}
+              <Button
+                variant='outline'
+                size='sm'
+                className='hidden md:flex'
+                onClick={() =>
+                  exportBookingsToCSV(
+                    table.getFilteredRowModel().rows.map((r) => r.original),
+                  )
+                }
+                disabled={table.getFilteredRowModel().rows.length === 0}
+              >
+                <Download className='mr-2 h-4 w-4' />
+                Export CSV
+              </Button>
+            </div>
+
+            {/* Search */}
+            <div className='relative'>
+              <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-400/70' />
+
+              <Input
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder='Search customer, phone, device...'
+                className='pl-10'
+              />
+
+              {globalFilter && (
+                <button
+                  onClick={() => setGlobalFilter('')}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-white/40'
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Desktop Filters */}
+            <div className='hidden md:flex flex-wrap items-center gap-3'>
+              <BookingDateFilter date={dateRange} onChange={setDateRange} />
+
+              <BookingStatusFilter
+                value={statusFilter}
+                onChange={setStatusFilter}
+              />
+
+              <BookingPaymentFilter
+                value={paymentFilter}
+                onChange={setPaymentFilter}
+              />
+
+              {hasActiveFilters && (
+                <Button
+                  variant='destructive'
+                  onClick={() => {
+                    setStatusFilter('all');
+                    setPaymentFilter('all');
+                    setDateRange(undefined);
+                    setGlobalFilter('');
+                  }}
+                >
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile Filters */}
+            <Collapsible
+              open={filtersOpen}
+              onOpenChange={setFiltersOpen}
+              className='md:hidden'
+            >
+              <CollapsibleTrigger asChild>
+                <Button variant='outline' className='w-full justify-between'>
+                  <span className='flex items-center gap-2'>
+                    <Filter className='h-4 w-4' />
+                    Filters
+                  </span>
+
+                  {hasActiveFilters && (
+                    <span className='rounded-full bg-cyan-400 px-2 py-0.5 text-xs text-black'>
+                      Active
+                    </span>
+                  )}
+                </Button>
+              </CollapsibleTrigger>
+
+              <CollapsibleContent className='mt-3 space-y-3'>
+                <BookingDateFilter date={dateRange} onChange={setDateRange} />
+
+                <BookingStatusFilter
+                  value={statusFilter}
+                  onChange={setStatusFilter}
+                />
+
+                <BookingPaymentFilter
+                  value={paymentFilter}
+                  onChange={setPaymentFilter}
+                />
+
+                {hasActiveFilters && (
+                  <Button
+                    variant='ghost'
+                    className='w-full'
+                    onClick={() => {
+                      setStatusFilter('all');
+                      setPaymentFilter('all');
+                      setDateRange(undefined);
+                      setGlobalFilter('');
+                    }}
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </CollapsibleContent>
+            </Collapsible>
           </div>
-          <div className='overflow-x-auto rounded-lg border'>
-            <table className='w-full text-sm border-collapse shadow-lg'>
-              <thead className='bg-muted/50'>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                     <th
-  key={header.id}
-  onClick={header.column.getToggleSortingHandler()}
-  className="cursor-pointer select-none px-4 py-2 text-left font-medium min-w-[120px]"
->
-  <div className="flex items-center gap-1 whitespace-nowrap">
-    {flexRender(
-      header.column.columnDef.header,
-      header.getContext(),
-    )}
-    <span className="shrink-0">
-      {{
-        asc: "↑",
-        desc: "↓",
-      }[header.column.getIsSorted() as string] ?? ""}
-    </span>
-  </div>
-</th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              <tbody>
-                {table.getRowModel().rows.length ? (
-                  table.getRowModel().rows.map((row) => (
-                    <tr key={row.id} className='border-t hover:bg-muted/30'>
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id} className='px-4 py-2'>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
+          {isMobile ? (
+            <div className='flex flex-col gap-3'>
+              {table.getRowModel().rows.map((row) => (
+                <BookingCard key={row.id} booking={row.original} />
+              ))}
+            </div>
+          ) : (
+            <div className='overflow-x-auto rounded-lg border'>
+              <table className='w-full text-sm border-collapse shadow-lg'>
+                <thead className='bg-muted/50'>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th
+                          key={header.id}
+                          onClick={header.column.getToggleSortingHandler()}
+                          className='cursor-pointer select-none px-4 py-2 text-left font-medium min-w-30'
+                        >
+                          <div className='flex items-center gap-1 whitespace-nowrap'>
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                            <span className='shrink-0'>
+                              {{
+                                asc: '↑',
+                                desc: '↓',
+                              }[header.column.getIsSorted() as string] ?? ''}
+                            </span>
+                          </div>
+                        </th>
                       ))}
                     </tr>
-                  ))
-                ) : (
-                  <tr>
-                    <td
-                      colSpan={columns.length}
-                      className='px-4 py-6 text-center text-muted-foreground'
-                    >
-                      No bookings found.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                  ))}
+                </thead>
+                <tbody>
+                  {table.getRowModel().rows.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <tr key={row.id} className='border-t hover:bg-muted/30'>
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id} className='px-4 py-2'>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan={columns.length}
+                        className='px-4 py-6 text-center text-muted-foreground'
+                      >
+                        No bookings found.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          )}
           <div className='flex flex-wrap items-center justify-between gap-3'>
             {/* Page size selector */}
             <div className='flex items-center gap-2 text-sm text-gray-500'>

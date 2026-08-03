@@ -1,167 +1,170 @@
-// GamesCatalogSection.tsx
 'use client';
-import Link from 'next/link';
-import { useState } from 'react';
+// GamesCatalogSection.tsx
 import Image from 'next/image';
+import Link from 'next/link';
+import { useState, useRef, useEffect } from 'react';
 import { ScrollArea, ScrollBar } from '../ui/scroll-area';
 import { gameKeys, fetchGames } from '@/lib/queries/games';
 import { useQuery } from '@tanstack/react-query';
 import GameCard from '../gameCard';
 import { CATEGORIES, type GameCategory } from '@/types/index';
 import { GameCardSkeleton } from '../skeletons/GameSkeleton';
+import TextReveal from '../gsap/TextReveal';
+import CardsReveal from '../gsap/CardReveal';
+import LineReveal from '../gsap/LineReveal';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import gsap from 'gsap';
 
-// const CATEGORIES: { value: Category; label: string }[] = [
-//   { value: 'all', label: 'All' },
-//   { value: 'ps5', label: 'PS5' },
-//   { value: 'pc', label: 'PC' },
-//   { value: 'racing', label: 'Racing' },
-//   { value: 'vr', label: 'VR' },
-// ];
+gsap.registerPlugin(ScrollTrigger);
+// export default function GamesCatalogSection() {
+//   const sectionRef = useRef<HTMLElement>(null);
+//   const descRef = useRef<HTMLParagraphElement>(null);
+//   const cardsRef = useRef<HTMLDivElement>(null);
 
-// const GAMES: Game[] = [
-//   {
-//     id: 'gta5',
-//     title: 'GTA V',
-//     category: 'ps5',
-//     image: '/games/gta.jpg',
-//     tags: ['Adventure', 'Open World'],
-//   },
-//   {
-//     id: 'jumpForce',
-//     title: 'Jump Force',
-//     category: 'ps5',
-//     image: '/games/jumpforce.jpg',
-//     tags: ['Action', 'Fighting'],
-//   },
-//   {
-//     id: 'fc26',
-//     title: 'FC 26',
-//     category: 'ps5',
-//     image: '/games/fc.jpg',
-//     tags: ['Sports'],
-//   },
-//   {
-//     id: 'cricket24',
-//     title: 'Cricket 24',
-//     category: 'ps5',
-//     image: '/games/cricket24.jpg',
-//     tags: ['Sports'],
-//   },
-//   {
-//     id: 'wukong',
-//     title: 'Black Myth: Wukong',
-//     category: 'ps5',
-//     image: '/games/wukong.jpg',
-//     featured: true,
-//     tags: ['NEW', 'RPG', 'Adventure'],
-//   },
-//   {
-//     id: 'UnchartedLL',
-//     title: 'Uncharted Lost Legacy',
-//     category: 'ps5',
-//     image: '/games/unchartedLL.webp',
-//     tags: ['Open World', 'Adventure'],
-//   },
-//   {
-//     id: 'ac-bf',
-//     title: "Assassin's Creed Black Flag Resynced",
-//     category: 'ps5',
-//     image: '/games/acbf.webp',
-//     tags: ['NEW', 'RPG', 'Open World'],
-//   },
-//   {
-//     id: 'mortalKombat',
-//     title: 'Mortal Kombat',
-//     category: 'ps5',
-//     image: '/games/mortalkombat.jpg',
-//     tags: ['Action', 'Fighting'],
-//   },
-//   {
-//     id: 'spidey2',
-//     title: 'Spider-Man 2',
-//     category: 'ps5',
-//     image: '/games/spiderman2.jpg',
-//   },
-//   {
-//     id: 'cs2',
-//     title: 'CS 2',
-//     category: 'pc',
-//     image: '/games/cs2.png',
-//     tags: ['Fps', 'Action'],
-//   },
-//   {
-//     id: 'fortnite',
-//     title: 'Fortnite',
-//     category: 'pc',
-//     image: '/games/fortnite.jpg',
-//   },
-//   {
-//     id: 'valorant',
-//     title: 'Valorant',
-//     category: 'pc',
-//     image: '/games/valo.jpg',
-//   },
-//   {
-//     id: 'gt7',
-//     title: 'Gran Turismo 7',
-//     category: 'racing',
-//     image: '/games/granturismo7.jpg',
-//   },
-//   {
-//     id: 'forza',
-//     title: 'Forza Horizon 6',
-//     category: 'racing',
-//     image: '/games/forzahorizon6.jpg',
-//     tags: ['New', 'racing'],
-//   },
-//   {
-//     id: 'astrobot',
-//     title: 'Astro Bot',
-//     category: 'vr',
-//     image: '/games/astrobot.webp',
-//     tags: ['Open World'],
-//   },
-// ];
+//   const [active, setActive] = useState<GameCategory>('all');
+//   const { data: games = [], isLoading } = useQuery({
+//     queryKey: gameKeys.all,
+//     queryFn: fetchGames,
+//   });
 
-// function GameCard({ game }: { game: Game }) {
+//   const PREVIEW_LIMIT = 8;
+
+//   const filtered =
+//     active === 'all' ? games : games.filter((g) => g.category === active);
+
+//   const preview = filtered.slice(0, PREVIEW_LIMIT);
+
+//   // const filtered =
+//   //   active === 'all' ? GAMES : GAMES.filter((g) => g.category === active);
+
+//   // const preview = filtered.slice(0, PREVIEW_LIMIT);
+//   const hasMore = filtered.length > PREVIEW_LIMIT;
+
+//   const skeletons = Array.from({ length: PREVIEW_LIMIT });
+
 //   return (
-//     <div
-//       className={[
-//         'group relative aspect-[3/4] overflow-hidden rounded-2xl border transition-colors',
-//         game.featured
-//           ? 'border-cyan-400 shadow-[0_0_24px_-4px_rgba(0,243,255,0.4)]'
-//           : 'border-cyan-400/20 hover:border-cyan-400/50',
-//       ].join(' ')}
+//     <section
+//       ref={sectionRef}
+//       className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
 //     >
-//       <Image
-//         src={game.image}
-//         alt={game.title}
-//         fill
-//         className='object-cover transition-transform duration-300 group-hover:scale-105'
-//       />
-//       <div className='absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent' />
+//       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+//         <LineReveal delay={0} duration={0.5}>
+//           <div className='h-px w-8 bg-[#00d4ff]' />
+//         </LineReveal>
+//         <TextReveal triggerRef={sectionRef} delay={0.15}>
+//           <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+//             GAME LIBRARY
+//           </span>
+//         </TextReveal>
 
-//       {game.tags && (
-//         <div className='absolute top-3 left-3 flex gap-1.5'>
-//           {game.tags.map((tag) => (
-//             <span
-//               key={tag}
-//               className='rounded bg-cyan-400 px-1.5 py-0.5 text-[10px] font-bold text-black'
-//             >
-//               {tag}
+//         <TextReveal triggerRef={sectionRef} delay={0.25}>
+//           <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+//             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+//               The Vault
 //             </span>
-//           ))}
-//         </div>
-//       )}
+//           </h1>
+//         </TextReveal>
 
-//       <div className='absolute bottom-0 left-0 right-0 p-3'>
-//         <p className='text-sm font-bold text-white'>{game.title}</p>
+//         <TextReveal triggerRef={sectionRef} delay={0.55}>
+//           <p
+//             ref={descRef}
+//             className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'
+//           >
+//             Every title, every setup. Filter by device and jump in.
+//           </p>
+//         </TextReveal>
+//         <CardsReveal triggerRef={sectionRef} delay={0.75} stagger={0.3}>
+//           <div className='mb-8 flex flex-wrap gap-2'>
+//             {CATEGORIES.map((cat) => (
+//               <button
+//                 key={cat.value}
+//                 onClick={() => setActive(cat.value)}
+//                 className={[
+//                   'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+//                   active === cat.value
+//                     ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400'
+//                     : 'border-white/15 text-white/60 hover:border-white/30',
+//                 ].join(' ')}
+//               >
+//                 {cat.label}
+//               </button>
+//             ))}
+//           </div>
+//         </CardsReveal>
+
+//         {isLoading ? (
+//           <>
+//             {/* Mobile */}
+//             <ScrollArea className='-mx-6 px-6 sm:hidden'>
+//               <div
+//                 className='grid grid-flow-col grid-rows-2 gap-3 pb-4'
+//                 style={{ gridAutoColumns: '180px' }}
+//               >
+//                 {skeletons.map((_, i) => (
+//                   <GameCardSkeleton key={i} />
+//                 ))}
+//               </div>
+
+//               <ScrollBar orientation='horizontal' />
+//             </ScrollArea>
+
+//             {/* Desktop / Tablet */}
+//             <div className='hidden sm:grid sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
+//               {skeletons.map((_, i) => (
+//                 <GameCardSkeleton key={i} />
+//               ))}
+//             </div>
+//           </>
+//         ) : (
+//           <>
+//             {/* Mobile */}
+//             <ScrollArea className='-mx-6 px-6 sm:hidden'>
+//               <CardsReveal triggerRef={sectionRef} delay={0.8} stagger={0.3}>
+//                 <div
+//                   className='grid grid-flow-col grid-rows-2 gap-3 pb-4'
+//                   style={{ gridAutoColumns: '180px' }}
+//                 >
+//                   {preview.map((game) => (
+//                     <GameCard key={game.id} game={game} />
+//                   ))}
+//                 </div>
+//               </CardsReveal>
+//               <ScrollBar orientation='horizontal' />
+//             </ScrollArea>
+
+//             {/* Desktop / Tablet */}
+//             <CardsReveal triggerRef={sectionRef} delay={0.8} stagger={0.3}>
+//               <div className='hidden sm:grid sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
+//                 {preview.map((game) => (
+//                   <GameCard key={game.id} game={game} />
+//                 ))}
+//               </div>
+//             </CardsReveal>
+
+//             {/* View All */}
+//             {hasMore && (
+//               <LineReveal triggerRef={sectionRef} delay={0.85}>
+//                 <div className='mt-8 flex justify-center'>
+//                   <Link
+//                     href='/games'
+//                     className='rounded-md border border-cyan-400/40 px-6 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-400/10'
+//                   >
+//                     View all {filtered.length} games →
+//                   </Link>
+//                 </div>
+//               </LineReveal>
+//             )}
+//           </>
+//         )}
 //       </div>
-//     </div>
+//     </section>
 //   );
 // }
 
 export default function GamesCatalogSection() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const cardsRef = useRef<HTMLDivElement>(null);
+
   const [active, setActive] = useState<GameCategory>('all');
   const { data: games = [], isLoading } = useQuery({
     queryKey: gameKeys.all,
@@ -174,47 +177,69 @@ export default function GamesCatalogSection() {
     active === 'all' ? games : games.filter((g) => g.category === active);
 
   const preview = filtered.slice(0, PREVIEW_LIMIT);
-
-  // const filtered =
-  //   active === 'all' ? GAMES : GAMES.filter((g) => g.category === active);
-
-  // const preview = filtered.slice(0, PREVIEW_LIMIT);
   const hasMore = filtered.length > PREVIEW_LIMIT;
 
   const skeletons = Array.from({ length: PREVIEW_LIMIT });
 
+  useEffect(() => {
+    if (!isLoading) {
+      // let the DOM paint the real cards first, then recalc trigger positions
+      requestAnimationFrame(() => ScrollTrigger.refresh());
+    }
+  }, [isLoading]);
   return (
-    <section className='px-6 py-20'>
-      <div className='mx-auto max-w-6xl'>
-        <div className='mb-2 flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-cyan-400'>
-          <span className='h-px w-8 bg-cyan-400' />
-          GAME LIBRARY
+    <section
+      ref={sectionRef}
+      className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
+    >
+      <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
+        {/* sub title */}
+        <div className='my-4 flex items-center gap-4'>
+          <LineReveal triggerRef={sectionRef} delay={0}>
+            <div className='h-px w-8 bg-[#00d4ff]' />
+          </LineReveal>
+          <TextReveal triggerRef={sectionRef} delay={0.15}>
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              GAME LIBRARY
+            </span>
+          </TextReveal>
         </div>
 
-        <h2 className='mb-3 bg-linear-to-r from-cyan-400 via-white to-fuchsia-400 bg-clip-text text-5xl font-extrabold text-transparent'>
-          The Vault
-        </h2>
+        {/* main title */}
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
+          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              The Vault
+            </span>
+          </h1>
+        </TextReveal>
 
-        <p className='mb-8 max-w-xl text-white/60'>
-          Every title, every setup. Filter by device and jump in.
-        </p>
+        {/* description */}
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+          <p className='mx-auto mb-4 text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
+            Every title, every setup. Filter by device and jump in.
+          </p>
+        </TextReveal>
 
-        <div className='mb-8 flex flex-wrap gap-2'>
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.value}
-              onClick={() => setActive(cat.value)}
-              className={[
-                'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
-                active === cat.value
-                  ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400'
-                  : 'border-white/15 text-white/60 hover:border-white/30',
-              ].join(' ')}
-            >
-              {cat.label}
-            </button>
-          ))}
-        </div>
+        {/* category filters */}
+        <CardsReveal triggerRef={sectionRef} delay={0.65} stagger={0.3}>
+          <div className='relative z-10 mb-8 flex flex-wrap gap-2'>
+            {CATEGORIES.map((cat) => (
+              <button
+                key={cat.value}
+                onClick={() => setActive(cat.value)}
+                className={[
+                  'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+                  active === cat.value
+                    ? 'border-cyan-400 bg-cyan-400/10 text-cyan-400'
+                    : 'border-white/15 text-white/60 hover:border-white/30',
+                ].join(' ')}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
+        </CardsReveal>
 
         {isLoading ? (
           <>
@@ -228,7 +253,6 @@ export default function GamesCatalogSection() {
                   <GameCardSkeleton key={i} />
                 ))}
               </div>
-
               <ScrollBar orientation='horizontal' />
             </ScrollArea>
 
@@ -243,35 +267,41 @@ export default function GamesCatalogSection() {
           <>
             {/* Mobile */}
             <ScrollArea className='-mx-6 px-6 sm:hidden'>
-              <div
-                className='grid grid-flow-col grid-rows-2 gap-3 pb-4'
-                style={{ gridAutoColumns: '180px' }}
-              >
-                {preview.map((game) => (
-                  <GameCard key={game.id} game={game} />
-                ))}
-              </div>
-
+              <CardsReveal triggerRef={sectionRef} delay={0.85} stagger={0.3}>
+                <div
+                  ref={cardsRef}
+                  className='grid grid-flow-col grid-rows-2 gap-3 pb-4'
+                  style={{ gridAutoColumns: '180px' }}
+                >
+                  {preview.map((game) => (
+                    <GameCard key={game.id} game={game} />
+                  ))}
+                </div>
+              </CardsReveal>
               <ScrollBar orientation='horizontal' />
             </ScrollArea>
 
             {/* Desktop / Tablet */}
-            <div className='hidden sm:grid sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
-              {preview.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))}
-            </div>
+            <CardsReveal triggerRef={sectionRef} delay={0.85} stagger={0.3}>
+              <div className='hidden sm:grid sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
+                {preview.map((game) => (
+                  <GameCard key={game.id} game={game} />
+                ))}
+              </div>
+            </CardsReveal>
 
             {/* View All */}
             {hasMore && (
-              <div className='mt-8 flex justify-center'>
-                <Link
-                  href='/games'
-                  className='rounded-md border border-cyan-400/40 px-6 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-400/10'
-                >
-                  View all {filtered.length} games →
-                </Link>
-              </div>
+              <LineReveal triggerRef={sectionRef} delay={0.95}>
+                <div className='mt-8 flex justify-center'>
+                  <Link
+                    href='/games'
+                    className='rounded-md border border-cyan-400/40 px-6 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-400/10'
+                  >
+                    View all {filtered.length} games →
+                  </Link>
+                </div>
+              </LineReveal>
             )}
           </>
         )}

@@ -103,7 +103,7 @@ export interface BookingRow {
 
   payment_status: 'pending' | 'paid' | 'failed' | 'refunded';
 
-  status: 'confirmed' | 'completed' | 'cancelled';
+  status: 'confirmed' | 'completed' | 'cancelled' | 'no_show';
 
   razorpay_order_id: string | null;
   razorpay_payment_id: string | null;

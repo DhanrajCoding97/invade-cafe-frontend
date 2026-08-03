@@ -34,8 +34,9 @@ import { fetchBookings, bookingKeys } from '@/lib/queries/bookings';
 import { bookingColumns } from '../../components/columns/bookingColumns';
 import { BookingsTable } from '../../components/BookingsTable';
 import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
-
+import { useIsMobile } from '@/hooks/use-mobile';
 export default function BookingsPage() {
+  const isMobile = useIsMobile();
   useRealtimeBookings();
   const {
     data: bookings,

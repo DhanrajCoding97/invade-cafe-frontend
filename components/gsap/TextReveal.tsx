@@ -14,7 +14,7 @@ type TextRevealProps = {
   }>;
   delay?: number;
   triggerRef?: React.RefObject<HTMLElement | null>;
-  start?: string; 
+  start?: string;
 };
 
 export default function TextReveal({
@@ -25,39 +25,77 @@ export default function TextReveal({
 }: TextRevealProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // useGSAP(
+  //   () => {
+  //     if (!containerRef.current) return;
+
+  //     const split = SplitText.create(containerRef.current, {
+  //       type: 'lines',
+  //       mask: 'lines',
+  //       linesClass: 'line++',
+  //     });
+
+  //     gsap.set(split.lines, { y: '100%' });
+  //     gsap.set(containerRef.current, { opacity: 1 }); // reveal wrapper, lines still masked
+
+  //     gsap.to(split.lines, {
+  //       y: '0%',
+  //       duration: 1,
+  //       stagger: 0.1,
+  //       ease: 'power4.out',
+  //       delay,
+  //       scrollTrigger: {
+  //         trigger: triggerRef?.current ?? containerRef.current,
+  //         start,
+  //         once: true,
+  //       },
+  //     });
+
+  //     return () => split.revert();
+  //   },
+  //   { scope: containerRef, dependencies: [delay, start] },
+  // );
   useGSAP(
     () => {
       if (!containerRef.current) return;
 
-      const split = SplitText.create(containerRef.current, {
-        type: 'lines',
-        mask: 'lines',
-        linesClass: 'line++',
+      let ctx: gsap.Context | undefined;
+      let split: SplitText | undefined;
+
+      document.fonts.ready.then(() => {
+        if (!containerRef.current) return; // unmounted before fonts resolved
+
+        split = SplitText.create(containerRef.current, {
+          type: 'lines',
+          mask: 'lines',
+          linesClass: 'line++',
+        });
+
+        gsap.set(split.lines, { y: '100%' });
+        gsap.set(containerRef.current, { opacity: 1 });
+
+        gsap.to(split.lines, {
+          y: '0%',
+          duration: 1,
+          stagger: 0.1,
+          ease: 'power4.out',
+          delay,
+          scrollTrigger: {
+            trigger: triggerRef?.current ?? containerRef.current,
+            start,
+            once: true,
+          },
+        });
       });
 
-      gsap.set(split.lines, { y: '100%' });
-      gsap.set(containerRef.current, { opacity: 1 }); // reveal wrapper, lines still masked
-
-      gsap.to(split.lines, {
-        y: '0%',
-        duration: 1,
-        stagger: 0.1,
-        ease: 'power4.out',
-        delay,
-        scrollTrigger: {
-          trigger: triggerRef?.current ?? containerRef.current,
-          start,
-          once: true,
-        },
-      });
-
-      return () => split.revert();
+      return () => split?.revert();
     },
     { scope: containerRef, dependencies: [delay, start] },
   );
-
   return React.cloneElement(children, {
     ref: containerRef,
-    className: [children.props.className, 'opacity-0'].filter(Boolean).join(' '),
+    className: [children.props.className, 'opacity-0']
+      .filter(Boolean)
+      .join(' '),
   });
 }
