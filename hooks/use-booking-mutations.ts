@@ -1,9 +1,8 @@
-// hooks/use-booking-mutations.ts
 'use client';
-import { createClient } from '@/lib/supabase/client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { bookingKeys } from '@/lib/queries/bookings';
 import { cancelBooking, updatePaymentStatus } from '@/app/actions/bookings';
+import { toast } from 'sonner';
 import type { PaymentMethod } from '@/types';
 
 export function useCancelBooking() {
@@ -12,6 +11,12 @@ export function useCancelBooking() {
     mutationFn: (bookingId: string) => cancelBooking(bookingId),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+    onError: (err) => {
+      console.log('toast about to show');
+      setTimeout(() => {
+        toast.error(err.message);
+      }, 0);
+    },
   });
 }
 

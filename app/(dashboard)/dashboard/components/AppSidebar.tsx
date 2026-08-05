@@ -38,7 +38,7 @@ import {
   CalendarDays,
   Plus,
   Monitor,
-  Wallet,
+  User2,
   Users,
   GamepadDirectional,
   IndianRupee,
@@ -49,26 +49,24 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 
-export function NavManagement({
-  items,
-}: {
-  items: {
-    name: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-}) {
+type NavItem = {
+  title: string;
+  url: string;
+  icon: LucideIcon;
+};
+
+export function NavManagement({ items }: NavMainProps) {
   return (
     <SidebarGroup className='group-data-[collapsible=icon]:hidden'>
       <SidebarGroupLabel>Management</SidebarGroupLabel>
 
       <SidebarMenu>
         {items.map((item) => (
-          <SidebarMenuItem key={item.name}>
+          <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
               <a href={item.url}>
                 <item.icon />
-                <span>{item.name}</span>
+                <span>{item.title}</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -172,15 +170,11 @@ export function NavUser({
   );
 }
 
-export function NavMain({
-  items,
-}: {
-  items: {
-    title: string;
-    url: string;
-    icon: LucideIcon;
-  }[];
-}) {
+type NavMainProps = {
+  items: NavItem[];
+};
+
+export function NavMain({ items }: NavMainProps) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Overview</SidebarGroupLabel>
@@ -228,35 +222,35 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
       url: '/dashboard/staff/bookings/new',
       icon: Plus,
     },
-    {
-      title: 'Stations',
-      url: '/dashboard/staff/stations',
-      icon: Monitor,
-    },
   ];
 
-  const management = [
+  const management: NavItem[] = [
     {
-      name: 'Games',
-      url: '/dashboard/staff/games',
-      icon: GamepadDirectional,
+      title: 'Profile settings',
+      url: '/dashboard/staff/stations',
+      icon: User2,
     },
   ];
 
   if (role === 'owner') {
     management.push(
-      // {
-      //   name: 'Pricing',
-      //   url: '/dashboard/staff/pricing',
-      //   icon: IndianRupee,
-      // },
       {
-        name: 'Customers',
+        title: 'Stations',
+        url: '/dashboard/staff/stations',
+        icon: Monitor,
+      },
+      {
+        title: 'Customers',
         url: '/dashboard/staff/customers',
         icon: Users,
       },
       {
-        name: 'Settings',
+        title: 'Games',
+        url: '/dashboard/staff/games',
+        icon: GamepadDirectional,
+      },
+      {
+        title: 'Settings',
         url: '/dashboard/staff/settings',
         icon: Settings2,
       },

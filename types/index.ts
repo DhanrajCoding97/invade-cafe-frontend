@@ -187,7 +187,8 @@ export const CATEGORIES: { value: GameCategory; label: string }[] = [
 // station types
 export type StationType = 'pc' | 'ps5' | 'racing' | 'vr';
 export type BookingStatus = 'free' | 'booked';
-export type OperationalStatus = 'active' | 'maintenance' | 'offline';
+export type OperationalStatus =
+  'active' | 'maintenance' | 'offline' | 'retired';
 
 export interface PcSpecs {
   cpu?: string;

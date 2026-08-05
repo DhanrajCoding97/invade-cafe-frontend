@@ -102,63 +102,6 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
 
       <CardFooter className='flex flex-col items-start gap-2'>
         {canCancel ? (
-          // <button
-          //   onClick={() => {
-          //     if (cancellingRef.current) return;
-          //     if (confirm('Cancel this booking?')) {
-          //       cancellingRef.current = true;
-          //       cancelMutation.mutate(booking.id, {
-          //         onSettled: () => {
-          //           cancellingRef.current = false;
-          //         },
-          //       });
-          //     }
-          //   }}
-          //   disabled={cancelMutation.isPending}
-          //   className='text-sm text-red-500 hover:underline disabled:opacity-50'
-          // >
-          //   {cancelMutation.isPending ? 'Cancelling…' : 'Cancel Booking'}
-          // </button>
-          // <AlertDialog>
-          //   <AlertDialogTrigger asChild>
-          //     <Button variant='destructive'>Cancel Booking</Button>
-          //   </AlertDialogTrigger>
-          //   <AlertDialogContent size='sm'>
-          //     <AlertDialogHeader>
-          //       <AlertDialogMedia className='bg-destructive/10 text-destructive dark:bg-destructive/20 dark:text-destructive'>
-          //         <Trash2Icon />
-          //       </AlertDialogMedia>
-          //       <AlertDialogTitle>Cancel Booking?</AlertDialogTitle>
-          //       {refundp}
-          //       <AlertDialogDescription>
-          //         This will permanently cancel your booking.Full refund for
-          //         first few cancellations then 90%
-          //       </AlertDialogDescription>
-          //     </AlertDialogHeader>
-          //     <AlertDialogFooter>
-          //       <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-          //       <AlertDialogAction
-          //         variant='destructive'
-          //         disabled={cancelMutation.isPending}
-          //         onClick={() => {
-          //           if (cancellingRef.current) return;
-
-          //           cancellingRef.current = true;
-
-          //           cancelMutation.mutate(booking.id, {
-          //             onSettled: () => {
-          //               cancellingRef.current = false;
-          //             },
-          //           });
-          //         }}
-          //       >
-          //         {cancelMutation.isPending
-          //           ? 'Cancelling...'
-          //           : 'Cancel Booking'}
-          //       </AlertDialogAction>
-          //     </AlertDialogFooter>
-          //   </AlertDialogContent>
-          // </AlertDialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button disabled={!canCancel} variant='destructive'>
@@ -188,17 +131,7 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
-        ) : // <button
-        //   onClick={() => {
-        //     if (confirm('Cancel this booking?'))
-        //       cancelMutation.mutate(booking.id);
-        //   }}
-        //   disabled={cancelMutation.isPending}
-        //   className='text-sm text-red-500 hover:underline disabled:opacity-50'
-        // >
-        //   {cancelMutation.isPending ? 'Cancelling…' : 'Cancel Booking'}
-        // </button>
-        booking.status === 'confirmed' ? (
+        ) : booking.status === 'confirmed' ? (
           <p className='text-xs text-muted-foreground'>
             Cancellation window has passed (within 2 hours of start). Contact
             the cafe to cancel.
@@ -294,24 +227,6 @@ export default function CustomerDashboard() {
       },
     };
   }, [bookings]);
-  // const { upcoming, history } = useMemo(() => {
-  //   const list = bookings ?? [];
-  //   const now = Date.now();
-  //   return {
-  //     upcoming: list.filter((b) => {
-  //       const start = new Date(`${b.date}T${b.start_time}`).getTime();
-  //       return (
-  //         b.status !== 'cancelled' && b.status !== 'completed' && start >= now
-  //       );
-  //     }),
-  //     history: list.filter((b) => {
-  //       const start = new Date(`${b.date}T${b.start_time}`).getTime();
-  //       return (
-  //         b.status === 'cancelled' || b.status === 'completed' || start < now
-  //       );
-  //     }),
-  //   };
-  // }, [bookings]);
 
   return (
     <div className='container mx-auto max-w-6xl py-8'>
@@ -322,12 +237,6 @@ export default function CustomerDashboard() {
             {profile?.full_name ? ` ${profile.full_name}` : ''}{' '}
           </span>
         </p>
-        {/* <a
-          href='/#booking'
-          className='rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
-        >
-          Book Session
-        </a> */}
       </div>
       <Tabs defaultValue='upcoming' className='w-full'>
         <TabsList className='grid w-full grid-cols-3'>

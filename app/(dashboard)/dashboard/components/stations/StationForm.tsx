@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -8,6 +7,7 @@ import { toast } from 'sonner';
 import type { StationRow, StationType } from '@/types';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectTrigger,
@@ -25,7 +25,7 @@ const stationFormSchema = z.object({
   name: z.string().min(1),
   hourly_rate: z.coerce.number().min(0),
   max_players: z.coerce.number().min(1),
-  cafe_location: z.string().min(1),
+  // cafe_location: z.string().min(1).optional(),
   cpu: z.string().optional(),
   gpu: z.string().optional(),
   ram: z.string().optional(),
@@ -55,26 +55,6 @@ export default function StationForm({
   const updateMutation = useUpdateStation();
   const submitting = createMutation.isPending || updateMutation.isPending;
 
-  // const {
-  //   control,
-  //   handleSubmit,
-  //   watch,
-  //   formState: { errors },
-  // } = useForm<StationFormValues>({
-  //     resolver: zodResolver(stationFormSchema),
-  //     defaultValues: {
-  //       type: station?.type ?? 'pc',
-  //       name: station?.name ?? '',
-  //       hourly_rate: station?.hourly_rate ?? 0,
-  //       max_players: station?.max_players ?? 1,
-  //       cafe_location: station?.cafe_location ?? 'main',
-  //       cpu: station?.specs?.cpu ?? '',
-  //       gpu: station?.specs?.gpu ?? '',
-  //       ram: station?.specs?.ram ?? '',
-  //       storage: station?.specs?.storage ?? '',
-  //     },
-  //   });
-
   const {
     control,
     handleSubmit,
@@ -87,7 +67,7 @@ export default function StationForm({
       name: station?.name ?? '',
       hourly_rate: station?.hourly_rate ?? 0,
       max_players: station?.max_players ?? 1,
-      cafe_location: station?.cafe_location ?? '',
+      // cafe_location: station?.cafe_location ?? 'main',
       cpu: station?.specs?.cpu ?? '',
       gpu: station?.specs?.gpu ?? '',
       ram: station?.specs?.ram ?? '',
@@ -97,14 +77,18 @@ export default function StationForm({
   const selectedType = watch('type');
 
   function onSubmit(values: StationFormOutput) {
+    console.log('onSubmit fired');
+    console.log(values);
+
+    const hasSpecs = values.cpu || values.gpu || values.ram || values.storage;
     const payload = {
       type: values.type,
       name: values.name,
       hourly_rate: values.hourly_rate,
       max_players: values.max_players,
-      cafe_location: values.cafe_location,
+      cafe_location: 'main',
       specs:
-        values.type === 'pc'
+        values.type === 'pc' && hasSpecs
           ? {
               cpu: values.cpu,
               gpu: values.gpu,
@@ -121,7 +105,6 @@ export default function StationForm({
           onSuccess: () => {
             onSuccess?.();
             toast.success('Station added');
-            z;
           },
         },
       );
@@ -130,12 +113,19 @@ export default function StationForm({
         onSuccess: () => {
           onSuccess?.();
           toast.success('Station added');
+          console.log('attempted creating station');
         },
       });
     }
   }
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
+    <form
+      onSubmit={handleSubmit(onSubmit, (errors) => {
+        console.log('Validation failed');
+        console.log(errors);
+      })}
+      className='flex flex-col gap-4'
+    >
       <Controller
         name='type'
         control={control}
@@ -256,13 +246,13 @@ export default function StationForm({
         </div>
       )}
 
-      <button
+      <Button
         type='submit'
         disabled={submitting}
         className='mt-2 rounded-md bg-cyan-400 px-4 py-2 text-sm font-bold text-black hover:bg-cyan-300 disabled:opacity-50'
       >
         {submitting ? 'Saving...' : station ? 'Save changes' : 'Add station'}
-      </button>
+      </Button>
     </form>
   );
 }

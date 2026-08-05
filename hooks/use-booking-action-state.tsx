@@ -1,7 +1,5 @@
-// use-booking-action-state.ts
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-// import { profileKeys, fetchMyProfile } from '@/lib/profile';
 import { profileKeys, fetchMyProfile } from '@/lib/queries/profile';
 import {
   useCancelBooking,

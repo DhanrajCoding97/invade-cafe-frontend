@@ -34,7 +34,7 @@ export async function updateStation(
   revalidatePath('/dashboard/staff/stations');
 }
 
-export async function updateStationStatus(
+export async function updateStationOperationalStatus(
   id: string,
   operational_status: OperationalStatus,
   admin_note?: string,
@@ -48,18 +48,43 @@ export async function updateStationStatus(
   revalidatePath('/dashboard/staff/stations');
 }
 
-export async function deleteStation(id: string) {
+export async function retireStation(id: string) {
   const supabase = await createClient();
-  // guard: block delete if currently booked
-  const { data: station } = await supabase
+
+  // Get current station state
+  const { data: station, error: fetchError } = await supabase
     .from('stations')
-    .select('status')
+    .select('status, operational_status')
     .eq('id', id)
     .single();
-  if (station?.status === 'booked') {
-    throw new Error('Cannot delete a station with an active booking');
+
+  if (fetchError) {
+    throw new Error(fetchError.message);
   }
-  const { error } = await supabase.from('stations').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+
+  // Prevent retiring an active session
+  if (station.status === 'booked' || station.status === 'occupied') {
+    throw new Error(
+      'Cannot retire a station with an active or ongoing booking.',
+    );
+  }
+
+  // Already retired
+  if (station.operational_status === 'retired') {
+    throw new Error('Station is already retired.');
+  }
+
+  // Soft delete
+  const { error } = await supabase
+    .from('stations')
+    .update({
+      operational_status: 'retired',
+    })
+    .eq('id', id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
   revalidatePath('/dashboard/staff/stations');
 }

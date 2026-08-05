@@ -33,7 +33,10 @@ export default async function RootLayout({
         <SmoothScroll>
           <Providers>{children}</Providers>
         </SmoothScroll>
-        <Toaster />
+        <Toaster
+          position='bottom-right'
+          toastOptions={{ className: 'z-[99999]' }}
+        />
       </body>
     </html>
   );

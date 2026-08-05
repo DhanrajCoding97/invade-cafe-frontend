@@ -1,4 +1,3 @@
-// src/app/dashboard/layout.tsx
 import { requireRole } from '@/lib/auth/requrireRole';
 import React from 'react';
 import {

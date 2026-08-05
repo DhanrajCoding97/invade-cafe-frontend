@@ -204,8 +204,6 @@ export async function updateManualBooking(
       customer_name: values.customerName,
       customer_phone: values.customerPhone,
       payment_method: values.paymentMethod,
-      // deliberately NOT touching status / session_started_at here —
-      // edit is for correcting booking details, not changing session lifecycle
     })
     .eq('id', bookingId);
 

@@ -38,6 +38,7 @@ export function useCancelMyBooking() {
     mutationFn: (bookingId: string) => cancelMyBooking(bookingId),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: customerBookingKeys.all });
+      queryClient.invalidateQueries({ queryKey: ['refund-percent'] }); // match your actual key
     },
   });
 }

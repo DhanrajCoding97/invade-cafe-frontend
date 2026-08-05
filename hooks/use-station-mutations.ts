@@ -1,4 +1,3 @@
-// hooks/use-station-mutations.ts
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -6,8 +5,7 @@ import { toast } from 'sonner';
 import {
   createStation,
   updateStation,
-  deleteStation,
-  updateStationStatus,
+  updateStationOperationalStatus,
 } from '@/app/(dashboard)/dashboard/staff/actions/stations';
 import { stationKeys } from '@/lib/queries/stations';
 import type { StationType, OperationalStatus, PcSpecs } from '@/types';
@@ -55,34 +53,20 @@ export function useUpdateStation() {
   });
 }
 
-export function useDeleteStation() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: (id: string) => deleteStation(id),
-    onSuccess: () => {
-      toast.success('Station deleted');
-      queryClient.invalidateQueries({ queryKey: stationKeys.all });
-    },
-    onError: (err) => {
-      toast.error(err instanceof Error ? err.message : 'Delete failed');
-    },
-  });
-}
-
-export function useUpdateStationStatus() {
+export function useUpdateStationOperationalStatus() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
       id,
-      status,
-      note,
+      operational_status,
+      admin_note,
     }: {
       id: string;
-      status: OperationalStatus;
-      note?: string;
-    }) => updateStationStatus(id, status, note),
+      operational_status: OperationalStatus;
+      admin_note?: string;
+    }) => updateStationOperationalStatus(id, operational_status, admin_note),
     onSuccess: (_data, variables) => {
-      toast.success(`Status updated to ${variables.status}`);
+      toast.success(`Status updated to ${variables.operational_status}`);
       queryClient.invalidateQueries({ queryKey: stationKeys.all });
     },
     onError: (err) => {

@@ -9,36 +9,70 @@ const razorpay =
     ? new Razorpay({ key_id: keyId, key_secret: keySecret })
     : null;
 
-export async function refundPayment(paymentId: string, amount?: number) {
-  if (!razorpay) {
-    throw new Error('Missing Razorpay environment variables');
-  }
+export async function refundPayment(
+  paymentId: string,
+  opts: { amount?: number; refundedBy: string; reason?: string },
+) {
+  if (!razorpay) throw new Error('Missing Razorpay environment variables');
 
   const supabase = await createClient();
 
+  //fetching paymentstatus,amount,refund_amount from backend to issue correct amount
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('id, payment_status')
+    .select(
+      'id, payment_status, amount, refunded_amount, user_id, razorpay_order_id',
+    )
     .eq('razorpay_payment_id', paymentId)
     .single();
 
-  if (fetchError || !booking) {
+  if (fetchError || !booking)
     throw new Error('Booking not found for this payment');
-  }
 
   if (booking.payment_status === 'refunded') {
     throw new Error('This booking has already been refunded');
   }
 
-  try {
-    const refund = await razorpay.payments.refund(
-      paymentId,
-      amount ? { amount } : {},
+  const alreadyRefunded = booking.refunded_amount ?? 0;
+  const amountPaidPaise = booking.amount * 100;
+  const refundableRemaining = amountPaidPaise - alreadyRefunded;
+  const amount = opts.amount ?? refundableRemaining;
+  if (
+    amount <= 0 ||
+    amount > refundableRemaining ||
+    !Number.isInteger(amount)
+  ) {
+    throw new Error('Invalid refund amount');
+  }
+
+  //prevent race condition if admin double clicks the refund button
+  const { data: claimed, error: claimError } = await supabase
+    .from('bookings')
+    .update({ payment_status: 'refund_processing' })
+    .eq('id', booking.id)
+    .in('payment_status', ['paid', 'partially_refunded'])
+    .select('id')
+    .single();
+
+  if (claimError || !claimed) {
+    throw new Error(
+      'Refund already in progress or booking state changed — refresh and retry',
     );
+  }
+  try {
+    const refund = await razorpay.payments.refund(paymentId, { amount });
+
+    const newRefundedTotal = alreadyRefunded + amount;
+
+    const finalStatus =
+      newRefundedTotal >= amountPaidPaise ? 'refunded' : 'partially_refunded';
 
     const { error: updateError } = await supabase
       .from('bookings')
-      .update({ payment_status: 'refunded' })
+      .update({
+        payment_status: finalStatus,
+        refunded_amount: newRefundedTotal,
+      })
       .eq('id', booking.id);
 
     if (updateError) {
@@ -46,27 +80,42 @@ export async function refundPayment(paymentId: string, amount?: number) {
         bookingId: booking.id,
         paymentId,
       });
+      await supabase.from('failed_refunds').insert({
+        razorpay_payment_id: paymentId,
+        razorpay_order_id: booking.razorpay_order_id,
+        user_id: booking.user_id,
+        amount,
+        reason: 'db_update_failed_after_refund',
+        notes: { error: updateError },
+      });
     }
+
+    await supabase.from('refund_log').insert({
+      booking_id: booking.id,
+      razorpay_refund_id: refund.id,
+      amount,
+      refunded_by: opts.refundedBy,
+      reason: opts.reason ?? null,
+    });
 
     return refund;
   } catch (err: any) {
+    // Roll the claim back so it can be retried
+    await supabase
+      .from('bookings')
+      .update({ payment_status: booking.payment_status })
+      .eq('id', booking.id);
+
     const description = err?.error?.description;
 
-    // Razorpay says it's already refunded — our DB just didn't know yet.
-    // Sync it rather than surfacing this as a failure to the user.
     if (description === 'The payment has been fully refunded already') {
-      const { error: updateError } = await supabase
+      await supabase
         .from('bookings')
-        .update({ payment_status: 'refunded' })
+        .update({
+          payment_status: 'refunded',
+          refunded_amount: booking.amount * 100,
+        })
         .eq('id', booking.id);
-
-      if (updateError) {
-        console.error('Sync-only update failed:', updateError, {
-          bookingId: booking.id,
-          paymentId,
-        });
-      }
-
       return {
         synced: true,
         note: 'Payment was already refunded; local status corrected.',
