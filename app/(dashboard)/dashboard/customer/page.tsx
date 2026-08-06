@@ -49,7 +49,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { handleSignOut } from '@/lib/auth/oauth';
 
-export function hoursUntil(booking: BookingRow) {
+function hoursUntil(booking: BookingRow) {
   const start = new Date(`${booking.date}T${booking.start_time}`);
   return (start.getTime() - Date.now()) / 3_600_000;
 }

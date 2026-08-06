@@ -25,10 +25,14 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { useCancelMyBooking } from '@/hooks/use-customer-booking';
-import { hoursUntil } from '../../page';
 import { useRefundPercent } from '@/hooks/use-refund-percent';
 import { Button } from '@/components/ui/button';
+import { type BookingRow } from '@/types';
 export default function CustomerBookingDetailPage() {
+  function hoursUntil(booking: BookingRow) {
+    const start = new Date(`${booking.date}T${booking.start_time}`);
+    return (start.getTime() - Date.now()) / 3_600_000;
+  }
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
