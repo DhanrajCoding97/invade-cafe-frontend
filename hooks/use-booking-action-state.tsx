@@ -20,13 +20,16 @@ export function useBookingActionState(booking: BookingRow) {
   const cancelBooking = useCancelBooking();
   const markPaid = useMarkPaid();
   const markRefunded = useMarkRefunded();
+  const isOnlineBooking = booking.payment_method === 'razorpay';
 
   const canMarkPaid =
     booking.payment_status === 'pending' &&
     booking.payment_method !== 'razorpay';
 
   const canCancel =
-    booking.status !== 'completed' && booking.status !== 'no_show';
+    booking.status !== 'completed' &&
+    booking.status !== 'no_show' &&
+    (role === 'owner' || (role === 'staff' && !isOnlineBooking));
 
   const canEdit =
     booking.status !== 'completed' && booking.status !== 'no_show';

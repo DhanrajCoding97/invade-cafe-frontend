@@ -18,6 +18,7 @@ import {
   Pencil,
   RotateCcw,
   MoreVertical,
+  Eye,
 } from 'lucide-react';
 import { type BookingRow } from '@/types';
 import ManualBookingForm from '../(dashboard)/dashboard/staff/components/ManualBookingForm';
@@ -36,6 +37,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import Link from 'next/link';
 export function BookingActions({
   booking,
   layout = 'row',
@@ -56,6 +58,27 @@ export function BookingActions({
     canRefund,
   } = useBookingActionState(booking);
   if (booking.status === 'cancelled') return null;
+
+  const viewButton =
+    layout === 'compact' ? (
+      <DropdownMenuItem asChild>
+        <Link href={`/dashboard/staff/bookings/${booking.id}`}>
+          <Eye size={14} className='mr-2' />
+          View booking
+        </Link>
+      </DropdownMenuItem>
+    ) : (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button variant='action' asChild>
+            <Link href={`/dashboard/bookings/${booking.id}`}>
+              <Eye className='size-5 transition-all duration-300 ease-in group-hover:text-cyan-300' />
+            </Link>
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>View Booking</TooltipContent>
+      </Tooltip>
+    );
 
   const markPaidBtn = canMarkPaid && (
     <Tooltip>
@@ -235,6 +258,7 @@ export function BookingActions({
   if (layout === 'row') {
     return (
       <div className='flex gap-2'>
+        {viewButton}
         {markPaidBtn}
         {cancelDialog}
         {editDialog}
@@ -245,7 +269,7 @@ export function BookingActions({
 
   // compact: Mark Paid stays primary, rest go in overflow
   const hasOverflowItems =
-    canEdit || canCancel || (role === 'owner' && canRefund);
+    true || canEdit || canCancel || (role === 'owner' && canRefund);
 
   return (
     <div className='flex gap-2'>
@@ -258,6 +282,7 @@ export function BookingActions({
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align='end'>
+            {viewButton}
             {editDialog}
             {cancelDialog}
             {refundDialog}
