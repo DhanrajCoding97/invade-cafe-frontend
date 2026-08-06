@@ -23,8 +23,9 @@ import Link from 'next/link';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 import { WheelTimePicker } from '@/components/wheel-picker-time-input';
 
-const OPEN_HOUR = 10; // 10:00 AM
-const CLOSE_HOUR = 23; // 11:00 PM
+const TEST_MODE = false;
+const OPEN_HOUR = TEST_MODE ? 0 : 10;
+const CLOSE_HOUR = TEST_MODE ? 24 : 23;
 const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
 
 interface ExistingBooking {
@@ -147,10 +148,12 @@ export default function DateTimeStep() {
     (_, i) => OPEN_HOUR + i,
   ).filter((hour) => {
     const slotStartMinutes = hour * 60;
-    const fitsBeforeClose = slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
-    const notInPast = !today || slotStartMinutes > nowMinutes;
+    const fitsBeforeClose =
+      TEST_MODE || slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
+    const notInPast = TEST_MODE || !today || slotStartMinutes > nowMinutes;
     return fitsBeforeClose && notInPast;
   });
+  console.log(availableSlots);
 
   const nowString = getCurrentTimeString();
   const cafeIsOpenNow =

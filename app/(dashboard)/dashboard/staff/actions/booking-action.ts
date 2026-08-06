@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import { requireRole } from '@/lib/auth/requrireRole';
 import { type ManualBookingValues } from '@/lib/schemas/ManualBookingFormSchema';
+import { getExtensionAmount } from '@/lib/extension-pricing';
 import { revalidatePath } from 'next/cache';
 export async function startSession(bookingId: string) {
   const supabase = await createClient();
@@ -38,54 +39,143 @@ export async function endSession(bookingId: string) {
   revalidatePath('/dashboard/staff');
 }
 
+// export async function extendSession(
+//   bookingId: string,
+//   stationId: string,
+//   extendMinutes: number,
+// ) {
+//   const supabase = await createClient();
+
+//   const { data: booking } = await supabase
+//     .from('bookings')
+//     .select('session_started_at, duration_hours, extended_until')
+//     .eq('id', bookingId)
+//     .single();
+
+//   if (!booking || !booking.session_started_at)
+//     throw new Error('Session not started');
+
+//   const actualEnd = new Date(booking.session_started_at);
+//   actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
+
+//   const base = booking.extended_until
+//     ? new Date(booking.extended_until)
+//     : actualEnd;
+//   const newEnd = new Date(
+//     base.getTime() + extendMinutes * 60_000,
+//   ).toISOString();
+
+//   const { data: conflicts } = await supabase
+//     .from('bookings')
+//     .select('id, date, start_time')
+//     .eq('station_id', stationId)
+//     .neq('id', bookingId)
+//     .eq('status', ['pending', 'confirmed']);
+
+//   const hasConflict = (conflicts ?? []).some((b) => {
+//     const otherStart = new Date(`${b.date}T${b.start_time}`);
+//     return otherStart < new Date(newEnd);
+//   });
+
+//   if (hasConflict) return { ok: false, reason: 'conflict' as const };
+
+//   const { error } = await supabase
+//     .from('bookings')
+//     .update({ extended_until: newEnd })
+//     .eq('id', bookingId);
+
+//   if (error) throw new Error(error.message);
+//   revalidatePath('/dashboard/staff');
+//   return { ok: true as const };
+// }
+
+// // app/actions/sessions.ts
+// 'use server';
+
+// import { createClient } from '@/lib/supabase/server';
+// import { getExtensionAmount } from '@/lib/extension-pricing';
+
 export async function extendSession(
   bookingId: string,
   stationId: string,
-  extendMinutes: number,
+  minutes: number,
 ) {
   const supabase = await createClient();
 
-  const { data: booking } = await supabase
+  const { data: booking, error: fetchError } = await supabase
     .from('bookings')
-    .select('session_started_at, duration_hours, extended_until')
+    .select('device, extended_until, session_started_at, duration_hours, date')
     .eq('id', bookingId)
     .single();
 
-  if (!booking || !booking.session_started_at)
-    throw new Error('Session not started');
+  if (fetchError || !booking) throw new Error('Booking not found');
+  if (!booking.session_started_at)
+    throw new Error('Session has not started yet');
 
   const actualEnd = new Date(booking.session_started_at);
   actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
-
-  const base = booking.extended_until
+  const currentEnd = booking.extended_until
     ? new Date(booking.extended_until)
     : actualEnd;
-  const newEnd = new Date(
-    base.getTime() + extendMinutes * 60_000,
-  ).toISOString();
+  const newEnd = new Date(currentEnd.getTime() + minutes * 60_000);
 
-  const { data: conflicts } = await supabase
+  // conflict check — is this station booked by someone else before newEnd?
+  const { data: conflicts, error: conflictError } = await supabase
     .from('bookings')
-    .select('id, date, start_time')
+    .select('id, start_time')
     .eq('station_id', stationId)
-    .neq('id', bookingId)
-    .eq('status', ['pending', 'confirmed']);
+    .eq('date', booking.date)
+    .in('status', ['confirmed'])
+    .neq('id', bookingId);
 
-  const hasConflict = (conflicts ?? []).some((b) => {
-    const otherStart = new Date(`${b.date}T${b.start_time}`);
-    return otherStart < new Date(newEnd);
+  if (conflictError) throw new Error(conflictError.message);
+
+  const hasConflict = conflicts?.some((c) => {
+    const nextStart = new Date(`${booking.date}T${c.start_time}`);
+    return nextStart < newEnd;
   });
 
-  if (hasConflict) return { ok: false, reason: 'conflict' as const };
+  if (hasConflict) {
+    return {
+      ok: false as const,
+      reason: 'Station is booked right after — cannot extend.',
+    };
+  }
 
-  const { error } = await supabase
+  const { error: updateError } = await supabase
     .from('bookings')
-    .update({ extended_until: newEnd })
+    .update({ extended_until: newEnd.toISOString() })
     .eq('id', bookingId);
 
+  if (updateError) throw new Error(updateError.message);
+
+  const amount = getExtensionAmount(booking.device, minutes);
+
+  const { error: insertError } = await supabase
+    .from('session_extensions')
+    .insert({
+      booking_id: bookingId,
+      minutes,
+      amount,
+      payment_status: 'pending',
+    });
+
+  if (insertError) throw new Error(insertError.message);
+
+  return { ok: true as const, amountDue: amount };
+}
+
+export async function markExtensionPaid(extensionId: string) {
+  const { user } = await requireRole(['owner', 'staff']);
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from('session_extensions')
+    .update({ payment_status: 'paid', marked_paid_by: user.id })
+    .eq('id', extensionId)
+    .eq('payment_status', 'pending'); // no-op if already paid, avoids double-marking noise
+
   if (error) throw new Error(error.message);
-  revalidatePath('/dashboard/staff');
-  return { ok: true as const };
 }
 
 export async function createManualBooking(values: ManualBookingValues) {

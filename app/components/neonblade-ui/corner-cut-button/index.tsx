@@ -313,7 +313,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         {/* Content sits above decorative layers */}
         <span
           className={[
-            'relative z-10 flex items-center gap-2',
+            'relative z-10 flex justify-center sm:justify-start items-center gap-2',
             fullWidthOnMobile ? 'justify-center' : '',
           ]
             .filter(Boolean)

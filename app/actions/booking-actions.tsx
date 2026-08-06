@@ -71,7 +71,7 @@ export function BookingActions({
       <Tooltip>
         <TooltipTrigger asChild>
           <Button variant='action' asChild>
-            <Link href={`/dashboard/bookings/${booking.id}`}>
+            <Link href={`/dashboard/staff/bookings/${booking.id}`}>
               <Eye className='size-5 transition-all duration-300 ease-in group-hover:text-cyan-300' />
             </Link>
           </Button>

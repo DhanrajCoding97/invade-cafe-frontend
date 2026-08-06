@@ -4,6 +4,7 @@ import { bookingKeys } from '@/lib/queries/bookings';
 import { cancelBooking, updatePaymentStatus } from '@/app/actions/bookings';
 import { toast } from 'sonner';
 import type { PaymentMethod } from '@/types';
+import { markExtensionPaid } from '@/app/(dashboard)/dashboard/staff/actions/booking-action';
 
 export function useCancelBooking() {
   const queryClient = useQueryClient();
@@ -94,5 +95,16 @@ export function useMarkRefunded() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bookingKeys.all });
     },
+  });
+}
+
+export function useMarkExtensionPaid() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (extensionId: string) => markExtensionPaid(extensionId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['session-extensions'] });
+    },
+    onError: (err: any) => toast.error(err?.message ?? 'Failed to mark paid'),
   });
 }

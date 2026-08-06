@@ -77,6 +77,13 @@ export interface Station {
   status: string;
 }
 
+export type Extension = {
+  id: string;
+  booking_id: string;
+  amount: number;
+  payment_status: 'pending' | 'paid';
+};
+
 export interface BookingRow {
   id: string;
 

@@ -49,7 +49,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { handleSignOut } from '@/lib/auth/oauth';
 
-function hoursUntil(booking: BookingRow) {
+export function hoursUntil(booking: BookingRow) {
   const start = new Date(`${booking.date}T${booking.start_time}`);
   return (start.getTime() - Date.now()) / 3_600_000;
 }
@@ -61,8 +61,8 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
   const refundPercent = data?.refundPercent ?? 100;
 
   const hrsLeft = hoursUntil(booking);
-  const cancellingRef = useRef(false);
   const canCancel = booking.status === 'confirmed' && hrsLeft >= 2;
+  const cancellingRef = useRef(false);
 
   return (
     <Card className='bg-[#0C0C0D]'>

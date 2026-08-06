@@ -34,7 +34,7 @@ export default function ConfirmationStep({ bookingId }: ConfirmationStepProps) {
         You can manage or cancel your booking from the dashboard.
       </p>
       <Link
-        href={`/dashboard/customer?tab=upcoming&booking=${bookingId}`}
+        href={`/dashboard/customer/bookings/${bookingId}`}
         className='max-w-[80%] group cursor-pointer font-bold transition-all duration-300 ease-in-out border flex items-center text-[15px] px-5 py-2.5 rounded-xl border-transparent active:scale-95 bg-[#00F3FF] hover:bg-[#39FF14] text-black
         '
       >
