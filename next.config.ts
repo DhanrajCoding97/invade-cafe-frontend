@@ -6,6 +6,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+    experimental: {
+    optimizeCss: true,
+  },
   images: {
     remotePatterns: [
       {
