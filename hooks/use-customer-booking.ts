@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { cancelMyBooking } from '@/app/(dashboard)/dashboard/customer/actions/customer-booking';
 import type { BookingRow } from '@/types';
-
+import { toast } from 'sonner';
 export const customerBookingKeys = {
   all: ['my-bookings'] as const,
 };
@@ -39,6 +39,12 @@ export function useCancelMyBooking() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: customerBookingKeys.all });
       queryClient.invalidateQueries({ queryKey: ['refund-percent'] }); // match your actual key
+    },
+    onError: (err) => {
+      console.log('toast about to show');
+      setTimeout(() => {
+        toast.error(err.message);
+      }, 0);
     },
   });
 }

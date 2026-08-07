@@ -36,6 +36,8 @@ export default async function RootLayout({
         <Toaster
           position='bottom-right'
           toastOptions={{ className: 'z-[99999]' }}
+          richColors
+          closeButton
         />
       </body>
     </html>

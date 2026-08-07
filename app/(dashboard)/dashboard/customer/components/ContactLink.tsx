@@ -1,16 +1,16 @@
 'use client';
-import { ArrowLeft } from 'lucide-react';
+import { Phone } from 'lucide-react';
 import Link from 'next/link';
 
-export default function GoBackLink() {
+export default function ContactLink() {
   return (
     <Link
       href='/dashboard/customer'
       className='flex items-center gap-2 py-2 hover:underline underline-offset-4 text-cyan-500'
     >
       {' '}
-      <ArrowLeft size={16} />
-      Go back
+      <Phone size={16} />
+      Need help with this booking? Contact for help.
     </Link>
   );
 }

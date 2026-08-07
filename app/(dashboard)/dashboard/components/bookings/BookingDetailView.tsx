@@ -32,8 +32,8 @@ function DetailTile({
   value: string;
 }) {
   return (
-    <div className='border border-white/10 rounded-2xl p-4 bg-white/[0.02]'>
-      <div className='flex items-center gap-2 text-[#28F1FF]/70 mb-2'>
+    <div className='flex items-center gap-2'>
+      <div className='flex items-center gap-2 text-[#28F1FF]/70'>
         {icon}
         <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
           {label}
