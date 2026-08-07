@@ -4,7 +4,7 @@ export default async function CustomerDashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main className='min-h-screen p-4'>
+    <main className='min-h-screen'>
       {/* Simple navbar */}
       {/* Customer sidebar (optional) */}
       {children}

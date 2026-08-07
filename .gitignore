@@ -1,8 +1,3 @@
-<<<<<<< HEAD
-# dependencies
-/node_modules
-/.pnp
-=======
 # Logs
 logs
 *.log
@@ -82,7 +77,7 @@ web_modules/
 # Next.js build output
 .next
 out
-
+.unlighthouse
 # Nuxt.js build / generate output
 .nuxt
 dist
@@ -134,7 +129,6 @@ dist
 .pnpm-store
 
 # yarn v3
->>>>>>> 3bf7165db07668ebcabb1e2285a211fee171a0a5
 .pnp.*
 .yarn/*
 !.yarn/patches
