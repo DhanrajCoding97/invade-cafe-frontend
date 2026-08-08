@@ -35,12 +35,18 @@ export async function getRefundPercent() {
   return { refundPercent: getRefundPercentForCount(count ?? 0) };
 }
 
-export async function cancelMyBooking(bookingId: string) {
+type CancelResult =
+  | { success: true; refundPercent: number }
+  | { success: false; message: string };
+
+export async function cancelMyBooking(
+  bookingId: string,
+): Promise<CancelResult> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+  if (!user) return { success: false, message: 'Not authenticated' };
 
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
@@ -50,16 +56,20 @@ export async function cancelMyBooking(bookingId: string) {
     .eq('id', bookingId)
     .single();
 
-  if (fetchError || !booking) throw new Error('Booking not found');
-  if (booking.user_id !== user.id) throw new Error('Not your booking');
-  if (booking.status === 'cancelled') throw new Error('Already cancelled');
+  if (fetchError || !booking)
+    return { success: false, message: 'Booking not found' };
+  if (booking.user_id !== user.id)
+    return { success: false, message: 'Not your booking' };
+  if (booking.status === 'cancelled')
+    return { success: false, message: 'Already cancelled' };
 
   const sessionStart = new Date(`${booking.date}T${booking.start_time}`);
   const hoursUntilStart = (sessionStart.getTime() - Date.now()) / 3_600_000;
   if (hoursUntilStart < 2) {
-    throw new Error(
-      'Cancellation window has passed. Contact the cafe to cancel.',
-    );
+    return {
+      success: false,
+      message: 'Cancellation window has passed. Contact the cafe to cancel.',
+    };
   }
 
   const admin = createServiceRoleClient();
@@ -75,11 +85,13 @@ export async function cancelMyBooking(bookingId: string) {
     .eq('user_id', user.id)
     .eq('status', 'cancelled')
     .gte('cancelled_at', startOfDay.toISOString());
-  if (todayErr) throw new Error(todayErr.message);
+  if (todayErr) return { success: false, message: todayErr.message };
   if ((todayCount ?? 0) >= 1) {
-    throw new Error(
-      'Only one cancellation allowed per day. Contact the cafe for further help.',
-    );
+    return {
+      success: false,
+      message:
+        'Only one cancellation allowed per day. Contact the cafe for further help.',
+    };
   }
 
   const { count: monthCount, error: monthErr } = await admin
@@ -88,7 +100,7 @@ export async function cancelMyBooking(bookingId: string) {
     .eq('user_id', user.id)
     .eq('status', 'cancelled')
     .gte('cancelled_at', startOfMonth.toISOString());
-  if (monthErr) throw new Error(monthErr.message);
+  if (monthErr) return { success: false, message: monthErr.message };
 
   const refundPercent = getRefundPercentForCount(monthCount ?? 0);
 
@@ -114,7 +126,91 @@ export async function cancelMyBooking(bookingId: string) {
     // payment_status is already updated inside refundPayment — don't set it here too
     .eq('id', bookingId);
 
-  if (error) throw new Error(error.message);
+  if (error) return { success: false, message: error.message };
 
-  return { refundPercent };
+  return { success: true, refundPercent };
 }
+
+// export async function cancelMyBooking(bookingId: string) {
+//   const supabase = await createClient();
+//   const {
+//     data: { user },
+//   } = await supabase.auth.getUser();
+//   if (!user) throw new Error('Not authenticated');
+
+//   const { data: booking, error: fetchError } = await supabase
+//     .from('bookings')
+//     .select(
+//       'id, user_id, date, start_time, status, payment_status, payment_method, razorpay_payment_id, amount',
+//     )
+//     .eq('id', bookingId)
+//     .single();
+
+//   if (fetchError || !booking) throw new Error('Booking not found');
+//   if (booking.user_id !== user.id) throw new Error('Not your booking');
+//   if (booking.status === 'cancelled') throw new Error('Already cancelled');
+
+//   const sessionStart = new Date(`${booking.date}T${booking.start_time}`);
+//   const hoursUntilStart = (sessionStart.getTime() - Date.now()) / 3_600_000;
+//   if (hoursUntilStart < 2) {
+//     throw new Error(
+//       'Cancellation window has passed. Contact the cafe to cancel.',
+//     );
+//   }
+
+//   const admin = createServiceRoleClient();
+//   const startOfDay = new Date();
+//   startOfDay.setHours(0, 0, 0, 0);
+//   const startOfMonth = new Date();
+//   startOfMonth.setDate(1);
+//   startOfMonth.setHours(0, 0, 0, 0);
+
+//   const { count: todayCount, error: todayErr } = await admin
+//     .from('bookings')
+//     .select('*', { count: 'exact', head: true })
+//     .eq('user_id', user.id)
+//     .eq('status', 'cancelled')
+//     .gte('cancelled_at', startOfDay.toISOString());
+//   if (todayErr) throw new Error(todayErr.message);
+//   if ((todayCount ?? 0) >= 1) {
+//     throw new Error(
+//       'Only one cancellation allowed per day. Contact the cafe for further help.',
+//     );
+//   }
+
+//   const { count: monthCount, error: monthErr } = await admin
+//     .from('bookings')
+//     .select('*', { count: 'exact', head: true })
+//     .eq('user_id', user.id)
+//     .eq('status', 'cancelled')
+//     .gte('cancelled_at', startOfMonth.toISOString());
+//   if (monthErr) throw new Error(monthErr.message);
+
+//   const refundPercent = getRefundPercentForCount(monthCount ?? 0);
+
+//   const shouldRefund =
+//     booking.payment_status === 'paid' &&
+//     booking.payment_method === 'razorpay' &&
+//     !!booking.razorpay_payment_id;
+
+//   if (shouldRefund) {
+//     const refundAmountPaise = Math.round(
+//       (booking.amount * 100 * refundPercent) / 100,
+//     );
+//     await refundPayment(booking.razorpay_payment_id!, {
+//       amount: refundAmountPaise,
+//       refundedBy: user.id,
+//       reason: `customer_self_cancel_${refundPercent}pct`,
+//     });
+//   }
+
+//   const { error } = await supabase
+//     .from('bookings')
+//     .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
+//     // payment_status is already updated inside refundPayment — don't set it here too
+//     .eq('id', bookingId);
+
+//   if (error) throw new Error(error.message);
+
+//   return { refundPercent };
+// }
