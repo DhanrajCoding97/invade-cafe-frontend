@@ -31,14 +31,14 @@ export async function POST(req: NextRequest) {
 
     const { data: station, error } = await supabase
       .from('stations')
-      .select('hourly_rate, status')
+      .select('hourly_rate, operational_status')
       .eq('id', stationId)
       .single();
 
     if (error || !station) {
       return NextResponse.json({ error: 'Station not found' }, { status: 404 });
     }
-    if (station.status !== 'available') {
+    if (station.operational_status !== 'available') {
       return NextResponse.json(
         { error: 'Station no longer available' },
         { status: 409 },
