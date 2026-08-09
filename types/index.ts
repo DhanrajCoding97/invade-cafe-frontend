@@ -84,6 +84,13 @@ export type Extension = {
   payment_status: 'pending' | 'paid';
 };
 
+export interface SessionExtension {
+  id: string;
+  minutes: number;
+  amount: number;
+  payment_status: 'pending' | 'paid';
+}
+
 export interface BookingRow {
   id: string;
 
@@ -126,6 +133,8 @@ export interface BookingRow {
     email: string | null;
     phone: string | null;
   } | null;
+
+  session_extensions?: SessionExtension[] | null;
 }
 
 export type DueCheckBooking = {

@@ -95,3 +95,15 @@ export async function markNoShow(bookingId: string) {
     .eq('id', bookingId);
   if (error) throw new Error(error.message);
 }
+
+export async function markExtensionPaid(
+  extensionId: string,
+  markedPaidBy: string,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from('session_extensions')
+    .update({ payment_status: 'paid', marked_paid_by: markedPaidBy })
+    .eq('id', extensionId);
+  if (error) throw new Error(error.message);
+}

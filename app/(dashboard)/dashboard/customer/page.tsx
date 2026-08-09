@@ -48,6 +48,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { handleSignOut } from '@/lib/auth/oauth';
+import { aggregateBookingTotals } from '@/lib/bookings/aggregate';
+import { formatDuration } from 'date-fns';
 
 function hoursUntil(booking: BookingRow) {
   const start = new Date(`${booking.date}T${booking.start_time}`);
@@ -277,57 +279,67 @@ export default function CustomerDashboard() {
         <TabsContent value='history' className='mt-4 '>
           {history.length ? (
             <div className='space-y-4'>
-              {history.map((booking) => (
-                <Card key={booking.id} className='bg-[#0C0C0D] p-'>
-                  <CardHeader className='pb-3'>
-                    <div className='flex items-center justify-between'>
+              {history.map((booking) => {
+                const { totalDurationHours, totalAmount } =
+                  aggregateBookingTotals(booking);
+
+                return (
+                  <Card key={booking.id} className='bg-[#0C0C0D] p-'>
+                    <CardHeader className='pb-3'>
+                      <div className='flex items-center justify-between'>
+                        <div>
+                          <CardTitle className='capitalize'>
+                            {booking.device}
+                          </CardTitle>
+                          <CardDescription>
+                            {booking.date} • {booking.start_time}
+                          </CardDescription>
+                        </div>
+
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold
+                    ${
+                      booking.status === 'completed'
+                        ? 'bg-green-500/15 text-green-400'
+                        : booking.status === 'cancelled'
+                          ? 'bg-red-500/15 text-red-400'
+                          : 'bg-cyan-500/15 text-cyan-400'
+                    }`}
+                        >
+                          {booking.status}
+                        </span>
+                      </div>
+                    </CardHeader>
+
+                    <CardContent className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
                       <div>
-                        <CardTitle className='capitalize'>
-                          {booking.device}
-                        </CardTitle>
-                        <CardDescription>
-                          {booking.date} • {booking.start_time}
-                        </CardDescription>
+                        <p className='text-muted-foreground'>Duration</p>
+                        <p>
+                          {formatDuration({
+                            hours: Math.floor(totalDurationHours),
+                            minutes: Math.round((totalDurationHours % 1) * 60),
+                          })}
+                        </p>
                       </div>
 
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold
-                  ${
-                    booking.status === 'completed'
-                      ? 'bg-green-500/15 text-green-400'
-                      : booking.status === 'cancelled'
-                        ? 'bg-red-500/15 text-red-400'
-                        : 'bg-cyan-500/15 text-cyan-400'
-                  }`}
-                      >
-                        {booking.status}
-                      </span>
-                    </div>
-                  </CardHeader>
+                      <div>
+                        <p className='text-muted-foreground'>Players</p>
+                        <p>{booking.players}</p>
+                      </div>
 
-                  <CardContent className='grid grid-cols-2 gap-4 text-sm md:grid-cols-4'>
-                    <div>
-                      <p className='text-muted-foreground'>Duration</p>
-                      <p>{booking.duration_hours}h</p>
-                    </div>
+                      <div>
+                        <p className='text-muted-foreground'>Amount</p>
+                        <p>₹{totalAmount}</p>
+                      </div>
 
-                    <div>
-                      <p className='text-muted-foreground'>Players</p>
-                      <p>{booking.players}</p>
-                    </div>
-
-                    <div>
-                      <p className='text-muted-foreground'>Amount</p>
-                      <p>₹{booking.amount}</p>
-                    </div>
-
-                    <div>
-                      <p className='text-muted-foreground'>Payment</p>
-                      <p className='capitalize'>{booking.payment_status}</p>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                      <div>
+                        <p className='text-muted-foreground'>Payment</p>
+                        <p className='capitalize'>{booking.payment_status}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           ) : (
             <Card>

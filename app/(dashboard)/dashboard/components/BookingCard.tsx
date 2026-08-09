@@ -148,6 +148,71 @@ const STATUS_COLOR: Record<
 //   );
 // }
 
+// export function BookingCard({ booking }: { booking: BookingRow }) {
+//   if (!booking) return null;
+
+//   const isOnline = booking.payment_method === 'razorpay';
+//   const displayName =
+//     booking.profiles?.full_name ?? booking.customer_name ?? 'Guest';
+//   const displayPhone = booking.profiles?.phone ?? booking.customer_phone ?? '—';
+
+//   return (
+//     <div className='rounded-xl border border-cyan-500/20 bg-black/40 p-4'>
+//       {/* Header row: name/phone on left, actions menu on right — real flex, not absolute */}
+//       <div className='flex items-start justify-between gap-2'>
+//         <div className='min-w-0'>
+//           <div className='flex flex-wrap items-center gap-2'>
+//             <span className='truncate font-semibold text-cyan-300'>
+//               {displayName}
+//             </span>
+//             {isOnline && (
+//               <Badge color='green' variant='outline' dot='pulse' glow={false}>
+//                 Online
+//               </Badge>
+//             )}
+//           </div>
+//           <span className='text-sm text-white/50'>{displayPhone}</span>
+//         </div>
+
+//         <div className='shrink-0'>
+//           <BookingActions booking={booking} layout='compact' />
+//         </div>
+//       </div>
+
+//       {/* Device + datetime */}
+//       <div className='mt-3 flex items-center gap-2 text-sm text-white/70'>
+//         <span>{booking.device}</span>
+//         <span className='text-white/30'>·</span>
+//         <span>
+//           {booking.date}, {booking.start_time}
+//         </span>
+//       </div>
+
+//       {/* Duration / Players / Amount — matches desktop table columns */}
+//       <div className='mt-2 flex items-center gap-4 text-xs text-white/50'>
+//         <span>{booking.duration_hours ?? 1}h</span>
+//         <span>
+//           {booking.players} {booking.players === 1 ? 'player' : 'players'}
+//         </span>
+//         <span className='font-medium text-white/70'>₹{booking.amount}</span>
+//       </div>
+
+//       {/* Status + payment */}
+//       <div className='mt-3 flex items-center justify-between border-t border-white/5 pt-3'>
+//         <Badge
+//           color={STATUS_COLOR[booking.status]}
+//           variant='outline'
+//           glow={false}
+//         >
+//           {booking.status}
+//         </Badge>
+//         <span className='text-xs text-white/50'>
+//           {booking.payment_status} · {booking.payment_method}
+//         </span>
+//       </div>
+//     </div>
+//   );
+// }
 export function BookingCard({ booking }: { booking: BookingRow }) {
   if (!booking) return null;
 
@@ -157,9 +222,12 @@ export function BookingCard({ booking }: { booking: BookingRow }) {
   const displayPhone = booking.profiles?.phone ?? booking.customer_phone ?? '—';
 
   return (
-    <div className='rounded-xl border border-cyan-500/20 bg-black/40 p-4'>
-      {/* Header row: name/phone on left, actions menu on right — real flex, not absolute */}
-      <div className='flex items-start justify-between gap-2'>
+    <div className='relative overflow-hidden rounded-xl border border-cyan-500/20 bg-black/40'>
+      {/* top accent */}
+      <div className='h-0.5 w-full bg-gradient-to-r from-cyan-500/60 via-cyan-400/20 to-transparent' />
+
+      {/* header */}
+      <div className='flex items-start justify-between gap-3 px-4 pt-4'>
         <div className='min-w-0'>
           <div className='flex flex-wrap items-center gap-2'>
             <span className='truncate font-semibold text-cyan-300'>
@@ -171,45 +239,71 @@ export function BookingCard({ booking }: { booking: BookingRow }) {
               </Badge>
             )}
           </div>
-          <span className='text-sm text-white/50'>{displayPhone}</span>
+          <span className='font-mono text-xs text-white/40'>
+            {displayPhone}
+          </span>
         </div>
 
-        <div className='shrink-0'>
-          <BookingActions booking={booking} layout='compact' />
-        </div>
-      </div>
-
-      {/* Device + datetime */}
-      <div className='mt-3 flex items-center gap-2 text-sm text-white/70'>
-        <span>{booking.device}</span>
-        <span className='text-white/30'>·</span>
-        <span>
-          {booking.date}, {booking.start_time}
-        </span>
-      </div>
-
-      {/* Duration / Players / Amount — matches desktop table columns */}
-      <div className='mt-2 flex items-center gap-4 text-xs text-white/50'>
-        <span>{booking.duration_hours ?? 1}h</span>
-        <span>
-          {booking.players} {booking.players === 1 ? 'player' : 'players'}
-        </span>
-        <span className='font-medium text-white/70'>₹{booking.amount}</span>
-      </div>
-
-      {/* Status + payment */}
-      <div className='mt-3 flex items-center justify-between border-t border-white/5 pt-3'>
         <Badge
           color={STATUS_COLOR[booking.status]}
           variant='outline'
           glow={false}
+          className='shrink-0 uppercase'
         >
           {booking.status}
         </Badge>
-        <span className='text-xs text-white/50'>
-          {booking.payment_status} · {booking.payment_method}
+      </div>
+
+      {/* receipt lines */}
+      <div className='mt-4 space-y-1.5 px-4 font-mono text-xs'>
+        <ReceiptLine label='Station' value={booking.device} />
+        <ReceiptLine label='Date' value={booking.date} />
+        <ReceiptLine label='Time' value={booking.start_time} />
+        <ReceiptLine
+          label='Duration'
+          value={`${booking.duration_hours ?? 1}h`}
+        />
+        <ReceiptLine
+          label='Players'
+          value={`${booking.players} ${booking.players === 1 ? 'player' : 'players'}`}
+        />
+        <ReceiptLine
+          label='Payment'
+          value={`${booking.payment_status} · ${booking.payment_method ?? '—'}`}
+        />
+      </div>
+
+      {/* total */}
+      <div className='mt-3 flex items-end justify-between px-4 pb-4'>
+        <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
+          Total
+        </span>
+        <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
+          ₹{booking.amount}
         </span>
       </div>
+
+      {/* perforation */}
+      <div className='relative flex h-4 items-center'>
+        <div className='absolute left-0 size-4 -translate-x-1/2 rounded-full bg-background ring-1 ring-cyan-500/20' />
+        <div className='mx-3 w-full border-t border-dashed border-white/15' />
+        <div className='absolute right-0 size-4 translate-x-1/2 rounded-full bg-background ring-1 ring-cyan-500/20' />
+      </div>
+
+      {/* action stub */}
+      <div className='px-4 pb-4 pt-2'>
+        <BookingActions booking={booking} layout='compact' />
+      </div>
+    </div>
+  );
+}
+
+function ReceiptLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className='flex items-baseline gap-2'>
+      <span className='uppercase tracking-wider text-white/35'>{label}</span>
+      <span className='min-w-0 flex-1 translate-y-[-3px] border-b border-dotted border-white/10' />
+      <span className='text-right text-white/80'>{value}</span>
     </div>
   );
 }

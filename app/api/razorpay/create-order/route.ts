@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     if (error || !station) {
       return NextResponse.json({ error: 'Station not found' }, { status: 404 });
     }
-    if (station.operational_status !== 'available') {
+    if (station.operational_status !== 'active') {
       return NextResponse.json(
         { error: 'Station no longer available' },
         { status: 409 },

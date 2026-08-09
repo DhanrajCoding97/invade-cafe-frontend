@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 export const customerBookingKeys = {
   all: ['my-bookings'] as const,
 };
-
 export function useMyBookings() {
   const supabase = createClient();
 
@@ -21,7 +20,17 @@ export function useMyBookings() {
 
       const { data, error } = await supabase
         .from('bookings')
-        .select('*')
+        .select(
+          `
+          *,
+          session_extensions (
+            id,
+            minutes,
+            amount,
+            payment_status
+          )
+        `,
+        )
         .eq('user_id', user.id)
         .order('date', { ascending: false })
         .order('start_time', { ascending: false });
@@ -31,6 +40,30 @@ export function useMyBookings() {
     },
   });
 }
+
+// export function useMyBookings() {
+//   const supabase = createClient();
+
+//   return useQuery({
+//     queryKey: customerBookingKeys.all,
+//     queryFn: async () => {
+//       const {
+//         data: { user },
+//       } = await supabase.auth.getUser();
+//       if (!user) return [];
+
+//       const { data, error } = await supabase
+//         .from('bookings')
+//         .select('*')
+//         .eq('user_id', user.id)
+//         .order('date', { ascending: false })
+//         .order('start_time', { ascending: false });
+
+//       if (error) throw new Error(error.message);
+//       return data as BookingRow[];
+//     },
+//   });
+// }
 
 // export function useCancelMyBooking() {
 //   const queryClient = useQueryClient();

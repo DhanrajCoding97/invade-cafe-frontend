@@ -233,6 +233,7 @@ import { getBookingById } from '@/lib/server/bookings';
 import { BookingDetailView } from '../../../components/bookings/BookingDetailView';
 import BackButton from '../../../components/shared/BackButton';
 import AdminBookingActions from '../../../components/bookings/AdminBookingActions';
+import { requireRole } from '@/lib/auth/requrireRole';
 type Props = {
   params: Promise<{
     id: string;
@@ -241,7 +242,7 @@ type Props = {
 
 export default async function AdminBookingDetailPage({ params }: Props) {
   const { id } = await params;
-
+  const { user, role } = await requireRole(['staff', 'owner']);
   const booking = await getBookingById(id);
 
   if (!booking) {
@@ -253,6 +254,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
       {/* <h1>Manage this booking</h1> */}
       <BookingDetailView
         booking={booking}
+        user={user}
         // backButton={<BackButton />}
         actions={<AdminBookingActions booking={booking} />}
       />

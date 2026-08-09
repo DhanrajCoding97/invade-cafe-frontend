@@ -1,13 +1,4 @@
 'use client';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
-import {
-  startSession,
-  endSession,
-  extendSession,
-} from '../../actions/booking-action';
-import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import {
   AlertDialog,
@@ -23,12 +14,21 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Trash2Icon } from 'lucide-react';
-import { useDueSessions } from '@/hooks/use-due-session';
 import { isSessionDue, minutesOverdue } from '@/lib/helpers/session-due';
 import { markNoShow } from '@/app/actions/bookings';
+import { useDueSessions } from '@/hooks/use-due-session';
 import { useMarkExtensionPaid } from '@/hooks/use-booking-mutations';
 import { Extension } from '@/types';
 import { StationCard } from './StationCard';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+import {
+  startSession,
+  endSession,
+  extendSession,
+} from '../../actions/booking-action';
+import { toast } from 'sonner';
 type Booking = {
   id: string;
   station_id: string;
@@ -539,21 +539,132 @@ export default function LiveSessionBoard({
         const b = currentBookingFor(s.id);
         return !!b?.session_started_at && !b?.session_ended_at;
       }).length;
+  //   const totalActive = STATION_TYPES.reduce(
+  //     (sum, t) => sum + activeCountFor(t.key),
+  //     0,
+  //   );
+
+  //   return (
+  //     <div>
+  //       {!audioUnlocked && (
+  //         <button
+  //           onClick={unlockAudio}
+  //           className='mb-4 flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-300'
+  //         >
+  //           🔊 Click to enable sound alerts for due sessions
+  //         </button>
+  //       )}
+  //       <h2 className='text-lg font-semibold mb-3'>Live Sessions Board</h2>
+
+  //       {/* Mobile: tab switcher instead of scrolling through everything */}
+  //       <div className='flex sm:hidden gap-2 mb-4 overflow-x-auto'>
+  //         {groupedStations.map(({ key, label, stations: groupStations }) => {
+  //           if (groupStations.length === 0) return null;
+  //           const activeCount = activeCountFor(key);
+  //           return (
+  //             <button
+  //               key={key}
+  //               onClick={() => setActiveType(key)}
+  //               className={`flex items-center gap-2 shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+  //                 activeType === key
+  //                   ? 'bg-cyan-400 text-black'
+  //                   : 'bg-neutral-800 text-neutral-400'
+  //               }`}
+  //             >
+  //               {label}
+  //               {activeCount > 0 && (
+  //                 <span
+  //                   className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+  //                     activeType === key
+  //                       ? 'bg-black/20'
+  //                       : 'bg-cyan-400 text-black'
+  //                   }`}
+  //                 >
+  //                   {activeCount}
+  //                 </span>
+  //               )}
+  //             </button>
+  //           );
+  //         })}
+  //       </div>
+
+  //       {/* Desktop/tablet: all groups stacked with headers, no tab needed */}
+  //       <div className='flex flex-col gap-8'>
+  //         {groupedStations.map(({ key, label, stations: groupStations }) => {
+  //           if (groupStations.length === 0) return null;
+  //           return (
+  //             <section
+  //               key={key}
+  //               className={`${activeType === key ? 'block' : 'hidden'} sm:block`}
+  //             >
+  //               <h3 className='hidden sm:block text-sm uppercase tracking-[0.2em] text-fuchsia-400 font-semibold mb-3'>
+  //                 {label}
+  //               </h3>
+  //               <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 live-session-grid'>
+  //                 {groupStations.map((station) => (
+  //                   <StationCard
+  //                     key={station.id}
+  //                     station={station}
+  //                     booking={currentBookingFor(station.id)}
+  //                     pendingIds={pendingIds}
+  //                     unpaidExtension={
+  //                       currentBookingFor(station.id)
+  //                         ? unpaidExtensionFor(currentBookingFor(station.id)!.id)
+  //                         : undefined
+  //                     }
+  //                     onStart={handleStart}
+  //                     onEnd={handleEnd}
+  //                     onExtend={handleExtend}
+  //                     onMarkExtensionPaid={(id) => markExtensionPaid.mutate(id)}
+  //                   />
+  //                 ))}
+  //               </div>
+  //             </section>
+  //           );
+  //         })}
+  //       </div>
+  //     </div>
+  //   );
+  // }
+  const totalActive = STATION_TYPES.reduce(
+    (sum, t) => sum + activeCountFor(t.key),
+    0,
+  );
 
   return (
-    <div>
+    <div className='relative'>
+      {/* HUD header */}
+      <div className='mb-5 overflow-hidden rounded-2xl border border-cyan-400/20 bg-[linear-gradient(140deg,#04080f_0%,#070a12_60%,#0a0410_100%)] p-4 shadow-[0_0_40px_-18px_rgba(34,211,238,0.7)]'>
+        <div className='grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4'>
+          <div className='min-w-0'>
+            <p className='font-mono text-[10px] uppercase tracking-[0.3em] text-cyan-400/70'>
+              Operations / Realtime
+            </p>
+            <h2 className='mt-1 truncate text-lg font-semibold tracking-wide text-neutral-50 sm:text-xl'>
+              Live Sessions Board
+            </h2>
+          </div>
+          <div className='flex shrink-0 items-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/5 px-3 py-1.5'>
+            <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_8px_2px_rgba(34,211,238,0.9)]' />
+            <span className='font-mono text-xs text-cyan-200'>
+              {totalActive} <span className='text-cyan-400/60'>active</span>
+            </span>
+          </div>
+        </div>
+        <div className='mt-3 h-px w-full bg-linear-to-r from-cyan-400/50 via-fuchsia-500/30 to-transparent' />
+      </div>
+
       {!audioUnlocked && (
         <button
           onClick={unlockAudio}
-          className='mb-4 flex items-center gap-2 rounded-lg border border-amber-400/40 bg-amber-400/10 px-3 py-2 text-xs text-amber-300'
+          className='mb-4 flex w-full items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 font-mono text-[11px] uppercase tracking-wider text-amber-300'
         >
-          🔊 Click to enable sound alerts for due sessions
+          🔊 Enable sound alerts for due sessions
         </button>
       )}
-      <h2 className='text-lg font-semibold mb-3'>Live Sessions Board</h2>
 
-      {/* Mobile: tab switcher instead of scrolling through everything */}
-      <div className='flex sm:hidden gap-2 mb-4 overflow-x-auto'>
+      {/* Mobile: tab switcher */}
+      <div className='mb-4 flex gap-2 overflow-x-auto pb-1 sm:hidden'>
         {groupedStations.map(({ key, label, stations: groupStations }) => {
           if (groupStations.length === 0) return null;
           const activeCount = activeCountFor(key);
@@ -561,18 +672,18 @@ export default function LiveSessionBoard({
             <button
               key={key}
               onClick={() => setActiveType(key)}
-              className={`flex items-center gap-2 shrink-0 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+              className={`flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 font-mono text-[11px] uppercase tracking-wider transition-all ${
                 activeType === key
-                  ? 'bg-cyan-400 text-black'
-                  : 'bg-neutral-800 text-neutral-400'
+                  ? 'border-cyan-400 bg-cyan-400 text-black shadow-[0_0_18px_-4px_rgba(34,211,238,0.9)]'
+                  : 'border-white/10 bg-white/5 text-neutral-400'
               }`}
             >
               {label}
               {activeCount > 0 && (
                 <span
-                  className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] ${
                     activeType === key
-                      ? 'bg-black/20'
+                      ? 'bg-black/25 text-black'
                       : 'bg-cyan-400 text-black'
                   }`}
                 >
@@ -584,7 +695,7 @@ export default function LiveSessionBoard({
         })}
       </div>
 
-      {/* Desktop/tablet: all groups stacked with headers, no tab needed */}
+      {/* Desktop/tablet: all groups stacked */}
       <div className='flex flex-col gap-8'>
         {groupedStations.map(({ key, label, stations: groupStations }) => {
           if (groupStations.length === 0) return null;
@@ -593,25 +704,31 @@ export default function LiveSessionBoard({
               key={key}
               className={`${activeType === key ? 'block' : 'hidden'} sm:block`}
             >
-              <h3 className='hidden sm:block text-sm uppercase tracking-[0.2em] text-fuchsia-400 font-semibold mb-3'>
-                {label}
-              </h3>
-              <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 live-session-grid'>
+              <div className='mb-3 hidden items-center gap-3 sm:flex'>
+                <h3 className='font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-fuchsia-400'>
+                  {label}
+                </h3>
+                <span className='font-mono text-[10px] text-neutral-600'>
+                  {activeCountFor(key)}/{groupStations.length}
+                </span>
+                <span className='h-px flex-1 bg-linear-to-r from-fuchsia-500/40 to-transparent' />
+              </div>
+              <div className='live-session-grid grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
                 {groupStations.map((station) => (
                   <StationCard
                     key={station.id}
                     station={station}
                     booking={currentBookingFor(station.id)}
                     pendingIds={pendingIds}
-                    unpaidExtension={
-                      currentBookingFor(station.id)
-                        ? unpaidExtensionFor(currentBookingFor(station.id)!.id)
-                        : undefined
-                    }
+                    // unpaidExtension={
+                    //   currentBookingFor(station.id)
+                    //     ? unpaidExtensionFor(currentBookingFor(station.id)!.id)
+                    //     : undefined
+                    // }
                     onStart={handleStart}
                     onEnd={handleEnd}
                     onExtend={handleExtend}
-                    onMarkExtensionPaid={(id) => markExtensionPaid.mutate(id)}
+                    // onMarkExtensionPaid={(id) => markExtensionPaid.mutate(id)}
                   />
                 ))}
               </div>
