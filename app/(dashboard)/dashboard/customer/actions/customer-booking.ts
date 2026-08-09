@@ -1,15 +1,15 @@
 'use server';
 
-import { refundPayment } from '@/app/actions/refund';
-import { createClient } from '@/lib/supabase/server';
-import { createServiceRoleClient } from '@/lib/supabase/service-role';
-import { getRefundPercentForCount } from '@/lib/cancellation-policy';
 // import Razorpay from 'razorpay';
 
 // const razorpay = new Razorpay({
 //   key_id: process.env.RAZORPAY_KEY_ID!,
 //   key_secret: process.env.RAZORPAY_KEY_SECRET!,
 // });
+import { refundPayment } from '@/app/actions/refund';
+import { createClient } from '@/lib/supabase/server';
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
+import { getRefundPercentForCount } from '@/lib/cancellation-policy';
 
 export async function getRefundPercent() {
   const supabase = await createClient();
@@ -120,13 +120,22 @@ export async function cancelMyBooking(
     });
   }
 
-  const { error } = await supabase
+  const { data: cancelled, error } = await admin
     .from('bookings')
     .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
     // payment_status is already updated inside refundPayment — don't set it here too
-    .eq('id', bookingId);
+    .eq('id', bookingId)
+    .select('id')
+    .single();
 
-  if (error) return { success: false, message: error.message };
+  if (error || !cancelled) {
+    console.error('Cancel status update failed:', error);
+    return {
+      success: false,
+      message:
+        'Refund processed, but updating booking status failed. Contact the cafe.',
+    };
+  }
 
   return { success: true, refundPercent };
 }

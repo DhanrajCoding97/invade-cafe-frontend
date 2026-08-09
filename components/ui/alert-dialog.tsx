@@ -159,7 +159,7 @@ function AlertDialogAction({
       variant={variant}
       size={size}
       asChild
-      className='text-[12px] sm:text-base'
+      className={cn('text-[12px] sm:text-base', className)}
     >
       <AlertDialogPrimitive.Action
         data-slot='alert-dialog-action'
@@ -182,7 +182,7 @@ function AlertDialogCancel({
       variant={variant}
       size={size}
       asChild
-      className='text-[12px] sm:text-base'
+      className={cn('text-[12px] sm:text-base', className)}
     >
       <AlertDialogPrimitive.Cancel
         data-slot='alert-dialog-cancel'
