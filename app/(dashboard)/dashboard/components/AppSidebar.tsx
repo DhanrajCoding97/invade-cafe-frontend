@@ -250,8 +250,8 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
         icon: GamepadDirectional,
       },
       {
-        title: 'Settings',
-        url: '/dashboard/staff/settings',
+        title: 'Cafe settings',
+        url: '/dashboard/staff/cafe-settings',
         icon: Settings2,
       },
     );
