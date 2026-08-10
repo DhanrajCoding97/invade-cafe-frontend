@@ -3,10 +3,12 @@
 import { createClient } from '@/lib/supabase/server';
 import { format } from 'date-fns';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
+import { getCafeSettings } from '@/lib/server/cafe-settitngs';
 import { requireRole } from '@/lib/auth/requrireRole';
 import { type ManualBookingValues } from '@/lib/schemas/ManualBookingFormSchema';
 import { getExtensionAmount } from '@/lib/extension-pricing';
 import { revalidatePath } from 'next/cache';
+
 export async function startSession(bookingId: string) {
   const supabase = await createClient();
 
@@ -181,7 +183,7 @@ export async function markExtensionPaid(extensionId: string) {
 export async function createManualBooking(values: ManualBookingValues) {
   await requireRole(['owner', 'staff']);
   const supabase = await createClient();
-
+  const cafeSettings = await getCafeSettings();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -202,6 +204,7 @@ export async function createManualBooking(values: ManualBookingValues) {
     players: values.players,
     tier: values.tier,
     fallbackRate: station.hourly_rate,
+    settings: cafeSettings,
   });
   const computedTotal = calculateTotal(rate, values.duration);
 
@@ -251,7 +254,7 @@ export async function updateManualBooking(
 ) {
   await requireRole(['owner', 'staff']);
   const supabase = await createClient();
-
+  const cafeSettings = await getCafeSettings();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -272,6 +275,7 @@ export async function updateManualBooking(
     players: values.players,
     tier: values.tier,
     fallbackRate: station.hourly_rate,
+    settings: cafeSettings,
   });
   const computedTotal = calculateTotal(rate, values.duration);
 
