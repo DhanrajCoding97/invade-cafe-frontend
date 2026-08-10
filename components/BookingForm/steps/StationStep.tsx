@@ -9,6 +9,7 @@ import { getDisplayRate } from '@/lib/pricing';
 import StationStepSkeleton from '@/components/skeletons/StationStepSkeleton';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 import { format } from 'date-fns';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 
 interface Station {
   id: string;
@@ -115,7 +116,7 @@ export default function StationStep() {
   const date = watch('date');
   const startTime = watch('startTime');
   const duration = watch('duration');
-
+  const { data: cafeSettings } = useCafeSettings();
   const {
     data: stations = [],
     isLoading,
@@ -145,12 +146,16 @@ export default function StationStep() {
             {stations.map((station) => {
               const selected = field.value === station.id;
               // const isMaintenance = station.status === 'maintenance';
-              const rate = getDisplayRate({
-                device,
-                players,
-                tier,
-                fallbackRate: station.hourly_rate,
-              });
+              const rate =
+                station && cafeSettings
+                  ? getDisplayRate({
+                      device,
+                      players,
+                      tier,
+                      fallbackRate: station.hourly_rate,
+                      settings: cafeSettings,
+                    })
+                  : 0;
 
               const isMaintenance =
                 station.operational_status === 'maintenance';

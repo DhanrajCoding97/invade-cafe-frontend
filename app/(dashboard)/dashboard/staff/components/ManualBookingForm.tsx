@@ -46,6 +46,7 @@ import { cn } from '@/lib/utils';
 import { Skeleton } from '@/components/ui/skeleton';
 import { WheelTimePicker } from '@/components/wheel-picker-time-input';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
 
@@ -789,6 +790,7 @@ export default function ManualBookingForm({
   const { startTime: nowTime } = nowDateAndTime();
   const [open, setOpen] = useState(false);
   const [timeOpen, setTimeOpen] = useState(false); // hoisted out of render()
+  const { data: cafeSettings } = useCafeSettings();
 
   const lockStructuralFields = mode === 'edit' && isOnlineBooking;
 
@@ -856,14 +858,17 @@ export default function ManualBookingForm({
     !stationsLoading && stationsForDevice.length === 0;
 
   const selectedStation = stationsForDevice.find((s) => s.id === stationId);
-  const rate = selectedStation
-    ? getDisplayRate({
-        device,
-        players: playersValue,
-        tier,
-        fallbackRate: selectedStation.hourly_rate,
-      })
-    : 0;
+
+  const rate =
+    selectedStation && cafeSettings
+      ? getDisplayRate({
+          device,
+          players: playersValue,
+          tier,
+          fallbackRate: selectedStation.hourly_rate,
+          settings: cafeSettings,
+        })
+      : 0;
   const computedTotal = calculateTotal(rate, durationValue);
   const displayTotal =
     paymentMethod === 'complimentary'

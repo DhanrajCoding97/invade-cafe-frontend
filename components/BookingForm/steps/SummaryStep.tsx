@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { useProfile } from '@/hooks/use-profile';
 import { useUpdatePhone } from '@/hooks/use-update-phone';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 
 async function fetchStationName(stationId: string): Promise<string> {
   const supabase = createClient();
@@ -41,6 +42,7 @@ export default function SummaryStep({
 }: SummaryStepProps) {
   const { watch } = useFormContext<BookingFormValues>();
   const values = watch();
+  const { data: cafeSettings } = useCafeSettings();
 
   //update profile with phone number
   const { data: profile, isLoading: profileLoading } = useProfile(session?.id);
@@ -67,12 +69,15 @@ export default function SummaryStep({
     enabled: !!values.stationId,
   });
 
-  const rate = getDisplayRate({
-    device: values.device,
-    players: values.players,
-    tier: values.tier,
-    fallbackRate: 0, // resolved server-side/at payment too — display-only here
-  });
+  const rate = cafeSettings
+    ? getDisplayRate({
+        device: values.device,
+        players: values.players,
+        tier: values.tier,
+        fallbackRate: 0,
+        settings: cafeSettings,
+      })
+    : 0;
   const total = calculateTotal(rate, values.duration);
   const rows = [
     { label: 'Device', value: values.device?.toUpperCase() },

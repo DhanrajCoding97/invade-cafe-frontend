@@ -284,7 +284,13 @@ export default function CustomerDashboard() {
                   aggregateBookingTotals(booking);
 
                 return (
-                  <Card key={booking.id} className='bg-[#0C0C0D] p-'>
+                  <Card
+                    key={booking.id}
+                    className='bg-[#0C0C0D] hover:cursor-pointer'
+                    onClick={() =>
+                      router.push(`/dashboard/customer/bookings/${booking.id}`)
+                    }
+                  >
                     <CardHeader className='pb-3'>
                       <div className='flex items-center justify-between'>
                         <div>

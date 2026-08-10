@@ -22,10 +22,11 @@ import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import Link from 'next/link';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 import { WheelTimePicker } from '@/components/wheel-picker-time-input';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 
-const TEST_MODE = false;
-const OPEN_HOUR = TEST_MODE ? 0 : 10;
-const CLOSE_HOUR = TEST_MODE ? 24 : 23;
+// const TEST_MODE = false;
+// const OPEN_HOUR = TEST_MODE ? 0 : 10;
+// const CLOSE_HOUR = TEST_MODE ? 24 : 23;
 const DURATION_OPTIONS = [1, 2, 3, 4, 5]; // hours
 
 interface ExistingBooking {
@@ -97,7 +98,8 @@ export default function DateTimeStep() {
   const date = watch('date');
   const duration = watch('duration') ?? 1;
   const dateKey = date ? format(date, 'yyyy-MM-dd') : undefined;
-
+  const { data: cafeSettings, isLoading: isSettingsLoading } =
+    useCafeSettings();
   const { data: bookings = [], isLoading } = useQuery({
     queryKey: ['bookings', stationId, dateKey],
     queryFn: () => fetchBookingsForDate(stationId, dateKey!),
@@ -111,9 +113,19 @@ export default function DateTimeStep() {
   const today = isToday(date);
   const now = new Date();
   const nowMinutes = now.getHours() * 60 + now.getMinutes();
+  const OPEN_MINUTES = cafeSettings
+    ? (() => {
+        const [hour, minute] = cafeSettings.opening_time.split(':').map(Number);
+        return hour * 60 + minute;
+      })()
+    : 0;
 
-  const OPEN_MINUTES = OPEN_HOUR * 60;
-  const CLOSE_MINUTES = CLOSE_HOUR * 60;
+  const CLOSE_MINUTES = cafeSettings
+    ? (() => {
+        const [hour, minute] = cafeSettings.closing_time.split(':').map(Number);
+        return hour * 60 + minute;
+      })()
+    : 0;
   const PLAY_NOW_BUFFER = 10; // minutes of operational slack before close
 
   //custom time slots
@@ -142,36 +154,38 @@ export default function DateTimeStep() {
     !customTimeConflict &&
     !customTimeInPast &&
     customTimeFitsBeforeClose;
+  const openHour = Math.floor(OPEN_MINUTES / 60);
+  const closeHour = Math.floor(CLOSE_MINUTES / 60);
 
   const availableSlots = Array.from(
-    { length: CLOSE_HOUR - OPEN_HOUR },
-    (_, i) => OPEN_HOUR + i,
+    { length: closeHour - openHour },
+    (_, i) => openHour + i,
   ).filter((hour) => {
     const slotStartMinutes = hour * 60;
-    const fitsBeforeClose =
-      TEST_MODE || slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
-    const notInPast = TEST_MODE || !today || slotStartMinutes > nowMinutes;
+
+    const fitsBeforeClose = slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
+
+    const notInPast = !today || slotStartMinutes > nowMinutes;
+
     return fitsBeforeClose && notInPast;
   });
-  console.log(availableSlots);
 
   const nowString = getCurrentTimeString();
   const cafeIsOpenNow =
     nowMinutes >= OPEN_MINUTES && nowMinutes < CLOSE_MINUTES;
-
   const playNowFits =
-    nowMinutes + duration * 60 <= CLOSE_MINUTES - PLAY_NOW_BUFFER;
-  // const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
+    nowMinutes + duration * 60 < CLOSE_MINUTES - PLAY_NOW_BUFFER;
+
   const playNowConflict = hasConflictMinutes(
     nowString,
     duration,
     dateKey!,
     bookings,
   );
-
   const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
 
   useEffect(() => {
+    console.log('CafeTimings', openHour, closeHour);
     const lenis = getLenisInstance();
 
     if (!lenis) return;
@@ -184,7 +198,20 @@ export default function DateTimeStep() {
 
     return () => lenis.start();
   }, [showCustomTime]);
-
+  // const availableSlots = Array.from(
+  //   { length: CLOSE_HOUR - OPEN_HOUR },
+  //   (_, i) => OPEN_HOUR + i,
+  // ).filter((hour) => {
+  //   const slotStartMinutes = hour * 60;
+  //   const fitsBeforeClose =
+  //     TEST_MODE || slotStartMinutes + duration * 60 <= CLOSE_MINUTES;
+  //   const notInPast = TEST_MODE || !today || slotStartMinutes > nowMinutes;
+  //   return fitsBeforeClose && notInPast;
+  // });
+  // const playNowFits =
+  //   nowMinutes + duration * 60 <= CLOSE_MINUTES - PLAY_NOW_BUFFER;
+  // const playNowConflict = hasConflictMinutes(nowString, duration, bookings);
+  // const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
   return (
     <div className='space-y-6'>
       <Controller
@@ -292,8 +319,8 @@ export default function DateTimeStep() {
                 {today && !cafeIsOpenNow && (
                   <p className='mb-3 text-sm text-white/50'>
                     Cafe opens at{' '}
-                    <span className='text-primary'>{OPEN_HOUR}:00</span> — book
-                    a slot for later today instead.
+                    <span className='text-primary'>{openHour}:00</span> — book a
+                    slot for later today instead.
                   </p>
                 )}
 

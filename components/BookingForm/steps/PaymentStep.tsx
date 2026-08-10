@@ -10,6 +10,7 @@ import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ShieldCheck } from 'lucide-react';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import { stationKeys } from '@/lib/queries/stations';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 declare global {
   interface Window {
     Razorpay: any;
@@ -52,6 +53,7 @@ export default function PaymentStep({
   const [error, setError] = useState<string | null>(null);
 
   const values = watch();
+  const { data: cafeSettings } = useCafeSettings();
 
   const queryClient = useQueryClient();
 
@@ -61,12 +63,15 @@ export default function PaymentStep({
     enabled: !!values.stationId,
   });
 
-  const rate = getDisplayRate({
-    device: values.device,
-    players: values.players,
-    tier: values.tier,
-    fallbackRate: 0,
-  });
+  const rate = cafeSettings
+    ? getDisplayRate({
+        device: values.device,
+        players: values.players,
+        tier: values.tier,
+        fallbackRate: 0,
+        settings: cafeSettings,
+      })
+    : 0;
   const total = calculateTotal(rate, values.duration);
 
   // async function handlePay() {

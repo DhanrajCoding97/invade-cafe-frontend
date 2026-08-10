@@ -23,7 +23,7 @@ export default async function StaffDashboardLayout({
           <ModeToggle />
         </header>
 
-        <main className='p-6 flex-1 overflow-y-auto overscroll-contain'>
+        <main className='p-8 flex-1 overflow-y-auto overscroll-contain'>
           {children}
         </main>
       </SidebarInset>

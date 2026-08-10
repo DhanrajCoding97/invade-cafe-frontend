@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import Razorpay from 'razorpay';
 import { createClient } from '@/lib/supabase/server';
 import { getDisplayRate } from '@/lib/pricing';
+import { getCafeSettings } from '@/lib/server/cafe-settitngs';
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
+    const settings = await getCafeSettings();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -52,6 +54,7 @@ export async function POST(req: NextRequest) {
       players,
       tier,
       fallbackRate: station.hourly_rate,
+      settings,
     });
     const amountPaise = Math.round(rate * duration * 100);
 

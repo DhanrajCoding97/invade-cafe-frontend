@@ -227,3 +227,38 @@ export interface StationRow {
   display_order: number;
   created_at: string;
 }
+
+// cafe settings
+export interface CafeSettingsForm {
+  pc_rate: number;
+  psvr_rate: number;
+  ps5_rate_1p: number;
+  ps5_rate_2p: number;
+  ps5_rate_3p: number;
+  ps5_rate_4p: number;
+  racing_single_rate: number;
+  racing_multiplayer_rate: number;
+  opening_time: string;
+  closing_time: string;
+}
+
+export interface CafeSettings {
+  pc_rate: number;
+  psvr_rate: number;
+  ps5_rate_1p: number;
+  ps5_rate_2p: number;
+  ps5_rate_3p: number;
+  ps5_rate_4p: number;
+  racing_single_rate: number;
+  racing_multiplayer_rate: number;
+  opening_time: string;
+  closing_time: string;
+}
+
+export interface RateArgs {
+  device: 'pc' | 'ps5' | 'vr' | 'racing' | undefined;
+  players?: number;
+  tier?: 'single' | 'multiplayer';
+  fallbackRate: number;
+  settings: CafeSettings;
+}
