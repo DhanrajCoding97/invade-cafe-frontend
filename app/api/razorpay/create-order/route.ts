@@ -7,7 +7,6 @@ import { getCafeSettings } from '@/lib/server/cafe-settitngs';
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createClient();
-    const settings = await getCafeSettings();
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -47,6 +46,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const settings = await getCafeSettings();
     // Recompute price server-side — the client's own duration/tier/players
     // is only a request, the rate calc here is what actually gets charged.
     const rate = getDisplayRate({
@@ -70,6 +70,7 @@ export async function POST(req: NextRequest) {
         duration: String(duration),
         date,
         startTime,
+        userId: user.id,
       },
     });
 

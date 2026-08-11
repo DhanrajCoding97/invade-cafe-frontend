@@ -183,7 +183,6 @@ export async function markExtensionPaid(extensionId: string) {
 export async function createManualBooking(values: ManualBookingValues) {
   await requireRole(['owner', 'staff']);
   const supabase = await createClient();
-  const cafeSettings = await getCafeSettings();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -198,6 +197,7 @@ export async function createManualBooking(values: ManualBookingValues) {
   if (stationError || !station) {
     throw new Error('Selected station not found.');
   }
+  const cafeSettings = await getCafeSettings();
 
   const rate = getDisplayRate({
     device: values.device,
@@ -254,7 +254,6 @@ export async function updateManualBooking(
 ) {
   await requireRole(['owner', 'staff']);
   const supabase = await createClient();
-  const cafeSettings = await getCafeSettings();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -269,6 +268,7 @@ export async function updateManualBooking(
   if (stationError || !station) {
     throw new Error('Selected station not found.');
   }
+  const cafeSettings = await getCafeSettings();
 
   const rate = getDisplayRate({
     device: values.device,
