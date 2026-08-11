@@ -187,7 +187,10 @@ export async function refundPayment(
     );
   }
   try {
-    const refund = await razorpay.payments.refund(paymentId, { amount });
+    const refund = await razorpay.payments.refund(paymentId, {
+      amount,
+      speed: 'optimum',
+    });
 
     const newRefundedTotal = alreadyRefunded + amount;
 
