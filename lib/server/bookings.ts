@@ -60,3 +60,14 @@ export async function getBookingById(id: string): Promise<BookingRow | null> {
 
   return data as BookingRow | null;
 }
+
+export async function fetchBookings(): Promise<BookingRow[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from('bookings')
+    .select(`*, profiles:user_id (full_name, avatar_url, email, phone)`)
+    .order('created_at', { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []) as BookingRow[];
+}
