@@ -94,10 +94,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 import Razorpay from 'razorpay';
-import { createClient } from '@/lib/supabase/server';
 import { createBookingFromPayment } from '@/lib/razorpay/create-booking-from-payment';
 import { reconcileRefundFromWebhook } from '@/lib/razorpay/reconcile-refund';
-
+import { createServiceRoleClient } from '@/lib/supabase/service-role';
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
   key_secret: process.env.RAZORPAY_KEY_SECRET!,
@@ -131,7 +130,7 @@ export async function POST(req: NextRequest) {
     }
 
     const event = JSON.parse(rawBody);
-    const supabase = await createClient();
+    const supabase = await createServiceRoleClient();
 
     // ---- Dedupe: derive a stable key per entity, not per delivery attempt ----
     let eventKey: string | null = null;

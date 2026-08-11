@@ -1,6 +1,5 @@
 import Razorpay from 'razorpay';
-import { createClient } from '@/lib/supabase/server';
-
+import { createServiceRoleClient } from '../supabase/service-role';
 export async function reconcileRefundFromWebhook({
   razorpay,
   razorpay_refund_id,
@@ -12,7 +11,7 @@ export async function reconcileRefundFromWebhook({
   razorpay_payment_id: string;
   status: 'processed' | 'failed';
 }) {
-  const supabase = await createClient();
+  const supabase = await createServiceRoleClient();
 
   const { data: booking, error: fetchError } = await supabase
     .from('bookings')
