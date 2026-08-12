@@ -213,7 +213,13 @@ const STATUS_COLOR: Record<
 //     </div>
 //   );
 // }
-export function BookingCard({ booking }: { booking: BookingRow }) {
+export function BookingCard({
+  booking,
+  role,
+}: {
+  booking: BookingRow;
+  role: 'owner' | 'staff' | undefined;
+}) {
   if (!booking) return null;
 
   const isOnline = booking.payment_method === 'razorpay';
@@ -292,7 +298,7 @@ export function BookingCard({ booking }: { booking: BookingRow }) {
 
       {/* action stub */}
       <div className='px-4 pb-4 pt-2'>
-        <BookingActions booking={booking} layout='compact' />
+        <BookingActions role={role} booking={booking} layout='compact' />
       </div>
     </div>
   );

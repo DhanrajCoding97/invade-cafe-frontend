@@ -48,7 +48,7 @@ export default async function BookingsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <BookingsPageClient />
+      <BookingsPageClient role={role} />
     </HydrationBoundary>
   );
 }

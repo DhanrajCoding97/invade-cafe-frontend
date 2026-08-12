@@ -311,7 +311,7 @@ export function BookingActions({
     canCancel,
     canEdit,
     canRefund,
-  } = useBookingActionState(booking);
+  } = useBookingActionState(booking, role);
 
   if (booking.status === 'cancelled') return null;
 

@@ -437,7 +437,7 @@ export function BookingsTable<TData>({
           {isMobile ? (
             <div className='flex flex-col gap-3'>
               {table.getRowModel().rows.map((row) => (
-                <BookingCard key={row.id} booking={row.original} />
+                <BookingCard key={row.id} booking={row.original} role={role} />
               ))}
             </div>
           ) : (

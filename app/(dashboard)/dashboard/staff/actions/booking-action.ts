@@ -8,6 +8,7 @@ import { requireRole } from '@/lib/auth/requrireRole';
 import { type ManualBookingValues } from '@/lib/schemas/ManualBookingFormSchema';
 import { getExtensionAmount } from '@/lib/extension-pricing';
 import { revalidatePath } from 'next/cache';
+import { sendPushToStaffAndOwners } from '@/lib/push-notifications/send-push';
 
 export async function startSession(bookingId: string) {
   const supabase = await createClient();
@@ -27,19 +28,20 @@ export async function getRpc() {
   const { data, error } = await supabase.rpc('get_my_role');
 }
 
-export async function endSession(bookingId: string) {
-  const supabase = await createClient();
-  const { error } = await supabase
-    .from('bookings')
-    .update({
-      session_ended_at: new Date().toISOString(),
-      status: 'completed',
-    })
-    .eq('id', bookingId);
+// export async function endSession(bookingId: string) {
+//   const supabase = await createClient();
+//   const { error } = await supabase
+//     .from('bookings')
+//     .update({
+//       session_ended_at: new Date().toISOString(),
+//       status: 'completed',
+//     })
+//     .eq('id', bookingId);
 
-  if (error) throw new Error(error.message);
-  revalidatePath('/dashboard/staff');
-}
+//   if (error) throw new Error(error.message);
+
+//   revalidatePath('/dashboard/staff');
+// }
 
 // export async function extendSession(
 //   bookingId: string,
@@ -97,6 +99,81 @@ export async function endSession(bookingId: string) {
 // import { createClient } from '@/lib/supabase/server';
 // import { getExtensionAmount } from '@/lib/extension-pricing';
 
+export async function endSession(bookingId: string) {
+  const supabase = await createClient();
+
+  // 1. Get the booking and station name before updating it
+  const { data: booking, error: bookingError } = await supabase
+    .from('bookings')
+    .select(
+      `
+      id,
+      station_id,
+      status,
+      stations (
+        name
+      )
+    `,
+    )
+    .eq('id', bookingId)
+    .single();
+
+  if (bookingError) {
+    throw new Error(bookingError.message);
+  }
+
+  if (!booking) {
+    throw new Error('Booking not found');
+  }
+
+  // Prevent ending an already completed/cancelled booking
+  if (booking.status === 'completed') {
+    throw new Error('Session has already ended');
+  }
+
+  if (booking.status === 'cancelled') {
+    throw new Error('Cannot end a cancelled booking');
+  }
+
+  // Supabase relation can be an object or array depending on relationship
+  const station = Array.isArray(booking.stations)
+    ? booking.stations[0]
+    : booking.stations;
+
+  const stationName = station?.name ?? 'Station';
+
+  // 2. End the session
+  const { error: updateError } = await supabase
+    .from('bookings')
+    .update({
+      session_ended_at: new Date().toISOString(),
+      status: 'completed',
+    })
+    .eq('id', bookingId);
+
+  if (updateError) {
+    throw new Error(updateError.message);
+  }
+
+  // 3. Notify staff + owners
+  // Don't fail the session-ending operation if push notification fails.
+  try {
+    await sendPushToStaffAndOwners({
+      title: 'Session ended',
+      body: `${stationName} — session has ended`,
+      url: '/dashboard/staff',
+    });
+  } catch (error) {
+    console.error('Failed to send session-ended push notification:', error);
+  }
+
+  // 4. Refresh the staff dashboard
+  revalidatePath('/dashboard/staff');
+
+  return {
+    success: true,
+  };
+}
 export async function extendSession(
   bookingId: string,
   stationId: string,

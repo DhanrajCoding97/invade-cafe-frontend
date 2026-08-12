@@ -29,6 +29,7 @@ import {
   extendSession,
 } from '../../actions/booking-action';
 import { toast } from 'sonner';
+import { PushNotificationToggle } from './PushNotificationToggle';
 type Booking = {
   id: string;
   station_id: string;
@@ -405,15 +406,43 @@ export default function LiveSessionBoard({
       (e) => e.booking_id === bookingId && e.payment_status === 'pending',
     );
 
-  function unlockAudio() {
-    const audio = new Audio('/sounds/session-due.mp3');
-    audio.volume = 0;
-    audio
-      .play()
-      .then(() => setAudioUnlocked(true))
-      .catch(() => {});
-  }
+  // function unlockAudio() {
+  //   const audio = new Audio('/sounds/session-due.mp3');
+  //   audio.volume = 0;
+  //   audio
+  //     .play()
+  //     .then(() => setAudioUnlocked(true))
+  //     .catch(() => {});
+  // }
+  // function PushNotificationToggle() {
+  //   const [subscribed, setSubscribed] = useState(false);
+  //   const [loading, setLoading] = useState(false);
 
+  //   async function handleEnable() {
+  //     setLoading(true);
+  //     try {
+  //       await subscribeToPush();
+  //       setSubscribed(true);
+  //       toast.success('Push notifications enabled');
+  //     } catch (err: any) {
+  //       toast.error(err?.message ?? 'Failed to enable notifications');
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+
+  //   if (subscribed) return null;
+
+  //   return (
+  //     <button
+  //       onClick={handleEnable}
+  //       disabled={loading}
+  //       className='mb-4 flex w-full items-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3 py-2 font-mono text-[11px] uppercase tracking-wider text-cyan-300'
+  //     >
+  //       🔔 {loading ? 'Enabling…' : 'Enable push notifications'}
+  //     </button>
+  //   );
+  // }
   function addPending(id: string) {
     setPendingIds((prev) => new Set(prev).add(id));
   }
@@ -644,6 +673,8 @@ export default function LiveSessionBoard({
               Live Sessions Board
             </h2>
           </div>
+
+          <PushNotificationToggle />
           <div className='flex shrink-0 items-center gap-2 rounded-xl border border-cyan-400/25 bg-cyan-400/5 px-3 py-1.5'>
             <span className='h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_8px_2px_rgba(34,211,238,0.9)]' />
             <span className='font-mono text-xs text-cyan-200'>
@@ -654,14 +685,14 @@ export default function LiveSessionBoard({
         <div className='mt-3 h-px w-full bg-linear-to-r from-cyan-400/50 via-fuchsia-500/30 to-transparent' />
       </div>
 
-      {!audioUnlocked && (
+      {/* {!audioUnlocked && (
         <button
           onClick={unlockAudio}
           className='mb-4 flex w-full items-center gap-2 rounded-xl border border-amber-400/30 bg-amber-400/10 px-3 py-2 font-mono text-[11px] uppercase tracking-wider text-amber-300'
         >
           🔊 Enable sound alerts for due sessions
         </button>
-      )}
+      )} */}
 
       {/* Mobile: tab switcher */}
       <div className='mb-4 flex gap-2 overflow-x-auto pb-1 sm:hidden'>
