@@ -61,11 +61,14 @@ export async function getBookingById(id: string): Promise<BookingRow | null> {
   return data as BookingRow | null;
 }
 
-export async function fetchBookings(): Promise<BookingRow[]> {
+const BOOKING_SELECT = `*, profiles:user_id (full_name, avatar_url, email, phone)`;
+
+export async function fetchBookingsServer(): Promise<BookingRow[]> {
+  const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('bookings')
-    .select(`*, profiles:user_id (full_name, avatar_url, email, phone)`)
+    .select(BOOKING_SELECT)
     .order('created_at', { ascending: false });
 
   if (error) throw new Error(error.message);

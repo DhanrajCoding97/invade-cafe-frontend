@@ -2,13 +2,16 @@
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/requrireRole';
 import LiveSessionBoard from './components/LiveSessionBoard';
+function getTodayIST() {
+  return new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Kolkata' });
+  // en-CA locale formats as YYYY-MM-DD, which matches your date column format
+}
 
 export default async function LiveSessionBoardPage() {
   const { role } = await requireRole(['staff', 'owner']);
   const supabase = await createClient();
 
-  const today = new Date().toISOString().slice(0, 10);
-
+  const today = getTodayIST();
   // const [{ data: stations }, { data: bookings }] = await Promise.all([
   //   supabase.from('stations').select('id, name, type').order('name'),
   //   supabase

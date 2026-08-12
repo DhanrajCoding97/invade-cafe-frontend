@@ -33,15 +33,17 @@ import {
   QueryClient,
 } from '@tanstack/react-query';
 import { bookingKeys } from '@/lib/queries/bookings';
-import { fetchBookings } from '@/lib/server/bookings';
+import { fetchBookingsServer } from '@/lib/server/bookings';
 import BookingsPageClient from '../../components/bookings/BookingPageClient';
+import { requireRole } from '@/lib/auth/requrireRole';
 
 export default async function BookingsPage() {
+  const { role } = await requireRole(['owner', 'staff']);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
     queryKey: bookingKeys.all,
-    queryFn: fetchBookings,
+    queryFn: fetchBookingsServer,
   });
 
   return (

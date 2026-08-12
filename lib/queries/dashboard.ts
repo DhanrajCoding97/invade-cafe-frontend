@@ -1,10 +1,10 @@
 // lib/queries/dashboard.ts
 import { createClient } from '@/lib/supabase/server';
 import { subDays, format, startOfDay, endOfDay } from 'date-fns';
-
+import { formatIST } from '../date-list';
 export async function getDashboardData() {
   const supabase = await createClient();
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const today = formatIST(new Date(), 'd MMM • EEEE');
   const sevenDaysAgo = format(subDays(new Date(), 6), 'yyyy-MM-dd');
 
   const [

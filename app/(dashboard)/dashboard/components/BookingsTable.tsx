@@ -39,6 +39,14 @@ import {
 } from '@/components/ui/collapsible';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { BookingCard } from './BookingCard';
+import type { RowData } from '@tanstack/react-table';
+import { todayIST } from '@/lib/date-list';
+
+declare module '@tanstack/react-table' {
+  interface TableMeta<TData extends RowData> {
+    role: 'owner' | 'staff';
+  }
+}
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
@@ -46,6 +54,7 @@ interface DataTableProps<TData> {
   loading?: boolean;
   error?: string | null;
   onRetry?: () => void;
+  role: 'owner' | 'staff';
 }
 
 function exportBookingsToCSV(rows: any[]) {
@@ -60,24 +69,38 @@ function exportBookingsToCSV(rows: any[]) {
     'Duration (hrs)',
     'Players',
     'Amount',
+    'Had Extension',
     'Payment Method',
     'Payment Status',
     'Status',
   ];
 
-  const csvRows = rows.map((row) => [
-    row.customer_name ?? row.profiles?.full_name ?? '',
-    row.customer_phone ?? row.profiles?.phone ?? '',
-    row.device ?? '',
-    row.date ?? '',
-    row.start_time ?? '',
-    row.duration_hours ?? '',
-    row.players ?? '',
-    row.amount ?? '',
-    row.payment_method ?? '',
-    row.payment_status ?? '',
-    row.status ?? '',
-  ]);
+  const csvRows = rows.map((row) => {
+    const extensions = row.session_extensions ?? [];
+    const extensionTotal = extensions.reduce(
+      (sum: number, e: any) => sum + e.amount,
+      0,
+    );
+    const isOnline = row.payment_method === 'razorpay';
+    const totalAmount = isOnline
+      ? row.amount
+      : Number(row.amount) + extensionTotal;
+
+    return [
+      row.customer_name ?? row.profiles?.full_name ?? '',
+      row.customer_phone ?? row.profiles?.phone ?? '',
+      row.device ?? '',
+      row.date ?? '',
+      row.start_time ?? '',
+      row.duration_hours ?? '',
+      row.players ?? '',
+      totalAmount,
+      extensionTotal > 0 ? 'Yes' : 'No', // extra column: had extension?
+      row.payment_method ?? '',
+      row.payment_status ?? '',
+      row.status ?? '',
+    ];
+  });
 
   // Escape commas/quotes/newlines so Excel doesn't misparse names or notes
   const escapeCell = (val: any) => {
@@ -100,7 +123,7 @@ function exportBookingsToCSV(rows: any[]) {
   const link = document.createElement('a');
   link.href = url;
 
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayIST();
   link.download = `bookings-${today}.csv`;
   link.click();
   URL.revokeObjectURL(url);
@@ -111,6 +134,7 @@ export function BookingsTable<TData>({
   data,
   loading = false,
   error = null,
+  role,
   onRetry,
 }: DataTableProps<TData>) {
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -166,6 +190,7 @@ export function BookingsTable<TData>({
   const table = useReactTable({
     data: tableData,
     columns: tableColumns,
+    meta: { role },
     state: {
       sorting,
       globalFilter,

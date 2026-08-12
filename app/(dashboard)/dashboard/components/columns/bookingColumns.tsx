@@ -99,7 +99,42 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
     accessorKey: 'amount',
     accessorFn: (row) => row.amount,
     header: 'Amount',
-    cell: ({ row }) => `₹${Number(row.original.amount).toFixed(0)}`,
+    cell: ({ row }) => {
+      const b = row.original;
+      const isOnlineBooking = b.payment_method === 'razorpay';
+      const extensions = b.session_extensions ?? [];
+      const pendingExtension = extensions.find(
+        (e) => e.payment_status === 'pending',
+      );
+      const extensionTotal = extensions.reduce((sum, e) => sum + e.amount, 0);
+
+      if (isOnlineBooking) {
+        // base is genuinely paid via Razorpay — show base, flag any unpaid extension separately
+        return (
+          <div className='flex flex-col gap-0.5'>
+            <span>₹{Number(b.amount).toFixed(0)}</span>
+            {pendingExtension && (
+              <span className='text-[10px] text-amber-400'>
+                +₹{pendingExtension.amount} ext unpaid
+              </span>
+            )}
+          </div>
+        );
+      }
+
+      // offline — everything collected together, show running total
+      const total = Number(b.amount) + extensionTotal;
+      return (
+        <div className='flex flex-col gap-0.5'>
+          <span>₹{total.toFixed(0)}</span>
+          {extensionTotal > 0 && (
+            <span className='text-[10px] text-muted-foreground'>
+              incl. ₹{extensionTotal} ext
+            </span>
+          )}
+        </div>
+      );
+    },
   },
   // {
   //   id: 'payment',
@@ -177,6 +212,8 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => <BookingActions booking={row.original} />,
+    cell: ({ row, table }) => (
+      <BookingActions booking={row.original} role={table.options?.meta?.role} />
+    ),
   },
 ];

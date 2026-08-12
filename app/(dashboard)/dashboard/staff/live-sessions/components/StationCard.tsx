@@ -705,7 +705,7 @@ export function StationCard({
                       </AlertDialogFooter>
                     </AlertDialogContent>
                   </AlertDialog>
-
+                  {/* 
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button
@@ -774,6 +774,151 @@ export function StationCard({
                           }
                         >
                           Extend by {finalMinutes || 0} min
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog> */}
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        disabled={isPending}
+                        className='flex w-full items-center justify-center gap-1.5 rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-3 py-1.5 font-mono text-[11px] uppercase tracking-wider text-cyan-200 transition-colors hover:bg-cyan-400/20 disabled:opacity-60'
+                      >
+                        {isPending && (
+                          <Loader2 className='h-3 w-3 animate-spin' />
+                        )}
+                        Extend
+                      </button>
+                    </AlertDialogTrigger>
+
+                    <AlertDialogContent className='w-[calc(100%-2rem)] max-w-md border-cyan-400/20 bg-[#08090b] p-5 sm:p-6'>
+                      <AlertDialogHeader className='space-y-1'>
+                        <AlertDialogTitle className='font-mono text-xl tracking-tight text-white'>
+                          Extend session
+                        </AlertDialogTitle>
+
+                        <AlertDialogDescription className='font-mono text-xs text-cyan-100/60'>
+                          Add extra time to the current session.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+
+                      <div className='space-y-4 py-3'>
+                        {/* Quick options */}
+                        <div className='space-y-2'>
+                          <p className='font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-white/40'>
+                            Quick extension
+                          </p>
+
+                          <div className='grid grid-cols-2 gap-2'>
+                            {options.map((opt) => {
+                              const isSelected = selected === opt.value;
+
+                              return (
+                                <button
+                                  key={opt.value}
+                                  type='button'
+                                  onClick={() => setSelected(opt.value)}
+                                  className={`
+                  relative flex h-12 items-center justify-center
+                  rounded-lg border font-mono text-sm
+                  transition-all duration-150
+                  ${
+                    isSelected
+                      ? 'border-cyan-400 bg-cyan-400/10 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.10)]'
+                      : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04] hover:text-white'
+                  }
+                `}
+                                >
+                                  {opt.label}
+
+                                  {isSelected && (
+                                    <span className='absolute right-2 top-2 text-[10px] text-cyan-300'>
+                                      ✓
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+
+                            {/* Custom */}
+                            <button
+                              type='button'
+                              onClick={() => setSelected(-1)}
+                              className={`
+              flex h-12 items-center justify-center rounded-lg border
+              font-mono text-sm transition-all duration-150
+              ${
+                selected === -1
+                  ? 'border-cyan-400 bg-cyan-400/10 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.10)]'
+                  : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04] hover:text-white'
+              }
+            `}
+                            >
+                              Custom
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Custom minutes */}
+                        {selected === -1 && (
+                          <div className='space-y-2'>
+                            <label className='font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-white/40'>
+                              Extra minutes
+                            </label>
+
+                            <div className='relative'>
+                              <input
+                                type='number'
+                                min={1}
+                                placeholder='Enter minutes'
+                                value={customMinutes}
+                                onChange={(e) =>
+                                  setCustomMinutes(e.target.value)
+                                }
+                                autoFocus
+                                className='h-11 w-full rounded-lg border border-white/10 bg-white/[0.03] px-3 pr-16 font-mono text-sm text-white outline-none placeholder:text-white/25 focus:border-cyan-400/60 focus:ring-1 focus:ring-cyan-400/20'
+                              />
+
+                              <span className='pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 font-mono text-xs text-white/30'>
+                                min
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Selected summary */}
+                        {finalMinutes > 0 && (
+                          <div className='flex items-center justify-between rounded-lg border border-cyan-400/10 bg-cyan-400/[0.04] px-3 py-2.5'>
+                            <span className='font-mono text-xs text-white/40'>
+                              Additional time
+                            </span>
+
+                            <span className='font-mono text-sm font-medium text-cyan-300'>
+                              +{finalMinutes} min
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      <AlertDialogFooter className='flex-row gap-2 sm:justify-end'>
+                        <AlertDialogCancel
+                          variant='ghost'
+                          className='mt-0 flex-1 sm:flex-none'
+                        >
+                          Cancel
+                        </AlertDialogCancel>
+
+                        <AlertDialogAction
+                          className='flex-1 bg-cyan-400 font-mono text-sm font-medium text-black hover:bg-cyan-300 sm:flex-none'
+                          disabled={finalMinutes <= 0 || isPending}
+                          onClick={() =>
+                            onExtend(booking, station.id, finalMinutes)
+                          }
+                        >
+                          {isPending && (
+                            <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                          )}
+                          Extend +{finalMinutes || 0} min
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>

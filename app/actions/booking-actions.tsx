@@ -295,12 +295,13 @@ import Link from 'next/link';
 export function BookingActions({
   booking,
   layout = 'row',
+  role,
 }: {
   booking: BookingRow;
   layout?: 'row' | 'compact';
+  role: 'owner' | 'staff' | undefined;
 }) {
   const {
-    role,
     editOpen,
     setEditOpen,
     cancelBooking,

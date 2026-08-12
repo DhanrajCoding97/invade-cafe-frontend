@@ -1,52 +1,3 @@
-// components/bookings/BookingDetailView.tsx
-'use client';
-import { type User } from '@supabase/supabase-js';
-import { useMarkExtensionPaid } from '@/hooks/use-booking-mutations';
-import {
-  ArrowLeft,
-  Monitor,
-  Calendar,
-  Clock,
-  Users,
-  IndianRupee,
-  QrCode,
-} from 'lucide-react';
-import type { ReactNode } from 'react';
-
-const statusStyles: Record<string, string> = {
-  confirmed: 'bg-blue-500/10 text-blue-300 border-blue-400/40',
-  pending: 'bg-orange-500/10 text-orange-300 border-orange-400/40',
-  cancelled: 'bg-red-500/10 text-red-300 border-red-400/40',
-  completed: 'bg-emerald-500/10 text-emerald-300 border-emerald-400/40',
-};
-
-const paymentStyles: Record<string, string> = {
-  pending: 'bg-orange-600/20 text-orange-300 border-orange-500/40',
-  paid: 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40',
-};
-
-function DetailTile({
-  icon,
-  label,
-  value,
-}: {
-  icon: ReactNode;
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className='flex items-center gap-2'>
-      <div className='flex items-center gap-2 text-[#28F1FF]/70'>
-        {icon}
-        <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
-          {label}
-        </span>
-      </div>
-      <p className='font-mono text-sm text-white'>{value}</p>
-    </div>
-  );
-}
-
 // export function BookingDetailView({
 //   booking,
 //   //   backButton,
@@ -214,6 +165,58 @@ function DetailTile({
 //     </div>
 //   );
 // }
+// components/bookings/BookingDetailView.tsx
+'use client';
+import { type User } from '@supabase/supabase-js';
+import {
+  useMarkExtensionPaid,
+  useMarkBookingAndExtensionsPaid,
+} from '@/hooks/use-booking-mutations';
+import {
+  ArrowLeft,
+  Monitor,
+  Calendar,
+  Clock,
+  Users,
+  IndianRupee,
+  QrCode,
+} from 'lucide-react';
+import type { ReactNode } from 'react';
+import { aggregateBookingTotals } from '@/lib/bookings/aggregate';
+
+const statusStyles: Record<string, string> = {
+  confirmed: 'bg-blue-500/10 text-blue-300 border-blue-400/40',
+  pending: 'bg-orange-500/10 text-orange-300 border-orange-400/40',
+  cancelled: 'bg-red-500/10 text-red-300 border-red-400/40',
+  completed: 'bg-emerald-500/10 text-emerald-300 border-emerald-400/40',
+};
+
+const paymentStyles: Record<string, string> = {
+  pending: 'bg-orange-600/20 text-orange-300 border-orange-500/40',
+  paid: 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40',
+};
+
+function DetailTile({
+  icon,
+  label,
+  value,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className='flex items-center gap-2'>
+      <div className='flex items-center gap-2 text-[#28F1FF]/70'>
+        {icon}
+        <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
+          {label}
+        </span>
+      </div>
+      <p className='font-mono text-sm text-white'>{value}</p>
+    </div>
+  );
+}
 
 export function BookingDetailView({
   booking,
@@ -226,30 +229,29 @@ export function BookingDetailView({
 }) {
   const isOnlineBooking = booking.payment_method === 'razorpay';
   const markExtensionPaid = useMarkExtensionPaid();
+  const markBookingAndExtensionPaid = useMarkBookingAndExtensionsPaid();
 
-  const extensions = booking?.session_extensions ?? [];
-  const extensionMinutes = extensions.reduce(
-    (sum: number, ext: any) => sum + Number(ext.minutes),
-    0,
-  );
-  const extensionAmount = extensions.reduce(
-    (sum: number, ext: any) => sum + Number(ext.amount),
-    0,
-  );
-  const hasPendingExtension = extensions.some(
-    (ext: any) => ext.payment_status === 'pending',
-  );
-
-  const totalDurationHours =
-    Number(booking?.duration_hours ?? 0) + extensionMinutes / 60;
-  const totalAmount = Number(booking?.amount ?? 0) + extensionAmount;
+  const {
+    extensions,
+    extensionMinutes,
+    extensionAmount,
+    totalDurationHours,
+    totalAmount,
+    paidAmount,
+    pendingAmount,
+    hasPendingExtension,
+  } = aggregateBookingTotals(booking);
 
   const formatDuration = (hours: number) => {
     const wholeHours = Math.floor(hours);
     const minutes = Math.round((hours - wholeHours) * 60);
+
     if (minutes === 0) return `${wholeHours}h`;
+
     return `${wholeHours}h ${minutes}m`;
   };
+
+  const paymentMethod = booking.payment_method ?? 'cash';
 
   return (
     <div className='p-3 sm:p-4 lg:p-6 border rounded-2xl'>
@@ -384,7 +386,7 @@ export function BookingDetailView({
             </span>
             <div className='flex items-center gap-3'>
               <span>₹{ext.amount}</span>
-              {ext.payment_status === 'pending' && (
+              {/* {ext.payment_status === 'pending' && (
                 <button
                   onClick={() =>
                     markExtensionPaid.mutate({
@@ -397,7 +399,62 @@ export function BookingDetailView({
                 >
                   {markExtensionPaid.isPending ? '...' : 'Mark Paid'}
                 </button>
-              )}
+              )} */}
+              {/* Only show per-line Mark Paid for online bookings.
+          For cash/walk-in, the bottom button handles both together. */}
+              {/* {isOnlineBooking && ext.payment_status === 'pending' && (
+                <button
+                  onClick={() =>
+                    markBookingAndExtensionPaid.mutate({
+                      bookingId: booking.id,
+                      method: paymentMethod,
+                    })
+                  }
+                  disabled={markBookingAndExtensionPaid.isPending}
+                >
+                  {markBookingAndExtensionPaid.isPending
+                    ? 'Processing...'
+                    : `Mark Paid ${booking.payment_method ?? 'cash'}`}
+                </button>
+              )} */}
+              {/* for offline booking with session extension show markBookingAndExtensionPaid and for online booking extensions show  markExtensionPaid*/}
+              {/* {ext.payment_status === 'pending' && (
+                <>
+                  {isOnlineBooking ? (
+                    // Online booking → only mark the extension as paid
+                    <button
+                      onClick={() =>
+                        markExtensionPaid.mutate({
+                          extensionId: ext.id,
+                          markedPaidBy: user.id,
+                        })
+                      }
+                      disabled={markExtensionPaid.isPending}
+                      className='text-xs px-2 py-1 rounded-md border border-emerald-400/40 text-emerald-300 hover:border-emerald-400 transition-colors'
+                    >
+                      {markExtensionPaid.isPending
+                        ? 'Processing...'
+                        : 'Mark Paid'}
+                    </button>
+                  ) : (
+                    // Manual/walk-in booking → booking + extensions are paid together
+                    <button
+                      onClick={() =>
+                        markBookingAndExtensionPaid.mutate({
+                          bookingId: booking.id,
+                          method: paymentMethod,
+                        })
+                      }
+                      disabled={markBookingAndExtensionPaid.isPending}
+                      className='text-xs px-2 py-1 rounded-md border border-emerald-400/40 text-emerald-300 hover:border-emerald-400 transition-colors'
+                    >
+                      {markBookingAndExtensionPaid.isPending
+                        ? 'Processing...'
+                        : 'Mark Paid'}
+                    </button>
+                  )}
+                </>
+              )} */}
             </div>
           </div>
         ))}
@@ -412,7 +469,7 @@ export function BookingDetailView({
       </div>
 
       {/* Payment details — unchanged */}
-      <div className='border border-white/10 rounded-2xl p-5 mb-6'>
+      {/* <div className='border border-white/10 rounded-2xl p-5 mb-6'>
         <p className='font-mono text-sm text-white mb-1 font-semibold'>
           Payment Details
         </p>
@@ -422,6 +479,53 @@ export function BookingDetailView({
         <div className='flex justify-between font-mono text-sm text-white/70'>
           <span>{booking?.payment_method ?? 'Wallet'}</span>
           <span>₹{booking?.amount}</span>
+        </div>
+      </div> */}
+      <div className='mb-6 rounded-2xl border border-white/10 p-5'>
+        <p className='mb-1 font-mono text-sm font-semibold text-white'>
+          Payment Details
+        </p>
+
+        <p className='mb-4 font-mono text-xs text-white/40'>
+          Transaction ID: {booking.transaction_id ?? '—'}
+        </p>
+
+        <div className='space-y-2 font-mono text-sm'>
+          {/* Original booking */}
+          <div className='flex justify-between text-white/70'>
+            <span>Booking</span>
+            <span>₹{Number(booking.amount ?? 0)}</span>
+          </div>
+
+          {/* Extensions */}
+          {extensions.map((ext) => (
+            <div key={ext.id} className='flex justify-between text-white/70'>
+              <span>Extension · {ext.minutes} min</span>
+
+              <span>₹{Number(ext.amount)}</span>
+            </div>
+          ))}
+
+          <div className='my-3 border-t border-white/10' />
+
+          <div className='flex justify-between font-semibold text-white'>
+            <span>Total</span>
+            <span>₹{totalAmount}</span>
+          </div>
+
+          {pendingAmount > 0 && (
+            <div className='mt-3 flex justify-between rounded-lg border border-amber-400/20 bg-amber-400/5 px-3 py-2 text-amber-300'>
+              <span>Amount due</span>
+              <span>₹{pendingAmount}</span>
+            </div>
+          )}
+
+          {pendingAmount === 0 && (
+            <div className='mt-3 flex justify-between rounded-lg border border-green-400/20 bg-green-400/5 px-3 py-2 text-green-300'>
+              <span>Payment status</span>
+              <span>Paid</span>
+            </div>
+          )}
         </div>
       </div>
 

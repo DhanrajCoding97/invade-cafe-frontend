@@ -256,7 +256,9 @@ export default async function AdminBookingDetailPage({ params }: Props) {
         booking={booking}
         user={user}
         // backButton={<BackButton />}
-        actions={<AdminBookingActions booking={booking} />}
+        actions={
+          <AdminBookingActions booking={booking} role={role} user={user} />
+        }
       />
     </div>
   );

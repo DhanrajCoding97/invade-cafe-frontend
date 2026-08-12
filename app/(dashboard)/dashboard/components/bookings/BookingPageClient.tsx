@@ -6,7 +6,11 @@ import { bookingColumns } from '../../components/columns/bookingColumns';
 import { BookingsTable } from '../../components/BookingsTable';
 import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
 
-export default function BookingsPageClient() {
+export default function BookingsPageClient({
+  role,
+}: {
+  role: 'owner' | 'staff';
+}) {
   useRealtimeBookings();
   const {
     data: bookings,
@@ -29,5 +33,7 @@ export default function BookingsPageClient() {
     return <div>Failed to load bookings.</div>;
   }
 
-  return <BookingsTable columns={bookingColumns} data={bookings ?? []} />;
+  return (
+    <BookingsTable columns={bookingColumns} data={bookings ?? []} role={role} />
+  );
 }

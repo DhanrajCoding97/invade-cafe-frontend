@@ -1,31 +1,50 @@
+'use client';
 import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { profileKeys, fetchMyProfile } from '@/lib/queries/profile';
 import {
   useCancelBooking,
   useMarkPaid,
   useMarkRefunded,
+  useMarkBookingAndExtensionsPaid,
+  useMarkExtensionPaid,
 } from './use-booking-mutations';
 import type { BookingRow } from '@/types/index';
 
-export function useBookingActionState(booking: BookingRow) {
+// const onSuccess = options?.onMutationSuccess;
+export function useBookingActionState(
+  booking: BookingRow,
+  role: 'owner' | 'staff' | undefined,
+  options?: { onMutationSuccess?: () => void },
+) {
   const [editOpen, setEditOpen] = useState(false);
-
-  const { data: profile } = useQuery({
-    queryKey: profileKeys.me,
-    queryFn: fetchMyProfile,
+  const onSuccess = options?.onMutationSuccess;
+  const cancelBooking = useCancelBooking({ onSuccess });
+  const markPaid = useMarkPaid({ onSuccess });
+  const markBookingAndExtensionsPaid = useMarkBookingAndExtensionsPaid({
+    onSuccess,
   });
-  const role = profile?.role;
+  const markExtensionPaid = useMarkExtensionPaid({ onSuccess });
+  const markRefunded = useMarkRefunded({ onSuccess });
 
-  const cancelBooking = useCancelBooking();
-  const markPaid = useMarkPaid();
-  const markRefunded = useMarkRefunded();
   const isOnlineBooking = booking.payment_method === 'razorpay';
+  const extensions = booking.session_extensions ?? [];
+  const isManualBooking = !isOnlineBooking;
+  const hasPendingExtension = extensions.some(
+    (ext) => ext.payment_status === 'pending',
+  );
 
-  const canMarkPaid =
+  // const canMarkPaid =
+  //   booking.payment_status === 'pending' &&
+  //   booking.payment_method !== 'razorpay';
+
+  // const canMarkBookingAndExtensionsPaid = canMarkPaid && hasPendingExtensions;
+  const canMarkPaid = booking.payment_status === 'pending' && isManualBooking;
+
+  const canMarkBookingAndExtensionsPaid =
     booking.payment_status === 'pending' &&
-    booking.payment_method !== 'razorpay';
+    isManualBooking &&
+    hasPendingExtension;
 
+  const canMarkExtensionPaid = isOnlineBooking && hasPendingExtension;
   const canCancel =
     booking.status !== 'completed' &&
     booking.status !== 'no_show' &&
@@ -45,10 +64,17 @@ export function useBookingActionState(booking: BookingRow) {
     role,
     editOpen,
     setEditOpen,
+    hasPendingExtension,
+
     cancelBooking,
     markPaid,
     markRefunded,
+    markBookingAndExtensionsPaid,
+    markExtensionPaid,
+
     canMarkPaid,
+    canMarkBookingAndExtensionsPaid,
+    canMarkExtensionPaid,
     canCancel,
     canEdit,
     canRefund,

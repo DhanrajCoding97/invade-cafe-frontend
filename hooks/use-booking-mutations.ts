@@ -5,27 +5,76 @@ import {
   cancelBooking,
   updatePaymentStatus,
   markExtensionPaid,
+  markBookingAndExtensionsPaid,
 } from '@/app/actions/bookings';
 import { toast } from 'sonner';
 import type { PaymentMethod } from '@/types';
 // import { markExtensionPaid } from '@/app/(dashboard)/dashboard/staff/actions/booking-action';
-
-export function useCancelBooking() {
+export function useCancelBooking(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: (bookingId: string) => cancelBooking(bookingId),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: bookingKeys.all,
+      });
+    },
+
     onError: (err) => {
       console.log('toast about to show');
+
       setTimeout(() => {
         toast.error(err.message);
       }, 0);
     },
   });
 }
+// export function useCancelBooking(options?: { onSuccess?: () => void }) {
+//   const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: (bookingId: string) => cancelBooking(bookingId),
+//     onSuccess: () =>
+//       queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+//     options?.onSuccess?.();
+//     onError: (err) => {
+//       console.log('toast about to show');
+//       setTimeout(() => {
+//         toast.error(err.message);
+//       }, 0);
+//     },
+//   });
+// }
 
-export function useMarkPaid() {
+export function useMarkBookingAndExtensionsPaid(options?: {
+  onSuccess?: () => void;
+}) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      bookingId,
+      method,
+    }: {
+      bookingId: string;
+      method: PaymentMethod;
+    }) => markBookingAndExtensionsPaid(bookingId, method),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['bookings'],
+      });
+
+      queryClient.invalidateQueries({
+        queryKey: ['session-extensions'],
+      });
+      options?.onSuccess?.();
+    },
+  });
+}
+
+export function useMarkPaid(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -35,8 +84,10 @@ export function useMarkPaid() {
       bookingId: string;
       method: PaymentMethod;
     }) => updatePaymentStatus(bookingId, 'paid', method),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+      options?.onSuccess?.();
+    },
   });
 }
 
@@ -72,7 +123,7 @@ export function useMarkPaid() {
 //     },
 //   });
 // }
-export function useMarkRefunded() {
+export function useMarkRefunded(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -98,11 +149,12 @@ export function useMarkRefunded() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+      options?.onSuccess?.();
     },
   });
 }
 
-export function useMarkExtensionPaid() {
+export function useMarkExtensionPaid(options?: { onSuccess?: () => void }) {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: ({
@@ -112,8 +164,10 @@ export function useMarkExtensionPaid() {
       extensionId: string;
       markedPaidBy: string;
     }) => markExtensionPaid(extensionId, markedPaidBy),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: bookingKeys.all });
+      options?.onSuccess?.();
+    },
   });
 }
 
