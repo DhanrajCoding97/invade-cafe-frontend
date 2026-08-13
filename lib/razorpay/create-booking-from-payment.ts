@@ -41,6 +41,16 @@ export async function createBookingFromPayment({
 
   const supabase = injectedSupabase ?? (await createClient());
 
+  const { data: existingByPaymentId } = await supabase
+    .from('bookings')
+    .select('id')
+    .eq('razorpay_payment_id', razorpay_payment_id)
+    .maybeSingle();
+
+  if (existingByPaymentId) {
+    return { ok: true, bookingId: existingByPaymentId.id };
+  }
+
   const { data: station } = await supabase
     .from('stations')
     .select('name')
