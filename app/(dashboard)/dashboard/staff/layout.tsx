@@ -7,6 +7,7 @@ import {
 } from '@/components/ui/sidebar';
 import { AppSidebar } from '../components/AppSidebar';
 import { ModeToggle } from '../components/ModeToggle';
+import { ServiceWorkerRegistrar } from '../components/ServiceWorkerRegistrar';
 export default async function StaffDashboardLayout({
   children,
 }: {
@@ -15,6 +16,8 @@ export default async function StaffDashboardLayout({
   const { user, role } = await requireRole(['staff', 'owner']);
   return (
     <SidebarProvider>
+      <ServiceWorkerRegistrar />
+
       <AppSidebar role={role} user={user} />
 
       <SidebarInset className='h-dvh overflow-hidden'>

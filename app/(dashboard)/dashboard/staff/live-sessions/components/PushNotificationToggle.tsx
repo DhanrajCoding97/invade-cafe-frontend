@@ -8,15 +8,38 @@ export function PushNotificationToggle() {
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
 
+  // useEffect(() => {
+  //   async function checkSubscription() {
+  //     try {
+  //       if (!('serviceWorker' in navigator)) return;
+
+  //       const registration = await navigator.serviceWorker.ready;
+
+  //       const subscription = await registration.pushManager.getSubscription();
+
+  //       setSubscribed(!!subscription);
+  //     } catch (error) {
+  //       console.error('Failed to check push subscription:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   }
+
+  //   checkSubscription();
+  // }, []);
+
   useEffect(() => {
     async function checkSubscription() {
       try {
         if (!('serviceWorker' in navigator)) return;
 
-        const registration = await navigator.serviceWorker.ready;
+        const registration = await navigator.serviceWorker.getRegistration();
+        if (!registration) {
+          setSubscribed(false);
+          return;
+        }
 
         const subscription = await registration.pushManager.getSubscription();
-
         setSubscribed(!!subscription);
       } catch (error) {
         console.error('Failed to check push subscription:', error);
