@@ -1418,7 +1418,7 @@ export default function ManualBookingForm({
               color='cyan'
               variant='outline'
               hoverEffect='scan'
-              className='flex-[1.2] rounded-none border-0 text-[11px] tracking-widest'
+              className='flex-[1.2] rounded-none border-0 text-[11px] tracking-widest disabled:cursor-not-allowed'
             >
               {submitting
                 ? mode === 'create'
