@@ -47,6 +47,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { WheelTimePicker } from '@/components/wheel-picker-time-input';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
+import { getErrorMessages } from '@/lib/get-error-message';
+
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
 
@@ -794,6 +796,8 @@ export default function ManualBookingForm({
 
   const lockStructuralFields = mode === 'edit' && isOnlineBooking;
 
+  // Helper to flatten nested error messages into a string array
+
   const {
     register,
     control,
@@ -834,6 +838,9 @@ export default function ManualBookingForm({
   const playersValue = Number(watch('players')) || 1;
   const durationValue = Number(watch('duration')) || 0;
   const rawAmountOverride = watch('amountOverride');
+
+  const errorMessages = getErrorMessages(errors);
+  const hasErrors = errorMessages.length > 0;
 
   const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
   const watchedDevice = watch('device');
@@ -1383,6 +1390,36 @@ export default function ManualBookingForm({
               </Field>
             )}
           />
+          {hasErrors && (
+            <div className='rounded-md bg-red-50 p-4 mb-4 border border-red-200'>
+              <div className='flex'>
+                <div className='flex-shrink-0'>
+                  {/* Optional: Error icon */}
+                  <svg
+                    className='h-5 w-5 text-red-400'
+                    viewBox='0 0 20 20'
+                    fill='currentColor'
+                  >
+                    <path
+                      fillRule='evenodd'
+                      d='M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z'
+                      clipRule='evenodd'
+                    />
+                  </svg>
+                </div>
+                <div className='ml-3'>
+                  <h3 className='text-sm font-medium text-red-800'>
+                    Please fix the following errors:
+                  </h3>
+                  <ul className='mt-2 text-sm text-red-700 list-disc list-inside space-y-1'>
+                    {errorMessages.map((msg, idx) => (
+                      <li key={idx}>{msg}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
 
         {serverError && (

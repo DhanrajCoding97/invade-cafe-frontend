@@ -6,7 +6,6 @@ import { formatIST } from '@/lib/date-list';
 export default async function StaffDashboardPage() {
   const data = await getDashboardData();
   const today = formatIST(new Date(), 'd MMM • EEEE');
-
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>

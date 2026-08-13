@@ -82,6 +82,12 @@
   background-color: var(--ccb-hover-color);
 }
 
+.ccb-solid:disabled,
+.ccb-outline:disabled {
+  opacity: 1;
+  /* remove any background/color changes here */
+}
+
 .ccb-outline.ccb-hover-glow:hover,
 .ccb-outline.ccb-hover-default:hover {
   background-color: color-mix(in srgb, var(--ccb-hover-color) 15%, #000);

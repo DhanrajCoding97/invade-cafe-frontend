@@ -89,7 +89,7 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
   children: ReactNode;
 
   onClick?: () => void;
-
+  disabled?: boolean;
   /**
    * When true, the button stretches to full width on mobile (below `sm`)
    * and reverts to content-sized on larger screens.
@@ -209,6 +209,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   className = '',
   style,
   type = 'button',
+  disabled,
   ...props
 }) => {
   const resolvedColor = COLOR_PRESETS[color] ?? color;
@@ -268,10 +269,62 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
           .join(' ')}
         aria-hidden='true'
       />
-
       <button
         type={type}
         onClick={onClick}
+        disabled={disabled}
+        className={cn(
+          'group font-orbitron relative flex-1 overflow-hidden font-bold tracking-wider uppercase transition-all',
+          SIZE_CLASSES[size],
+          CORNER_CLASSES[corner],
+          HOVER_CLASSES[hoverEffect],
+          styles[`ccb-${variant}`],
+          hoverOutlined && styles['ccb-hover-outlined'],
+          // Keep pointer or use not-allowed — pick one:
+          disabled ? 'cursor-not-allowed' : 'cursor-pointer',
+          variant === 'solid' &&
+            cn(
+              'bg-(--ccb-color)',
+              resolvedTextColor ? 'text-(--ccb-text-color)' : 'text-black',
+              // Disabled = same as active
+              'disabled:opacity-100 disabled:bg-(--ccb-color)',
+              resolvedTextColor
+                ? 'disabled:text-(--ccb-text-color)'
+                : 'disabled:text-black',
+            ),
+          variant === 'outline' &&
+            cn(
+              'bg-black',
+              resolvedTextColor
+                ? 'text-(--ccb-text-color)'
+                : 'text-(--ccb-color)',
+              // Disabled = same as active
+              'disabled:opacity-100 disabled:bg-black',
+              resolvedTextColor
+                ? 'disabled:text-(--ccb-text-color)'
+                : 'disabled:text-(--ccb-color)',
+            ),
+          variant === 'ghost' &&
+            cn(
+              'disabled:opacity-100',
+              // If your ghost style relies on CSS-module borders/bg, add:
+              // 'disabled:bg-transparent'
+            ),
+        )}
+        style={{
+          ...ghostStyle,
+          ...(resolvedTextColor && variant === 'ghost'
+            ? { color: resolvedTextColor }
+            : {}),
+          // Optional: very subtle disabled cue while keeping the "active" look
+          ...(disabled && variant === 'ghost' ? { opacity: 1 } : {}),
+        }}
+        {...props}
+      >
+        {/* <button
+        type={type}
+        onClick={onClick}
+        disabled={disabled}
         className={cn(
           'group font-orbitron relative flex-1 cursor-pointer overflow-hidden font-bold tracking-wider uppercase transition-all',
           SIZE_CLASSES[size],
@@ -299,7 +352,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
             : {}),
         }}
         {...props}
-      >
+      > */}
         {/* Shine sweep layer — only rendered when needed */}
         {hoverEffect === 'shine' && (
           <span className={styles['ccb-shine-layer']} aria-hidden='true' />

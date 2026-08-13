@@ -4,7 +4,7 @@ import { subDays, format, startOfDay, endOfDay } from 'date-fns';
 import { formatIST } from '../date-list';
 export async function getDashboardData() {
   const supabase = await createClient();
-  const today = formatIST(new Date(), 'd MMM • EEEE');
+  const todayISO = formatIST(new Date(), 'yyyy-MM-dd'); // for DB queries
   const sevenDaysAgo = format(subDays(new Date(), 6), 'yyyy-MM-dd');
 
   const [
@@ -18,17 +18,17 @@ export async function getDashboardData() {
       .select(
         'id, amount, status, payment_status, start_time, customer_name, device, station_id, profiles(full_name)',
       )
-      .eq('date', today),
+      .eq('date', todayISO),
     supabase
       .from('bookings')
       .select('date, amount, payment_status')
       .gte('date', sevenDaysAgo)
-      .lte('date', today)
+      .lte('date', todayISO)
       .eq('payment_status', 'paid'),
     supabase
       .from('bookings')
       .select('id')
-      .eq('date', today)
+      .eq('date', todayISO)
       .not('session_started_at', 'is', null)
       .is('session_ended_at', null),
     supabase.from('stations').select('id').neq('status', 'maintenance'),

@@ -74,23 +74,22 @@ export async function sendPushToStaffAndOwners(payload: {
   console.log('Push notification results:', results);
 
   console.log('Push notification results:', results);
-
-  //   await Promise.allSettled(
-  //     subs.map((sub) =>
-  //       webpush
-  //         .sendNotification(
-  //           {
-  //             endpoint: sub.endpoint,
-  //             keys: { p256dh: sub.p256dh, auth: sub.auth },
-  //           },
-  //           JSON.stringify(payload),
-  //         )
-  //         .catch(async (err: any) => {
-  //           // 410 Gone = subscription expired/revoked, clean it up
-  //           if (err.statusCode === 410) {
-  //             await admin.from('push_subscriptions').delete().eq('id', sub.id);
-  //           }
-  //         }),
-  //     ),
-  //   );
 }
+//   await Promise.allSettled(
+//     subs.map((sub) =>
+//       webpush
+//         .sendNotification(
+//           {
+//             endpoint: sub.endpoint,
+//             keys: { p256dh: sub.p256dh, auth: sub.auth },
+//           },
+//           JSON.stringify(payload),
+//         )
+//         .catch(async (err: any) => {
+//           // 410 Gone = subscription expired/revoked, clean it up
+//           if (err.statusCode === 410) {
+//             await admin.from('push_subscriptions').delete().eq('id', sub.id);
+//           }
+//         }),
+//     ),
+//   );
