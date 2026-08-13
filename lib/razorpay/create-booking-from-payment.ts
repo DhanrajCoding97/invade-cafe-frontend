@@ -17,10 +17,12 @@ export async function createBookingFromPayment({
   razorpay_payment_id,
   razorpay_order_id,
   userId,
+  supabase: injectedSupabase,
 }: {
   razorpay_payment_id: string;
   razorpay_order_id: string;
   userId: string;
+  supabase?: SupabaseClient;
 }): Promise<CreateBookingResult> {
   const keyId = process.env.RAZORPAY_KEY_ID;
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -37,7 +39,7 @@ export async function createBookingFromPayment({
   const order = await razorpay.orders.fetch(razorpay_order_id);
   const notes = (order.notes ?? {}) as Record<string, string>;
 
-  const supabase = await createClient();
+  const supabase = injectedSupabase ?? (await createClient());
 
   const { data: station } = await supabase
     .from('stations')

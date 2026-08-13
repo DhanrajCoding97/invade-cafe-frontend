@@ -42,6 +42,7 @@ export async function POST(req: NextRequest) {
       razorpay_payment_id,
       razorpay_order_id,
       userId: user.id,
+      supabase,
     });
 
     if (!result.ok) {
