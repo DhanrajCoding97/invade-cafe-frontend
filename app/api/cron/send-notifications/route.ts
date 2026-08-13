@@ -251,14 +251,21 @@ import { NextResponse } from 'next/server';
 import webpush from 'web-push';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
 
+function resolveCustomerName(b: any): string {
+  // Manual/staff-created bookings store the name directly on the booking.
+  // Online (Razorpay/Google-auth) bookings have no customer_name — the
+  // identity lives on the linked profile instead.
+  return b.customer_name ?? b.profiles?.full_name ?? 'Guest';
+}
+
 const MESSAGES: Record<string, (b: any) => { title: string; body: string }> = {
   new_booking: (b) => ({
     title: 'New booking',
-    body: `${b.customer_name ?? 'Guest'} booked ${b.device} at ${b.start_time}`,
+    body: `${resolveCustomerName(b)} booked ${b.device} at ${b.start_time}`,
   }),
   upcoming_booking: (b) => ({
     title: 'Booking starting soon',
-    body: `${b.customer_name ?? 'Guest'} starts in 10 min on ${b.device}`,
+    body: `${resolveCustomerName(b)} starts in 10 min on ${b.device}`,
   }),
   session_not_started: (b) => ({
     title: 'Session not started',
@@ -274,11 +281,11 @@ const MESSAGES: Record<string, (b: any) => { title: string; body: string }> = {
   }),
   booking_cancelled: (b) => ({
     title: 'Booking cancelled',
-    body: `${b.customer_name ?? 'Guest'}'s booking was cancelled`,
+    body: `${resolveCustomerName(b)}'s booking was cancelled`,
   }),
   no_show: (b) => ({
     title: 'No-show',
-    body: `${b.customer_name ?? 'Guest'} did not show up for ${b.device}`,
+    body: `${resolveCustomerName(b)} did not show up for ${b.device}`,
   }),
 };
 
@@ -309,12 +316,12 @@ export async function POST(req: Request) {
     const { data: pending, error: fetchError } = await admin
       .from('booking_notifications')
       .select(
-        'id, event_type, attempts, bookings(customer_name, device, start_time, end_time)',
+        `id, event_type, attempts,
+     bookings(customer_name, device, start_time, duration_hours, user_id, profiles(full_name))`,
       )
       .eq('status', 'pending')
       .lt('attempts', 3)
       .limit(50);
-
     if (fetchError) {
       console.error('Fetch pending notifications failed:', fetchError);
       return NextResponse.json({ error: fetchError.message }, { status: 500 });
