@@ -18,7 +18,10 @@
 
 @theme {
   --animate-rotate-border: border-rotate 8s linear infinite;
-  --breakpoint-xs: 30rem; /* 480px */
+  --breakpoint-xs: 30rem;
+
+  --font-rajdhani: var(--font-rajdhani);
+  --font-orbitron: var(--font-orbitron);
 }
 
 @keyframes heroFadeUp {
@@ -444,4 +447,8 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.manul-btn button {
+  width: 100%;
 }

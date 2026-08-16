@@ -1,16 +1,11 @@
 import React from 'react';
 import { Metadata } from 'next';
 import { Toaster } from '@/components/ui/sonner';
-import { Orbitron } from 'next/font/google';
+import { orbitron } from '@/lib/fonts';
 import './globals.css';
 import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/transitions/SmoothScroll';
 import { Providers } from '@/providers/QueryProvider';
-const orbitron = Orbitron({
-  subsets: ['latin'],
-  variable: '--font-orbitron',
-  weight: ['400', '600', '900'],
-});
 
 export const metadata: Metadata = {
   title: 'Invade Gaming Cafe',

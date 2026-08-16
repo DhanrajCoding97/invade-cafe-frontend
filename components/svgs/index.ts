@@ -11,3 +11,4 @@ export { default as InstagramIcon } from './instagramIcon.svg';
 export { default as WhatsappIcon } from './whatsappIcon.svg';
 export { default as ClockIcon } from './clockIcon.svg';
 export { default as MapArrowIcon } from './maparrowIcon.svg';
+export { default as BellIcon } from './bellIcon.svg';

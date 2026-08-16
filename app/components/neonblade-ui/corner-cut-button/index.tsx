@@ -234,9 +234,10 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
     <div
       className={cn(
         'group/ccb relative p-px',
-        fullWidthOnMobile
-          ? 'flex w-full sm:inline-flex sm:w-auto'
-          : 'inline-flex',
+        // fullWidthOnMobile
+        //   ? 'flex w-full sm:inline-flex sm:w-auto'
+        //   : 'inline-flex',
+        fullWidthOnMobile ? 'inline-flex w-fit' : 'inline-flex',
         styles[`ccb-wrapper-${hoverEffect}`],
         hoverEffect === 'flicker' && styles['ccb-wrapper'],
         className,
@@ -274,7 +275,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         className={cn(
-          'group font-orbitron relative flex-1 overflow-hidden font-bold tracking-wider uppercase transition-all',
+          'group font-orbitron relative flex-1 sm:flex-none overflow-hidden font-bold tracking-wider uppercase transition-all',
           SIZE_CLASSES[size],
           CORNER_CLASSES[corner],
           HOVER_CLASSES[hoverEffect],

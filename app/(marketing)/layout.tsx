@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import AuthSlot from '@/components/auth/AuthSlot';
 import NavBar from '../components/neonblade-ui/navbar';
 import SmoothScroll from '@/components/transitions/SmoothScroll';
+import { orbitron } from '@/lib/fonts';
 export default async function LandingPageLayout({
   children,
 }: Readonly<{
@@ -29,7 +30,7 @@ export default async function LandingPageLayout({
     });
   }
   return (
-    <>
+    <div className={orbitron.className}>
       <NavBar
         variant='standard'
         position='fixed'
@@ -42,9 +43,7 @@ export default async function LandingPageLayout({
         items={navItems}
         authSlot={<AuthSlot />}
       />
-      <SmoothScroll>
-          {children}
-      </SmoothScroll>
-    </>
+      <SmoothScroll>{children}</SmoothScroll>
+    </div>
   );
 }

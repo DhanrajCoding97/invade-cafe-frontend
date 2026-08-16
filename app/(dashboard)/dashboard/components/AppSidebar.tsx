@@ -8,6 +8,7 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 
 import type { User } from '@supabase/supabase-js';
@@ -48,6 +49,9 @@ import {
   LogOut,
   type LucideIcon,
 } from 'lucide-react';
+import { ModeToggle } from './ModeToggle';
+import { handleSignOut } from '@/lib/auth/oauth';
+import { cn } from '@/lib/utils';
 
 type NavItem = {
   title: string;
@@ -90,83 +94,97 @@ export function NavUser({
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <SidebarMenuButton
-              size='lg'
-              className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
-            >
-              <Avatar className='h-8 w-8 rounded-lg'>
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
-              </Avatar>
-              <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user.name}</span>
-                <span className='truncate text-xs'>{user.email}</span>
-              </div>
-              <ChevronsUpDown className='ml-auto size-4' />
-            </SidebarMenuButton>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            className='w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg'
-            side={isMobile ? 'bottom' : 'right'}
-            align='end'
-            sideOffset={4}
-          >
-            <DropdownMenuLabel className='p-0 font-normal'>
-              <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-                <Avatar className='h-8 w-8 rounded-lg'>
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
-                </Avatar>
-                <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
-                </div>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Profile
-              </DropdownMenuItem>
+        {/* User info */}
+        <div
+          className={cn(
+            'flex items-center gap-2 px-2 py-2',
+            'group-data-[collapsible=icon]:justify-center',
+          )}
+        >
+          <Avatar className='h-8 w-8 shrink-0 rounded-lg'>
+            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+          </Avatar>
 
-              <DropdownMenuItem>
-                <Settings2 />
-                Settings
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            {/* <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
-            {/* <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup> */}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <LogOut />
-              Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          <div className='grid min-w-0 flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden'>
+            <span className='truncate font-semibold'>{user.name}</span>
+            <span className='truncate text-xs'>{user.email}</span>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className='mx-2 border-t border-sidebar-border' />
+
+        {/* Logout */}
+        <SidebarMenuButton
+          type='button'
+          onClick={handleSignOut}
+          className='mt-1'
+          tooltip='Log out'
+        >
+          <LogOut />
+          <span>Log out</span>
+        </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>
+    // <SidebarMenu>
+    //   <SidebarMenuItem>
+    //     <DropdownMenu>
+    //       <DropdownMenuTrigger asChild>
+    //         <SidebarMenuButton
+    //           size='lg'
+    //           className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+    //         >
+    //           <Avatar className='h-8 w-8 rounded-lg'>
+    //             <AvatarImage src={user.avatar} alt={user.name} />
+    //             <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+    //           </Avatar>
+    //           <div className='grid flex-1 text-left text-sm leading-tight'>
+    //             <span className='truncate font-semibold'>{user.name}</span>
+    //             <span className='truncate text-xs'>{user.email}</span>
+    //           </div>
+    //           <ChevronsUpDown className='ml-auto size-4' />
+    //         </SidebarMenuButton>
+    //       </DropdownMenuTrigger>
+    //       <DropdownMenuContent
+    //         className='w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg'
+    //         side={isMobile ? 'bottom' : 'right'}
+    //         align='end'
+    //         sideOffset={4}
+    //       >
+    //         <DropdownMenuLabel className='p-0 font-normal'>
+    //           <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
+    //             <Avatar className='h-8 w-8 rounded-lg'>
+    //               <AvatarImage src={user.avatar} alt={user.name} />
+    //               <AvatarFallback className='rounded-lg'>CN</AvatarFallback>
+    //             </Avatar>
+    //             <div className='grid flex-1 text-left text-sm leading-tight'>
+    //               <span className='truncate font-semibold'>{user.name}</span>
+    //               <span className='truncate text-xs'>{user.email}</span>
+    //             </div>
+    //           </div>
+    //         </DropdownMenuLabel>
+    //         <DropdownMenuSeparator />
+    //         <DropdownMenuGroup>
+    //           <DropdownMenuItem>
+    //             <BadgeCheck />
+    //             Profile
+    //           </DropdownMenuItem>
+
+    //           <DropdownMenuItem>
+    //             <Settings2 />
+    //             Settings
+    //           </DropdownMenuItem>
+    //         </DropdownMenuGroup>
+    //         <DropdownMenuSeparator />
+    //         <DropdownMenuItem>
+    //           <LogOut />
+    //           Log out
+    //         </DropdownMenuItem>
+    //       </DropdownMenuContent>
+    //     </DropdownMenu>
+    //   </SidebarMenuItem>
+    // </SidebarMenu>
   );
 }
 
@@ -263,7 +281,15 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
   };
   return (
     <Sidebar collapsible='icon' {...props}>
-      <SidebarHeader>{/* <TeamSwitcher teams={data.teams} /> */}</SidebarHeader>
+      <SidebarHeader>
+        <div className='flex items-center justify-between group-data-[collapsible=icon]:justify-center'>
+          <SidebarTrigger />
+
+          <div className='group-data-[collapsible=icon]:hidden'>
+            <ModeToggle />
+          </div>
+        </div>
+      </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMain} />
         <NavManagement items={management} />

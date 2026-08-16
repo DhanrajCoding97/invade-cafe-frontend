@@ -13,6 +13,7 @@ import DateTimeStep from './steps/DateTimeStep';
 import SummaryStep from './steps/SummaryStep';
 import PaymentStep from './steps/PaymentStep';
 import ConfirmedStep from './steps/ConfirmedStep';
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 import {
   clearBookingDraft,
   loadBookingDraft,
@@ -83,6 +84,7 @@ export default function () {
   const [direction, setDirection] = useState<1 | -1>(1);
   const [conflictMessage, setConflictMessage] = useState<string | null>(null);
   const [cardsReady, setCardsReady] = useState(false);
+  const [isNextLoading, setIsNextLoading] = useState(false);
   const form = useForm<BookingFormValues>({
     resolver: zodResolver(bookingSchema),
     defaultValues: {
@@ -184,28 +186,65 @@ export default function () {
     });
   }, [stepIndex]);
 
+  // async function goNext() {
+  //   if (step === 'options') {
+  //     const device = form.getValues('device');
+  //     const field =
+  //       device === 'ps5' ? 'players' : device === 'racing' ? 'tier' : null;
+  //     if (field) {
+  //       const valid = await form.trigger(field);
+  //       if (!valid) return;
+  //     }
+  //   } else {
+  //     const fields = STEP_FIELDS[step];
+  //     if (fields && !(await form.trigger(fields))) return;
+  //   }
+
+  //   let next = stepIndex + 1;
+  //   const device = form.getValues('device');
+
+  //   if (STEPS[next] === 'options' && !needsOptionsStep(device)) next++;
+  //   // if (STEPS[next] === 'login' && session) next++;
+
+  //   setStepIndex(next);
+  //   setDirection(1);
+  // }
   async function goNext() {
-    if (step === 'options') {
-      const device = form.getValues('device');
-      const field =
-        device === 'ps5' ? 'players' : device === 'racing' ? 'tier' : null;
-      if (field) {
-        const valid = await form.trigger(field);
-        if (!valid) return;
+    if (isNextLoading) return;
+
+    setIsNextLoading(true);
+
+    try {
+      if (step === 'options') {
+        const device = form.getValues('device');
+
+        const field =
+          device === 'ps5' ? 'players' : device === 'racing' ? 'tier' : null;
+
+        if (field) {
+          const valid = await form.trigger(field);
+          if (!valid) return;
+        }
+      } else {
+        const fields = STEP_FIELDS[step];
+
+        if (fields && !(await form.trigger(fields))) return;
       }
-    } else {
-      const fields = STEP_FIELDS[step];
-      if (fields && !(await form.trigger(fields))) return;
+
+      let next = stepIndex + 1;
+      const device = form.getValues('device');
+
+      if (STEPS[next] === 'options' && !needsOptionsStep(device)) {
+        next++;
+      }
+
+      // if (STEPS[next] === 'login' && session) next++;
+
+      setStepIndex(next);
+      setDirection(1);
+    } finally {
+      setIsNextLoading(false);
     }
-
-    let next = stepIndex + 1;
-    const device = form.getValues('device');
-
-    if (STEPS[next] === 'options' && !needsOptionsStep(device)) next++;
-    // if (STEPS[next] === 'login' && session) next++;
-
-    setStepIndex(next);
-    setDirection(1);
   }
 
   function goBack() {
@@ -395,14 +434,27 @@ export default function () {
                     </button>
                   )}
                   {step !== 'payment' && step !== 'summary' && (
-                    <button
-                      ref={nextButtonRef}
+                    // <button
+                    //   ref={nextButtonRef}
+                    //   type='button'
+                    //   onClick={goNext}
+                    //   className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
+                    // >
+                    //   Next
+                    // </button>
+                    <CornerCutButton
+                      className='ml-auto'
                       type='button'
+                      disabled={isNextLoading}
                       onClick={goNext}
-                      className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
+                      color='cyan'
+                      variant='outline'
+                      showArrow
+                      hoverEffect='shift'
+                      fullWidthOnMobile={true}
                     >
-                      Next
-                    </button>
+                      {isNextLoading ? 'Processing…' : `Next`}
+                    </CornerCutButton>
                   )}
                 </div>
               )}

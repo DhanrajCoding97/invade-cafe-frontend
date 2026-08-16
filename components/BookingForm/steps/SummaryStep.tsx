@@ -207,9 +207,12 @@ export default function SummaryStep({
       ) : (
         <CornerCutButton
           onClick={onContinue}
+          color='cyan'
           variant='outline'
+          showArrow
+          hoverEffect='shift'
+          fullWidthOnMobile={true}
           className='ml-auto'
-          size='sm'
         >
           Checkout
         </CornerCutButton>
