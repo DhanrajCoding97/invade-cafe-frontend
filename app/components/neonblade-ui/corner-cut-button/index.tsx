@@ -232,12 +232,21 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
 
   return (
     <div
+      // className={cn(
+      //   'group/ccb relative p-px',
+      //   // fullWidthOnMobile
+      //   //   ? 'flex w-full sm:inline-flex sm:w-auto'
+      //   //   : 'inline-flex',
+      //   fullWidthOnMobile ? 'inline-flex w-fit' : 'inline-flex',
+      //   styles[`ccb-wrapper-${hoverEffect}`],
+      //   hoverEffect === 'flicker' && styles['ccb-wrapper'],
+      //   className,
+      // )}
       className={cn(
         'group/ccb relative p-px',
-        // fullWidthOnMobile
-        //   ? 'flex w-full sm:inline-flex sm:w-auto'
-        //   : 'inline-flex',
-        fullWidthOnMobile ? 'inline-flex w-fit' : 'inline-flex',
+        fullWidthOnMobile
+          ? 'flex w-full sm:inline-flex sm:w-auto'
+          : 'inline-flex',
         styles[`ccb-wrapper-${hoverEffect}`],
         hoverEffect === 'flicker' && styles['ccb-wrapper'],
         className,
