@@ -6,6 +6,7 @@ import './globals.css';
 import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/transitions/SmoothScroll';
 import { Providers } from '@/providers/QueryProvider';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 export const metadata: Metadata = {
   title: 'Invade Gaming Cafe',
@@ -34,6 +35,7 @@ export default async function RootLayout({
           richColors
           closeButton
         />
+        <SpeedInsights />
       </body>
     </html>
   );

@@ -284,7 +284,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         onClick={onClick}
         disabled={disabled}
         className={cn(
-          'group font-orbitron relative flex-1 sm:flex-none overflow-hidden font-bold tracking-wider uppercase transition-all',
+          'group font-orbitron relative flex-1 overflow-hidden font-bold tracking-wider uppercase transition-all',
           SIZE_CLASSES[size],
           CORNER_CLASSES[corner],
           HOVER_CLASSES[hoverEffect],

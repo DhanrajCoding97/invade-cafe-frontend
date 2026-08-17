@@ -43,8 +43,8 @@ export default async function Page() {
             backgroundSize: '60px 50px, 50px 50px, 100% 100%, 100% 100%',
           }}
         />
-        <GamesCatalogSection />
         <ServicesSection />
+        <GamesCatalogSection />
         <PricingSection />
         <GallerySection />
         <TestimonialSection />

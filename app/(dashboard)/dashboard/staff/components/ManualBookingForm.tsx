@@ -32,7 +32,7 @@ import {
 } from '@/lib/schemas/ManualBookingFormSchema';
 import { Calendar } from '@/components/ui/calendar';
 import { format } from 'date-fns';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, TriangleAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { PhoneInput } from '@/components/ui/phone-input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -48,6 +48,7 @@ import { WheelTimePicker } from '@/components/wheel-picker-time-input';
 import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
 import { getErrorMessages } from '@/lib/get-error-message';
+import { Station } from '@/types';
 
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
@@ -844,22 +845,31 @@ export default function ManualBookingForm({
 
   const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
   const watchedDevice = watch('device');
-  const { data: stations = [], isLoading: stationsLoading } =
-    useAvailableStations({
-      device: watchedDevice,
+  const stationParams = useMemo(
+    () => ({
+      device,
       date: dateStr,
-      startTime: debouncedStartTime,
+      startTime: watchedStartTime,
       duration: durationValue,
-      excludeBookingId: mode === 'edit' ? bookingId : undefined,
-    });
-
-  const stationsForDevice = useMemo(
-    () =>
-      stations.filter((station) =>
-        device === 'vr' ? station.type === 'ps5' : station.type === device,
-      ),
-    [stations, device],
+    }),
+    [device, dateStr, watchedStartTime, durationValue],
   );
+
+  const debouncedStationParams = useDebouncedValue(stationParams, 400);
+  const { data, isLoading: stationsLoading } = useAvailableStations({
+    ...debouncedStationParams,
+    excludeBookingId: mode === 'edit' ? bookingId : undefined,
+  });
+  const EMPTY_STATIONS: Station[] = [];
+  const stationsForDevice = data ?? EMPTY_STATIONS;
+
+  // const stationsForDevice = useMemo(
+  //   () =>
+  //     stations.filter((station) =>
+  //       device === 'vr' ? station.type === 'ps5' : station.type === device,
+  //     ),
+  //   [stations, device],
+  // );
 
   const noStationsAvailable =
     !stationsLoading && stationsForDevice.length === 0;
@@ -1138,12 +1148,15 @@ export default function ManualBookingForm({
                 )}
 
                 {noStationsAvailable && (
-                  <p className='mt-2 font-mono text-[10px] leading-relaxed text-amber-400'>
-                    No {device === 'vr' ? 'VR' : device.toUpperCase()} station
-                    is available for the selected time.
-                    <br />
-                    Choose a different start time to make an advance booking.
-                  </p>
+                  <div className='rounded-none flex items-start gap-2 px-2 py-4 bg-black/80 border border-amber-400'>
+                    <TriangleAlert size={24} className='text-amber-400' />
+                    <p className='text-[12px] sm:text-base leading-relaxed text-amber-400'>
+                      No {device === 'vr' ? 'VR' : device.toUpperCase()}
+                      &nbsp;station is available for the selected time.
+                      &nbsp;Choose a different start time to make an advance
+                      booking.
+                    </p>
+                  </div>
                 )}
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -1391,9 +1404,9 @@ export default function ManualBookingForm({
             )}
           />
           {hasErrors && (
-            <div className='rounded-md bg-red-50 p-4 mb-4 border border-red-200'>
+            <div className='rounded-none px-2 py-4 bg-black/80 border border-red-800'>
               <div className='flex'>
-                <div className='flex-shrink-0'>
+                <div className='shrink-0'>
                   {/* Optional: Error icon */}
                   <svg
                     className='h-5 w-5 text-red-400'
@@ -1440,8 +1453,8 @@ export default function ManualBookingForm({
       {/* ---------- Sticky bottom total + submit ---------- */}
       <footer className='sticky bottom-0 z-40 p-4'>
         <div className='border p-2 border-[#28F1FF] bg-black/95 shadow-[0_-8px_32px_rgba(40,241,255,0.15)] backdrop-blur-xl'>
-          <div className='flex flex-col gap-2 sm:flex-row items-stretch'>
-            <div className='flex items-center sm:items-start flex-1 sm:flex-col justify-center sm:border-r border-[#28F1FF]/20 px-4 py-3'>
+          <div className='flex flex-col gap-2 xm:flex-row items-stretch'>
+            <div className='flex gap-2 items-center sm:items-start flex-1 sm:flex-col justify-center sm:border-r border-[#28F1FF]/20 px-4 py-3'>
               <span className='font-mono text-[10px] uppercase tracking-widest text-[#28F1FF]/60'>
                 Total_Payable
               </span>
@@ -1455,6 +1468,7 @@ export default function ManualBookingForm({
               color='cyan'
               variant='outline'
               hoverEffect='scan'
+              fullWidthOnMobile={true}
               className='flex-[1.2] rounded-none border-0 text-[11px] tracking-widest disabled:cursor-not-allowed'
             >
               {submitting

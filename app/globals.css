@@ -19,6 +19,7 @@
 @theme {
   --animate-rotate-border: border-rotate 8s linear infinite;
   --breakpoint-xs: 30rem;
+  --breakpoint-xm: 33.75rem;
 
   --font-rajdhani: var(--font-rajdhani);
   --font-orbitron: var(--font-orbitron);
