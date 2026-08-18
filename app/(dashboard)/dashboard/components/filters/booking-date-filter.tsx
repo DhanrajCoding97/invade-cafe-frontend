@@ -6,7 +6,18 @@ import { format, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
 import { type DateRange } from 'react-day-picker';
 import { Button } from '@/components/ui/button';
-import { Calendar } from '@/components/ui/calendar';
+import dynamic from 'next/dynamic';
+// import { Calendar } from '@/components/ui/calendar';
+const Calendar = dynamic(
+  () =>
+    import('@/components/ui/calendar').then((mod) => ({
+      default: mod.Calendar,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className='h-64 bg-muted rounded animate-pulse' />,
+  },
+);
 import {
   Popover,
   PopoverTrigger,

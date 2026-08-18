@@ -1,11 +1,21 @@
 // components/BookingForm/steps/DateTimeStep.tsx
 'use client';
+import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import { Zap } from 'lucide-react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
-import { Calendar } from '@/components/ui/calendar';
+const Calendar = dynamic(
+  () =>
+    import('@/components/ui/calendar').then((mod) => ({
+      default: mod.Calendar,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className='h-64 bg-muted rounded animate-pulse' />,
+  },
+);
 
 import { useEffect } from 'react';
 import { getLenisInstance } from '@/lib/lenisInstance';

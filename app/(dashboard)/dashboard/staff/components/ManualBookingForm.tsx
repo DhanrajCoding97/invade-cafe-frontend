@@ -1,4 +1,5 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
@@ -30,7 +31,16 @@ import {
   manualBookingSchema,
   type ManualBookingValues,
 } from '@/lib/schemas/ManualBookingFormSchema';
-import { Calendar } from '@/components/ui/calendar';
+const Calendar = dynamic(
+  () =>
+    import('@/components/ui/calendar').then((mod) => ({
+      default: mod.Calendar,
+    })),
+  {
+    ssr: false,
+    loading: () => <div className='h-64 bg-muted rounded animate-pulse' />,
+  },
+);
 import { format } from 'date-fns';
 import { CalendarIcon, TriangleAlert } from 'lucide-react';
 import { Input } from '@/components/ui/input';

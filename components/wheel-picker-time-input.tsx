@@ -32,7 +32,7 @@ function from24Hour(value: string) {
   return { hour: h, minute: parseInt(mStr, 10) || 0, meridiem };
 }
 
-interface WheelTimePickerProps {
+export interface WheelTimePickerProps {
   id?: string;
   name?: string;
   value?: string; // "HH:mm" 24hr, e.g. from an existing booking

@@ -1,8 +1,10 @@
 import { getDashboardData } from '@/lib/queries/dashboard';
 import { KpiCard } from '../components/KpiCard';
-import { RevenueChart } from '../components/charts/RevenueChart';
+// import { RevenueChart } from '../components/charts/RevenueChart';
+import { RevenueChartClient } from '../components/charts/RevenueChartClient';
 import Link from 'next/link';
 import { formatIST } from '@/lib/date-list';
+
 export default async function StaffDashboardPage() {
   const data = await getDashboardData();
   const today = formatIST(new Date(), 'd MMM • EEEE');
@@ -28,8 +30,7 @@ export default async function StaffDashboardPage() {
         />
       </div>
 
-      <RevenueChart data={data.revenueTrend} />
-
+      <RevenueChartClient data={data.revenueTrend} />
       <div className='rounded-xl border border-white/10 bg-white/5 p-4'>
         <div className='flex items-center justify-between mb-3'>
           <h3 className='text-sm font-semibold text-white/80'>
