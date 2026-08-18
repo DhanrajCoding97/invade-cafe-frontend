@@ -30,7 +30,7 @@ export default async function LandingPageLayout({
     });
   }
   return (
-    <div className={orbitron.className}>
+    <main className={orbitron.className}>
       <NavBar
         variant='standard'
         position='fixed'
@@ -44,6 +44,6 @@ export default async function LandingPageLayout({
         authSlot={<AuthSlot />}
       />
       <SmoothScroll>{children}</SmoothScroll>
-    </div>
+    </main>
   );
 }

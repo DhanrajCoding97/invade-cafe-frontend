@@ -54,7 +54,7 @@ export const useDotButton = (
 export const DotButton: React.FC<ComponentPropsWithRef<'button'>> = (props) => {
   const { children, ...restProps } = props;
   return (
-    <button type='button' {...restProps}>
+    <button aria-label='Slider Dot buttons' type='button' {...restProps}>
       {children}
     </button>
   );

@@ -64,15 +64,17 @@ export default function TestimonialSection() {
         </div>
         {/* main title */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Testimonials
             </span>
-          </h1>
+          </h2>
         </TextReveal>
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Real feedback from real customers.
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Our regulars keep coming back for the setups, the atmosphere, and
+            the community — here's what real customers have to say about their
+            experience at Invade Gaming Cafe.
           </p>
         </TextReveal>
       </div>
@@ -81,6 +83,7 @@ export default function TestimonialSection() {
           <Marquee pauseOnHover className='[--duration:22s]'>
             {firstRow.map((review, index) => (
               <Link
+                aria-label='Google Review Link'
                 className='flex w-[clamp(260px,80vw,320px)] shrink-0'
                 key={index}
                 href='https://biturl.in/Home/Index/54F66B24'
@@ -103,6 +106,7 @@ export default function TestimonialSection() {
           <Marquee reverse pauseOnHover className='[--duration:22s]'>
             {secondRow.map((review, index) => (
               <Link
+                aria-label='Google Review Link'
                 className='flex w-[clamp(260px,80vw,320px)] shrink-0'
                 key={index}
                 href='https://biturl.in/Home/Index/54F66B24'

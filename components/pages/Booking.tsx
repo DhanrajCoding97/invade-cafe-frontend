@@ -121,11 +121,11 @@ export default function BookingSection() {
           }}
         >        </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Claim Your Rig
             </span>
-          </h1>
+          </h2>
         </TextReveal>
         {/* description */}
         {/* <GsapTextAnimation
@@ -136,8 +136,11 @@ export default function BookingSection() {
         >
         </GsapTextAnimation> */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Reserve From competitive PCs to VR and Sim Racing
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Ready to play? Reserve your station in advance — from competitive
+            gaming PCs to VR headsets and sim racing rigs — and skip the wait.
+            Booking online takes seconds and guarantees your setup is ready the
+            moment you arrive.
           </p>
         </TextReveal>
         <BookingForm />

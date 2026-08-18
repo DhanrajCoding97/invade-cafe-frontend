@@ -5,6 +5,7 @@ import NeonGlowCornerCutCard from '@/app/components/neonblade-ui/neon-glow-corne
 import LineReveal from '../gsap/LineReveal';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';
+import { FriesIcon } from '../svgs';
 
 export default function ServicesSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -29,23 +30,29 @@ export default function ServicesSection() {
         </div>
         {/* main title */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               SERVICES
             </span>
-          </h1>
+          </h2>
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto mb-4 text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Everything you need for the ultimate gaming experience.
+          {/* Everything you need for the ultimate gaming experience. */}
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            From high-performance gaming PCs running the latest esports titles
+            to PS5 consoles, immersive VR headsets, and full sim racing rigs
+            with force-feedback wheels, Invade Gaming Cafe brings every major
+            gaming setup under one roof. No need to own expensive hardware —
+            just walk in, pick your station, and start playing within minutes.
           </p>
         </TextReveal>
         {/* snacks badge */}
         <LineReveal triggerRef={sectionRef} delay={0.65} duration={0.4}>
-          <div className='flex justify-start invisible opacity-0'>
+          <div className='flex justify-start invisible opacity-0 pt-2'>
             <span className='inline-flex items-center gap-2 rounded-full border border-green-400/40 bg-green-400/5 px-4 py-1.5 text-xs text-green-400'>
-              🍿 Snacks & drinks available on-site
+              <FriesIcon className='h-4 w-4' /> Snacks & drinks available
+              on-site
             </span>
           </div>
         </LineReveal>

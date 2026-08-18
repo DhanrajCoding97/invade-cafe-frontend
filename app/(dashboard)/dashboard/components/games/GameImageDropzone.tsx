@@ -166,14 +166,15 @@ export default function GameImageDropzone({
 
       {value && (
         <div className='relative w-24'>
-          <div className='relative aspect-[3/4] overflow-hidden rounded-lg border border-cyan-400/40'>
+          <div className='relative aspect-3/4 overflow-hidden rounded-lg border border-cyan-400/40'>
             <Image src={value} alt='Cover' fill className='object-cover' />
             <button
+              aria-label='Remove Game'
               type='button'
               onClick={handleRemove}
               className='absolute right-1 top-1 rounded-full bg-black/70 p-0.5 text-white hover:bg-black'
             >
-              <X className='h-3 w-3' />
+              <X aria-hidden='true' className='h-3 w-3' />
             </button>
           </div>
           {fileName && (

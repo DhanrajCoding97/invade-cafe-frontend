@@ -207,17 +207,22 @@ export default function GamesCatalogSection() {
 
         {/* main title */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               The Vault
             </span>
-          </h1>
+          </h2>
         </TextReveal>
 
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto mb-4 text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Every title, every setup. Filter by device and jump in.
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            {/* Every title, every setup. Filter by device and jump in. */}
+            Our library spans every major genre and platform — competitive
+            shooters, racing sims, sports titles, and VR experiences. Filter by
+            device to find exactly what you're looking for, whether that's a
+            battle royale on PC, a racing sim on our rigs, or an immersive title
+            on PSVR.
           </p>
         </TextReveal>
 

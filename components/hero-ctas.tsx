@@ -3,7 +3,7 @@ import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 
 export default function HeroCtas() {
   return (
-    <div className='mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
+    <div className='mt-8 sm:mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>
       <CornerCutButton
         className='hero-cta-book-now'
         onClick={() => {

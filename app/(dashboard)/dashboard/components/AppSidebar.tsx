@@ -68,7 +68,7 @@ export function NavManagement({ items }: NavMainProps) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild>
-              <a href={item.url}>
+              <a href={item.url} aria-label={item.title}>
                 <item.icon />
                 <span>{item.title}</span>
               </a>
@@ -201,7 +201,7 @@ export function NavMain({ items }: NavMainProps) {
         {items.map((item) => (
           <SidebarMenuItem key={item.title}>
             <SidebarMenuButton asChild tooltip={item.title}>
-              <a href={item.url}>
+              <a href={item.url} aria-label={item.title}>
                 <item.icon />
                 <span>{item.title}</span>
               </a>

@@ -97,7 +97,10 @@ export default function AdminBookingActions({
           onClick={() => setEditOpen(true)}
           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-fuchsia-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-fuchsia-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 active:translate-y-0'
         >
-          <Pencil className='size-5 transition-all duration-300 ease-in group-hover:text-white' />
+          <Pencil
+            aria-hidden='true'
+            className='size-5 transition-all duration-300 ease-in group-hover:text-white'
+          />
           Edit Booking
         </Button>
       </DialogTrigger>
@@ -252,7 +255,10 @@ export default function AdminBookingActions({
           disabled={markPaid.isPending}
           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500  text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 active:translate-y-0'
         >
-          <BadgeCheck className='size-5 transition-all duration-300 ease-in group-hover:text-green-500' />{' '}
+          <BadgeCheck
+            aria-hidden='true'
+            className='size-5 transition-all duration-300 ease-in group-hover:text-green-500'
+          />
           Mark Paid
         </Button>
       </AlertDialogTrigger>
@@ -289,7 +295,7 @@ export default function AdminBookingActions({
           disabled={markExtensionPaid.isPending}
           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
         >
-          <BadgeCheck className='size-5' />
+          <BadgeCheck aria-hidden='true' className='size-5' />
           Mark Extension Paid
         </Button>
       </AlertDialogTrigger>
@@ -337,7 +343,7 @@ export default function AdminBookingActions({
             disabled={markBookingAndExtensionsPaid.isPending}
             className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
           >
-            <BadgeCheck className='size-5' />
+            <BadgeCheck aria-hidden='true' className='size-5' />
             Mark All Paid
           </Button>
         </AlertDialogTrigger>
@@ -415,7 +421,10 @@ export default function AdminBookingActions({
           disabled={cancelBooking.isPending}
           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-red-800 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-red-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 active:translate-y-0'
         >
-          <Ban className='size-5 transition-colors duration-200 group-hover:text-red-300 motion-preset-shake motion-paused group-hover:motion-running' />
+          <Ban
+            aria-hidden='true'
+            className='size-5 transition-colors duration-200 group-hover:text-red-300 motion-preset-shake motion-paused group-hover:motion-running'
+          />
           Cancel Booking
         </Button>
       </AlertDialogTrigger>
@@ -467,7 +476,10 @@ export default function AdminBookingActions({
           disabled={markRefunded.isPending}
           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-amber-500 text-sm font-semibold uppercase tracking-wider text-black  hover:bg-amber-600 hover:shadow-[0_0_18px_rgba(245,158,11,0.35)] hover:-translate-y-0.5 active:translate-y-0 transition-colors duration-200 hover:text-amber-100'
         >
-          <Wallet className='size-5 transition-colors duration-200 group-hover:text-amber-100' />
+          <Wallet
+            aria-hidden='true'
+            className='size-5 transition-colors duration-200 group-hover:text-amber-100'
+          />
           Issue Refund
         </Button>
       </AlertDialogTrigger>

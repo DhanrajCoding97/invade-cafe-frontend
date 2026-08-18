@@ -53,17 +53,21 @@ export default function GallerySection() {
         </div>
         {/* main title */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Gallery
             </span>
-          </h1>
+          </h2>
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Explore the atmosphere, gaming setups, racing simulators, VR
-            stations, and unforgettable moments from our café.
+          <p className='py-2 max-w-[80ch] text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Step inside and you'll find a space built for gamers — dedicated PC
+            stations with proper gaming chairs, a PS5 corner for couch co-op and
+            competitive play, sim racing rigs set up for a genuinely immersive
+            driving experience, and a VR zone for stepping fully into the game.
+            Take a look through our gallery to get a feel for the setups and
+            atmosphere before you visit.
           </p>
         </TextReveal>
         <LineReveal triggerRef={sectionRef} delay={0.75}>

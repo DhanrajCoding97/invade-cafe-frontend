@@ -2,6 +2,7 @@
 import styles from './pricing-card.module.css';
 import React, { HTMLAttributes, ReactNode, useState } from 'react';
 import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 // ---- Types -------------------------------------------------
 
@@ -210,11 +211,12 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               onClick={handleDecrease}
               disabled={players <= minPlayers}
               className='flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-white/70 transition-all hover:border-white/40 hover:text-white disabled:opacity-30'
-              aria-label='Decrease players'
+              aria-label='Decrease players count'
             >
-              <svg width='14' height='2' viewBox='0 0 14 2' fill='currentColor'>
+              <Minus aria-hidden='true' className='h-3.5 w-3.5' />
+              {/* <svg width='14' height='2' viewBox='0 0 14 2' fill='currentColor'>
                 <rect width='14' height='2' rx='1' />
-              </svg>
+              </svg> */}
             </button>
             <span className='min-w-17.5 text-base font-semibold text-white'>
               {players} player{players !== 1 ? 's' : ''}
@@ -223,9 +225,10 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               onClick={handleIncrease}
               disabled={players >= maxPlayers}
               className='flex h-8 w-8 items-center justify-center rounded-full border border-white/15 text-white/70 transition-all hover:border-white/40 hover:text-white disabled:opacity-30'
-              aria-label='Increase players'
+              aria-label='Increase players count'
             >
-              <svg
+              <Plus aria-hidden='true' className='w-3.5 h-3.5' />
+              {/* <svg
                 width='14'
                 height='14'
                 viewBox='0 0 14 14'
@@ -233,7 +236,7 @@ export const PricingCard: React.FC<PricingCardProps> = ({
               >
                 <rect x='6' width='2' height='14' rx='1' />
                 <rect y='6' width='14' height='2' rx='1' />
-              </svg>
+              </svg> */}
             </button>
           </div>
         )}

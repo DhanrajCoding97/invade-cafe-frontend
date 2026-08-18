@@ -157,6 +157,7 @@ function EmptyUpcoming() {
           Book your next session.
         </p>
         <Link
+          aria-label='Invade Gaming Booking Section'
           href='/#booking'
           className='inline-block rounded-tl-none rounded-tr-none rounded-bl-none rounded-br-lg bg-cyan-500 px-5 py-2 font-semibold text-black border-t'
         >
@@ -265,6 +266,7 @@ export default function CustomerDashboard() {
                 <UpcomingCard key={b.id} booking={b} />
               ))}
               <Link
+                aria-label='Invade Gaming Booking Section'
                 href='/#booking'
                 className='rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
               >

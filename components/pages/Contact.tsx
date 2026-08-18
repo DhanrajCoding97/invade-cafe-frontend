@@ -47,16 +47,20 @@ export default function Contact() {
         </div>
         {/* main title */}
         <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
             <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
               Visit Invade
             </span>
-          </h1>
+          </h2>
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='mx-auto text-left text-[clamp(0.8rem,2vw,1.125rem)] text-[#bcbcbc]'>
-            Our location, hours, and the easiest ways to reach us.
+          <p className='py-2 max-w-3xl text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Invade Gaming Cafe is located on the ground floor of Bhakti
+            Residency, Shop-08/A, Plot Number-06, opposite Juinagar Railway
+            Station in Sector 11, Sanpada, Navi Mumbai. We're open daily from 10
+            AM to 11 PM — drop in anytime or check below for directions and
+            contact details.
           </p>
         </TextReveal>
         {/* Two-column body */}

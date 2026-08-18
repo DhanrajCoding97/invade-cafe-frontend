@@ -323,19 +323,26 @@ export function BookingActions({
 
   const viewButton = isCompact ? (
     <Link
+      aria-label='View this booking'
       key='view'
       href={`/dashboard/staff/bookings/${booking.id}`}
       className={stubBtn}
     >
-      <Eye className='size-4' />
+      <Eye aria-hidden='true' className='size-4' />
       View
     </Link>
   ) : (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button variant='action' asChild>
-          <Link href={`/dashboard/staff/bookings/${booking.id}`}>
-            <Eye className='size-5 transition-all duration-300 ease-in group-hover:text-cyan-300' />
+          <Link
+            aria-label='View this booking'
+            href={`/dashboard/staff/bookings/${booking.id}`}
+          >
+            <Eye
+              aria-hidden='true'
+              className='size-5 transition-all duration-300 ease-in group-hover:text-cyan-300'
+            />
           </Link>
         </Button>
       </TooltipTrigger>
@@ -357,7 +364,7 @@ export function BookingActions({
         disabled={markPaid.isPending}
         className='h-11 w-full gap-2 rounded-md bg-cyan-500 text-sm font-semibold uppercase tracking-wider text-black hover:bg-cyan-400'
       >
-        <BadgeCheck className='size-4' />
+        <BadgeCheck aria-hidden='true' className='size-4' />
         {markPaid.isPending ? 'Processing...' : 'Mark Paid'}
       </Button>
     ) : (
@@ -372,8 +379,12 @@ export function BookingActions({
             }
             disabled={markPaid.isPending}
             variant='action'
+            aria-label='Mark booking Paid'
           >
-            <BadgeCheck className='size-5 transition-all duration-300 ease-in group-hover:text-green-500' />
+            <BadgeCheck
+              aria-hidden='true'
+              className='size-5 transition-all duration-300 ease-in group-hover:text-green-500'
+            />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Mark this booking as paid</TooltipContent>
@@ -383,15 +394,27 @@ export function BookingActions({
   const editButton =
     canEdit &&
     (isCompact ? (
-      <button key='edit' className={stubBtn} onClick={() => setEditOpen(true)}>
-        <Pencil className='size-4' />
+      <button
+        aria-label='Open Edit Dialog'
+        key='edit'
+        className={stubBtn}
+        onClick={() => setEditOpen(true)}
+      >
+        <Pencil aria-hidden='true' className='size-4' />
         Edit
       </button>
     ) : (
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button variant='action' onClick={() => setEditOpen(true)}>
-            <Pencil className='size-5 transition-all duration-300 ease-in group-hover:text-blue-300' />
+          <Button
+            aria-label='Open Edit Dialog'
+            variant='action'
+            onClick={() => setEditOpen(true)}
+          >
+            <Pencil
+              aria-hidden='true'
+              className='size-5 transition-all duration-300 ease-in group-hover:text-blue-300'
+            />
           </Button>
         </TooltipTrigger>
         <TooltipContent>Edit Booking</TooltipContent>
@@ -440,12 +463,19 @@ export function BookingActions({
               <button
                 className={`${stubBtn} text-[#FF6060]/70 hover:bg-[#FF6060]/10 hover:text-[#FF6060]`}
               >
-                <Ban className='size-4' />
+                <Ban aria-hidden='true' className='size-4' />
                 Cancel
               </button>
             ) : (
-              <Button disabled={cancelBooking.isPending} variant='action'>
-                <Ban className='size-5 transition-all duration-300 ease-in group-hover:text-[#FF6060]' />
+              <Button
+                aria-label='Open Cancel Booking Dialog'
+                disabled={cancelBooking.isPending}
+                variant='action'
+              >
+                <Ban
+                  aria-hidden='true'
+                  className='size-5 transition-all duration-300 ease-in group-hover:text-[#FF6060]'
+                />
               </Button>
             )}
           </AlertDialogTrigger>
@@ -483,13 +513,20 @@ export function BookingActions({
         <TooltipTrigger asChild>
           <AlertDialogTrigger asChild>
             {isCompact ? (
-              <button className={stubBtn}>
-                <RotateCcw className='size-4' />
+              <Button aria-label='Open Refund Dialog' className={stubBtn}>
+                <RotateCcw aria-hidden='true' className='size-4' />
                 Refund
-              </button>
+              </Button>
             ) : (
-              <Button disabled={markRefunded.isPending} variant='action'>
-                <Wallet className='size-5 transition-all duration-300 ease-in group-hover:text-green-600' />
+              <Button
+                aria-label='Open Refund Dialog'
+                disabled={markRefunded.isPending}
+                variant='action'
+              >
+                <Wallet
+                  aria-hidden='true'
+                  className='size-5 transition-all duration-300 ease-in group-hover:text-green-600'
+                />
               </Button>
             )}
           </AlertDialogTrigger>

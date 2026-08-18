@@ -19,7 +19,7 @@ export default function HeroSection() {
       <HeroBackground />
 
       <div className='absolute inset-0 z-10 flex flex-col items-center justify-center px-4 py-4 sm:px-6 sm:py-12 lg:px-8 lg:py-20'>
-        <div className='hero-badge '>
+        <div className='hero-badge mb-4 sm:mb-2'>
           <Badge
             responsive
             color='green'
@@ -40,7 +40,7 @@ export default function HeroSection() {
           </Badge>
         </div>
         <div className='relative mt:6 sm:mt-7 min-w-[90dvw] sm:max-w-3xl text-center'>
-          <h1 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold w-full'>
+          <h1 className='w-full text-[clamp(2.25rem,8vw,3.75rem)] font-extrabold leading-[1.05]'>
             <span className='line-mask'>
               <span
                 className='line-inner bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent'
@@ -51,13 +51,13 @@ export default function HeroSection() {
             </span>
           </h1>
           <span className='line-mask'>
-            <span
-              className='line-inner mx-auto mt-5 text-[15px] leading-5 font-medium text-white/75'
+            <p
+              className='line-inner pt-4 max-w-[80ch] text-left text-[clamp(0.8rem,2.2vw,1.125rem)] leading-normal sm:leading-[1.65] text-[#bcbcbc]'
               style={{ animationDelay: '0.4s' }}
             >
               Laid-back hangout featuring PC and PlayStation games, plus racing
               simulators and VR options.
-            </span>
+            </p>
           </span>
         </div>
         <HeroCtas />

@@ -80,7 +80,7 @@ export default function AdminGamesPage() {
           onClick={openAdd}
           className='flex items-center gap-1.5 rounded-md bg-cyan-400 px-4 py-2 text-sm font-bold text-black hover:bg-cyan-300'
         >
-          <Plus className='h-4 w-4' /> Add game
+          <Plus className='h-4 w-4' aria-hidden='true' /> Add game
         </button>
       </div>
 
@@ -106,11 +106,13 @@ export default function AdminGamesPage() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
+                        aria-label='Open Games DropDown Menu'
                         variant='icon-plain'
                         size='icon-sm'
                         className='group absolute top-3 right-3 rounded-full border border-cyan-200 bg-[#18292A] text-white/80 hover:bg-black hover:text-white hover:border-cyan-400/50 hover:shadow-[0_0_16px_rgba(34,211,238,.25)] transition-all duration-200 ease-in-out '
                       >
                         <MoreHorizontal
+                          aria-hidden='true'
                           className='h-5 w-5 group-hover:motion-preset-pulse-sm'
                           color='#FFF'
                         />
@@ -118,7 +120,7 @@ export default function AdminGamesPage() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent>
                       <DropdownMenuItem onClick={() => openEdit(game)}>
-                        <Pencil />
+                        <Pencil aria-hidden='true' />
                         Edit
                       </DropdownMenuItem>
 
@@ -126,7 +128,7 @@ export default function AdminGamesPage() {
                         variant='destructive'
                         onClick={() => handleDelete(game)}
                       >
-                        <Trash2 />
+                        <Trash2 aria-hidden='true' />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>
