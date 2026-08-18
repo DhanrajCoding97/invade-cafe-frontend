@@ -425,13 +425,18 @@ export default function () {
                   className='mt-auto flex justify-between'
                 >
                   {stepIndex > 0 && (
-                    <button
+                    <CornerCutButton
                       type='button'
                       onClick={goBack}
-                      className='text-white/60'
+                      color='cyan'
+                      variant='outline'
+                      showArrow
+                      arrowDirection='left'
+                      hoverEffect='shift'
+                      fullWidthOnMobile={false}
                     >
                       Back
-                    </button>
+                    </CornerCutButton>
                   )}
                   {step !== 'payment' && step !== 'summary' && (
                     // <button
@@ -451,7 +456,7 @@ export default function () {
                       variant='outline'
                       showArrow
                       hoverEffect='shift'
-                      fullWidthOnMobile={true}
+                      fullWidthOnMobile={false}
                     >
                       {isNextLoading ? 'Processing…' : `Next`}
                     </CornerCutButton>

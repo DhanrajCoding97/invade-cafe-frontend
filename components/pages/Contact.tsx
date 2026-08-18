@@ -55,7 +55,7 @@ export default function Contact() {
         </TextReveal>
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='py-2 max-w-3xl text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
             Invade Gaming Cafe is located on the ground floor of Bhakti
             Residency, Shop-08/A, Plot Number-06, opposite Juinagar Railway
             Station in Sector 11, Sanpada, Navi Mumbai. We're open daily from 10

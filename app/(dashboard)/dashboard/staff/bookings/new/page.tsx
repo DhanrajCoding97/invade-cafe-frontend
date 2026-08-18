@@ -7,9 +7,6 @@ export default function NewBookingPage() {
     <div className='flex flex-col items-center justify-center'>
       <ManualBookingForm
         mode='create'
-        // onSuccess={(bookingId) => {
-        //   router.push('/dashboard/staff/bookings');
-        // }}
         onSuccess={() => router.push('/dashboard/staff/bookings')}
       />
     </div>

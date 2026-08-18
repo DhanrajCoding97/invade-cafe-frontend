@@ -3,6 +3,7 @@ import React, { ButtonHTMLAttributes, ReactNode } from 'react';
 // import './corner-cut-button.css';
 import styles from './corner-cut-button.module.css';
 import { cn } from '@/lib/utils';
+import { MoveLeft, MoveRight } from 'lucide-react';
 // import Link from 'next/link';
 // ---- Types -------------------------------------------------
 
@@ -149,6 +150,8 @@ export interface CornerCutButtonProps extends ButtonHTMLAttributes<HTMLButtonEle
    */
   showArrow?: boolean;
 
+  arrowDirection?: 'right' | 'left';
+
   /**
    * Hover effect color. Overrides the element color on hover (for glow and shift effects).
    */
@@ -203,6 +206,7 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
   hoverEffect = 'default',
   glowIntensity = 'medium',
   showArrow = false,
+  arrowDirection,
   hoverColor,
   hoverOutlined = false,
   textColor,
@@ -383,12 +387,25 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
             .join(' ')}
         >
           {children}
-          {showArrow && (
+          {/* {showArrow && (
             <span
               className='inline-block transition-transform group-hover:translate-x-1'
               aria-hidden='true'
             >
               →
+            </span>
+          )} */}
+          {showArrow && (
+            <span
+              className={cn(
+                'inline-block transition-transform',
+                arrowDirection === 'left'
+                  ? 'group-hover:-translate-x-1'
+                  : 'group-hover:translate-x-1',
+              )}
+              aria-hidden='true'
+            >
+              {arrowDirection === 'left' ? <MoveLeft /> : <MoveRight />}
             </span>
           )}
         </span>
