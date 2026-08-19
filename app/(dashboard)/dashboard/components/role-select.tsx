@@ -21,7 +21,10 @@ import {
 import { useUpdateUserRole } from '@/hooks/use-customer-mutation';
 import { type CustomerRow } from '@/types';
 import { toast } from 'sonner';
-import Badge from '@/app/components/neonblade-ui/badge';
+import dynamic from 'next/dynamic';
+const Badge = dynamic(() => import('@/app/components/neonblade-ui/badge'), {
+  ssr: false,
+});
 import { type UserRole } from '@/types';
 
 export function RoleSelect({ customer }: { customer: CustomerRow }) {
