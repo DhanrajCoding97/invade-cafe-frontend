@@ -1,5 +1,12 @@
 'use client';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import dynamic from 'next/dynamic';
+
+const CornerCutButton = dynamic(
+  () => import('@/app/components/neonblade-ui/corner-cut-button'),
+  {
+    ssr: false,
+  },
+);
 import { FcGoogle } from 'react-icons/fc';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
 import Image from 'next/image';

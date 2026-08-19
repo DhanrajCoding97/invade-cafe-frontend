@@ -1,7 +1,13 @@
 'use client';
 import { useRef } from 'react';
 import { services } from '@/types';
-import NeonGlowCornerCutCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card';
+import dynamic from 'next/dynamic';
+const NeonGlowCornerCutCard = dynamic(
+  () => import('@/app/components/neonblade-ui/neon-glow-corner-cut-card'),
+  {
+    ssr: false,
+  },
+);
 import LineReveal from '../gsap/LineReveal';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';

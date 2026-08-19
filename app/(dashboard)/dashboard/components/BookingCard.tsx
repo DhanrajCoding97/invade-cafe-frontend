@@ -15,7 +15,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import Badge from '@/app/components/neonblade-ui/badge';
+import dynamic from 'next/dynamic';
+const Badge = dynamic(() => import('@/app/components/neonblade-ui/badge'), {
+  ssr: false,
+});
 import type { BookingRow } from '@/types';
 import { BookingActions } from '@/app/actions/booking-actions';
 

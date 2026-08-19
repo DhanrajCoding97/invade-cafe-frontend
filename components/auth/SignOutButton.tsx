@@ -28,7 +28,14 @@
 
 'use client';
 import { toast } from 'sonner';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import dynamic from 'next/dynamic';
+
+const CornerCutButton = dynamic(
+  () => import('@/app/components/neonblade-ui/corner-cut-button'),
+  {
+    ssr: false,
+  },
+);
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 

@@ -1,6 +1,6 @@
 // EmblaCarouselDotButton.tsx
 'use client';
-
+import { type Slide } from './VideoImageCarousel';
 import React, {
   ComponentPropsWithRef,
   useCallback,
@@ -8,6 +8,11 @@ import React, {
   useState,
 } from 'react';
 import { EmblaCarouselType } from 'embla-carousel';
+interface DotButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  slide: Slide;
+  isSelected: boolean;
+  dotClassName?: string; // new
+}
 
 type UseDotButtonType = {
   selectedIndex: number;
@@ -51,11 +56,24 @@ export const useDotButton = (
   return { selectedIndex, scrollSnaps, onDotButtonClick };
 };
 
-export const DotButton: React.FC<ComponentPropsWithRef<'button'>> = (props) => {
-  const { children, ...restProps } = props;
+// DotButton.tsx
+export const DotButton: React.FC<DotButtonProps> = ({
+  slide,
+  isSelected,
+  dotClassName, // renamed — styles the visual dot, not the button
+  ...restProps
+}) => {
+  const label = slide.alt ?? (slide.type === 'video' ? 'video slide' : 'slide');
+
   return (
-    <button aria-label='Slider Dot buttons' type='button' {...restProps}>
-      {children}
+    <button
+      className='flex h-11 w-8 shrink-0 items-center justify-center' // touch target — never overridden
+      aria-label={`Go to ${label}`}
+      aria-current={isSelected ? 'true' : undefined}
+      type='button'
+      {...restProps}
+    >
+      <span className={dotClassName} /> {/* the actual visible dot */}
     </button>
   );
 };

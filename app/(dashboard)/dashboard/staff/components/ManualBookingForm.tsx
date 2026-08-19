@@ -26,7 +26,12 @@ import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import { useAvailableStations } from '@/hooks/UseAvailableStation';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+const CornerCutButton = dynamic(
+  () => import('@/app/components/neonblade-ui/corner-cut-button'),
+  {
+    ssr: false,
+  },
+);
 import {
   manualBookingSchema,
   type ManualBookingValues,

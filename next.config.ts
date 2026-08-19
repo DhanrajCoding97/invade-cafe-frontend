@@ -67,6 +67,9 @@
   });
 
   const nextConfig: NextConfig = {
+    experimental: {
+      cssChunking: 'strict'
+  },
     images: {
       remotePatterns: [
         {
@@ -81,6 +84,7 @@
       ],
     },
 
+    
     turbopack: {
       rules: {
         '*.svg': {

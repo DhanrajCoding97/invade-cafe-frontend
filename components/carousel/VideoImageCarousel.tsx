@@ -20,7 +20,7 @@ const numberWithinRange = (n: number, min: number, max: number) =>
 
 export type Slide =
   | { type: 'image'; src: string; alt: string }
-  | { type: 'video'; src: string; alt?: string, poster: string };
+  | { type: 'video'; src: string; alt?: string; poster: string };
 
 type VideoImageCarouselProps = {
   slides: Slide[];
@@ -85,8 +85,10 @@ export function VideoImageCarousel({
               const target = loopItem.target();
               if (slideIndex === loopItem.index && target !== 0) {
                 const sign = Math.sign(target);
-                if (sign === -1) diffToTarget = scrollSnap - (1 + scrollProgress);
-                if (sign === 1) diffToTarget = scrollSnap + (1 - scrollProgress);
+                if (sign === -1)
+                  diffToTarget = scrollSnap - (1 + scrollProgress);
+                if (sign === 1)
+                  diffToTarget = scrollSnap + (1 - scrollProgress);
               }
             });
           }
@@ -200,7 +202,9 @@ export function VideoImageCarousel({
                   />
                 ) : (
                   <video
-                    ref={(el) => { videoRefs.current[index] = el; }}
+                    ref={(el) => {
+                      videoRefs.current[index] = el;
+                    }}
                     src={slide.src}
                     poster={slide.poster}
                     muted
@@ -213,7 +217,9 @@ export function VideoImageCarousel({
 
                 {/* Dimming overlay — replaces opacity-based fade, zero bleed-through */}
                 <div
-                  ref={(el) => { overlayRefs.current[index] = el; }}
+                  ref={(el) => {
+                    overlayRefs.current[index] = el;
+                  }}
                   className={cn(
                     'pointer-events-none absolute inset-0 bg-black transition-opacity duration-500 ease-out',
                     index === selectedIndex ? 'opacity-0' : 'opacity-40',
@@ -230,10 +236,14 @@ export function VideoImageCarousel({
         <div className='flex gap-2'>
           {scrollSnaps.map((_, index) => (
             <DotButton
+              slide={slides[index]}
+              isSelected={index === selectedIndex}
               key={index}
               onClick={() => onDotButtonClick(index)}
-              className={`h-2 w-2 rounded-full transition-colors ${
-                index === selectedIndex ? 'bg-cyan-400' : 'bg-white/25'
+              dotClassName={`h-3 w-3 rounded-full transition-colors duration-300 ease-in ${
+                index === selectedIndex
+                  ? 'bg-cyan-400'
+                  : 'bg-white/25 hover:bg-cyan-400'
               }`}
             />
           ))}

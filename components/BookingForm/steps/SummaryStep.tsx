@@ -8,7 +8,14 @@ import { createClient } from '@/lib/supabase/client';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import type { BookingFormValues } from '@/lib/schemas/BookingFormSchema';
 import { FcGoogle } from 'react-icons/fc';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import dynamic from 'next/dynamic';
+
+const CornerCutButton = dynamic(
+  () => import('@/app/components/neonblade-ui/corner-cut-button'),
+  {
+    ssr: false,
+  },
+);
 import { cn } from '@/lib/utils';
 
 import { useState } from 'react';

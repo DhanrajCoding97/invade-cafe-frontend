@@ -1,6 +1,12 @@
 'use client';
-import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import dynamic from 'next/dynamic';
 
+const CornerCutButton = dynamic(
+  () => import('@/app/components/neonblade-ui/corner-cut-button'),
+  {
+    ssr: false,
+  },
+);
 export default function HeroCtas() {
   return (
     <div className='mt-8 sm:mt-10 flex w-full flex-col items-center justify-center gap-4 xs:flex-row'>

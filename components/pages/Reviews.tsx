@@ -1,7 +1,15 @@
 'use client';
 import { Review } from '@/types';
 import { Marquee } from '../ui/marquee';
-import NeonGlowCornerCutCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card';
+import dynamic from 'next/dynamic';
+
+const NeonGlowCornerCutCard = dynamic(
+  () => import('@/app/components/neonblade-ui/neon-glow-corner-cut-card'),
+  {
+    ssr: false,
+  },
+);
+
 import Link from 'next/link';
 import { useRef } from 'react';
 import LineReveal from '../gsap/LineReveal';

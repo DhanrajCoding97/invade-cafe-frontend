@@ -124,6 +124,7 @@ export default function Contact() {
           <div className='group relative order-1 min-h-85 overflow-hidden rounded-2xl border border-white/10 transition-colors hover:border-[#00d4ff]/40 md:order-2'>
             <div className='pointer-events-none absolute -inset-4 -z-10 rounded-3xl bg-[#00d4ff]/10 opacity-0 blur-2xl transition-opacity group-hover:opacity-100' />
             <iframe
+              title='InVade Gaming Cafe location on Google Maps'
               src='https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3643.5212078436365!2d73.01288567520483!3d19.05530278214504!2m3!1f0!2f0!3f0!3m2!1i1020!2i768!4f13.1!3m3!1m2!1s0x3be7c17d6e4b5365%3A0x3ef9695a4157527c!2sINVADE%20GAMING%20CAFE!5e1!3m2!1sen!2sin!4v1783675916752!5m2!1sen!2sin'
               width='100%'
               height='100%'

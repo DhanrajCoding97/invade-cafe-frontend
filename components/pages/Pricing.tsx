@@ -1,5 +1,14 @@
 'use client';
-import PricingCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard';
+// import PricingCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard';
+import dynamic from 'next/dynamic';
+
+const PricingCard = dynamic(
+  () =>
+    import('@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard'),
+  {
+    ssr: false,
+  },
+);
 import { useRouter } from 'next/navigation';
 import { VrIcon } from '../svgs';
 import { PsIcon } from '../svgs';
