@@ -52,7 +52,7 @@ export default function HeroSection() {
           </h1>
           <span className='line-mask'>
             <p
-              className='line-inner pt-4 max-w-[80ch] text-left text-[clamp(0.8rem,2.2vw,1.125rem)] leading-normal sm:leading-[1.65] text-[#bcbcbc]'
+              className='line-inner text-center pt-4 max-w-[80ch]  text-[clamp(0.8rem,2.2vw,1.125rem)] leading-normal sm:leading-[1.65] text-[#bcbcbc]'
               style={{ animationDelay: '0.4s' }}
             >
               Laid-back hangout featuring PC and PlayStation games, plus racing

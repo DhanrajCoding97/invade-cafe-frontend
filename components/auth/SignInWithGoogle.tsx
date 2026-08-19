@@ -1,12 +1,6 @@
 'use client';
-import dynamic from 'next/dynamic';
-
-const CornerCutButton = dynamic(
-  () => import('@/app/components/neonblade-ui/corner-cut-button'),
-  {
-    ssr: false,
-  },
-);
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+import { useNavMobileMenu } from '@/app//components/neonblade-ui/navbar/navbar-context';
 import { FcGoogle } from 'react-icons/fc';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
 import Image from 'next/image';
@@ -23,17 +17,24 @@ import { useState } from 'react';
 export default function SignInWithGoogle() {
   const [loginOpen, SetLoginOpen] = useState(false);
   const isMobile = useIsMobile();
+  const { closeMobileMenu } = useNavMobileMenu();
   return (
-    <Dialog open={loginOpen} onOpenChange={SetLoginOpen}>
+    <Dialog
+      open={loginOpen}
+      onOpenChange={(open) => {
+        SetLoginOpen(open);
+        if (open) closeMobileMenu();
+      }}
+    >
       <DialogTrigger asChild>
         <button
-          className={styles['nbr-mobile-item']}
           onClick={() => SetLoginOpen(true)}
+          className='cursor-pointer relative inline-flex items-center justify-center border border-cyan-400/40 bg-cyan-400/5 px-5 py-2 font-orbitron text-[0.7rem] font-medium uppercase tracking-[0.12em] text-cyan-300 transition-all duration-200 hover:border-cyan-300 hover:bg-cyan-400/10 hover:text-cyan-200 hover:shadow-[0_0_14px_-4px_rgba(34,211,238,0.8)]'
         >
           Login
         </button>
       </DialogTrigger>
-      <DialogContent className='z-9999 w-full max-w-[90vw] border border-primary/30 bg-black p-0 shadow-glow-cyan [&>button]:hidden'>
+      <DialogContent className='w-full max-w-[90vw] border border-primary/30 bg-black p-0 shadow-glow-cyan [&>button]:hidden'>
         {/* Background grid */}
         <div className='absolute inset-0 pointer-events-none bg-grid opacity-60' />
 

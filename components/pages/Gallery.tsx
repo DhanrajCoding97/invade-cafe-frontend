@@ -37,44 +37,44 @@ export default function GallerySection() {
     <section
       id='gallery'
       ref={sectionRef}
-      className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
+      className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 '
     >
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          {/* <LineReveal triggerRef={sectionRef} delay={0}>
-          </LineReveal> */}
-          <div className='h-px w-8 bg-[#00d4ff]' />
-          {/* <TextReveal triggerRef={sectionRef} delay={0.15}>
-          </TextReveal> */}
-          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            INSIDE THE CAFE
-          </span>
+          <LineReveal triggerRef={sectionRef} delay={0}>
+            <div className='h-px w-8 bg-[#00d4ff]' />
+          </LineReveal>
+          <TextReveal triggerRef={sectionRef} delay={0.15}>
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              INSIDE THE CAFE
+            </span>
+          </TextReveal>
         </div>
         {/* main title */}
-        {/* <TextReveal triggerRef={sectionRef} delay={0.25}>
-        </TextReveal> */}
-        <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-          <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-            Gallery
-          </span>
-        </h2>
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Gallery
+            </span>
+          </h2>
+        </TextReveal>
         {/* description */}
-        {/* <TextReveal triggerRef={sectionRef} delay={0.55}>
-        </TextReveal> */}
-        <p className='py-2 max-w-[80ch] text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
-          Step inside and you'll find a space built for gamers — dedicated PC
-          stations with proper gaming chairs, a PS5 corner for couch co-op and
-          competitive play, sim racing rigs set up for a genuinely immersive
-          driving experience, and a VR zone for stepping fully into the game.
-          Take a look through our gallery to get a feel for the setups and
-          atmosphere before you visit.
-        </p>
-        {/* <LineReveal triggerRef={sectionRef} delay={0.75}>
-        </LineReveal> */}
-        <div className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
-          <VideoImageCarousel slides={CarouselSlides} />
-        </div>
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+          <p className='py-2 max-w-[80ch] text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Step inside and you'll find a space built for gamers — dedicated PC
+            stations with proper gaming chairs, a PS5 corner for couch co-op and
+            competitive play, sim racing rigs set up for a genuinely immersive
+            driving experience, and a VR zone for stepping fully into the game.
+            Take a look through our gallery to get a feel for the setups and
+            atmosphere before you visit.
+          </p>
+        </TextReveal>
+        <LineReveal triggerRef={sectionRef} delay={0.75}>
+          <div className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
+            <VideoImageCarousel slides={CarouselSlides} />
+          </div>
+        </LineReveal>
       </div>
     </section>
   );

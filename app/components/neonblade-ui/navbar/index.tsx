@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, ReactNode } from 'react';
 import { getLenisInstance } from '@/lib/lenisInstance';
 import { cn } from '@/lib/utils';
 import styles from './navbar.module.css';
+import { NavMobileMenuContext } from './navbar-context';
 
 /** Named color presets or any valid CSS color string */
 export type NavBarColor = 'cyan' | 'pink' | 'green' | (string & {});
@@ -683,63 +684,69 @@ export const NavBar: React.FC<NavBarProps> = ({
           : styles['nbr-pos-fixed'];
 
     return (
-      <nav
-        className={cn(
-          styles['nbr-dock'],
-          styles[`nbr-dock--${dockPosition}`],
-          hidden && styles['nbr-hidden'],
-          dockPosClass,
-          className,
-        )}
-        // className={`nbr-dock nbr-dock--${dockPosition} ${hidden ? 'nbr-hidden' : ''} ${dockPosClass} ${className}`}
-        style={cssVars}
-        aria-label='Navigation'
+      <NavMobileMenuContext.Provider
+        value={{ closeMobileMenu: () => setMobileOpen(false) }}
       >
-        <div className={styles['nbr-dock-inner']}>
-          {items.map((item, idx) => (
-            <a
-              key={idx}
-              href={item.href}
-              className={cn(
-                styles['nbr-dock-item'],
-                item.active && styles['nbr-dock-item--active'],
-              )}
-              onClick={item.onClick}
-              title={item.label}
-              aria-label={item.label}
-            >
-              {item.icon && (
-                <span className='flex h-[1.1rem] w-[1.1rem] items-center justify-center'>
-                  {item.icon}
-                </span>
-              )}
-              {dockShowLabels && (
-                <span className={styles['nbr-dock-item-label']}>
-                  {item.label}
-                </span>
-              )}
-            </a>
-          ))}
-
-          {showProfile && (
-            <>
-              <div className={styles['nbr-dock-profile-sep']} aria-hidden />
-              <div className={styles['nbr-dock-item']}>
-                <ProfileDropdown
-                  avatar={profileAvatar}
-                  name={profileName}
-                  items={profileItems}
-                  color={resolvedColor}
-                  onAction={onProfileAction}
-                />
-                {dockShowLabels && (
-                  <span className={styles['nbr-dock-item-label']}>Account</span>
-                )}
-              </div>
-            </>
+        <nav
+          className={cn(
+            styles['nbr-dock'],
+            styles[`nbr-dock--${dockPosition}`],
+            hidden && styles['nbr-hidden'],
+            dockPosClass,
+            className,
           )}
-        </div>
-      </nav>
+          // className={`nbr-dock nbr-dock--${dockPosition} ${hidden ? 'nbr-hidden' : ''} ${dockPosClass} ${className}`}
+          style={cssVars}
+          aria-label='Navigation'
+        >
+          <div className={styles['nbr-dock-inner']}>
+            {items.map((item, idx) => (
+              <a
+                key={idx}
+                href={item.href}
+                className={cn(
+                  styles['nbr-dock-item'],
+                  item.active && styles['nbr-dock-item--active'],
+                )}
+                onClick={item.onClick}
+                title={item.label}
+                aria-label={item.label}
+              >
+                {item.icon && (
+                  <span className='flex h-[1.1rem] w-[1.1rem] items-center justify-center'>
+                    {item.icon}
+                  </span>
+                )}
+                {dockShowLabels && (
+                  <span className={styles['nbr-dock-item-label']}>
+                    {item.label}
+                  </span>
+                )}
+              </a>
+            ))}
+
+            {showProfile && (
+              <>
+                <div className={styles['nbr-dock-profile-sep']} aria-hidden />
+                <div className={styles['nbr-dock-item']}>
+                  <ProfileDropdown
+                    avatar={profileAvatar}
+                    name={profileName}
+                    items={profileItems}
+                    color={resolvedColor}
+                    onAction={onProfileAction}
+                  />
+                  {dockShowLabels && (
+                    <span className={styles['nbr-dock-item-label']}>
+                      Account
+                    </span>
+                  )}
+                </div>
+              </>
+            )}
+          </div>
+        </nav>
+      </NavMobileMenuContext.Provider>
     );
   }
 
@@ -763,7 +770,9 @@ export const NavBar: React.FC<NavBarProps> = ({
       : styles[`nbr-bg-${transparency}`];
 
   return (
-    <>
+    <NavMobileMenuContext.Provider
+      value={{ closeMobileMenu: () => setMobileOpen(false) }}
+    >
       <nav
         className={cn(
           styles['nbr-root'],
@@ -777,7 +786,7 @@ export const NavBar: React.FC<NavBarProps> = ({
         style={cssVars}
         aria-label='Navigation'
       >
-        <div className='mx-auto flex items-center justify-between gap-4 px-6 py-3.5'>
+        <div className='mx-auto flex items-center justify-between gap-4 px-6 py-3.5 '>
           {/* Logo */}
           {logoNode}
 
@@ -942,9 +951,16 @@ export const NavBar: React.FC<NavBarProps> = ({
                 </div>
               );
             })}
-            {authSlot && (
-              <div className='mt-3 px-0.5 md:hidden'>{authSlot}</div>
+          </div>
+        )}
+        {authSlot && (
+          <div
+            className={cn(
+              'px-5 pb-3.5 md:hidden bg-black',
+              mobileOpen ? 'block' : 'hidden',
             )}
+          >
+            {authSlot}
           </div>
         )}
       </nav>
@@ -957,7 +973,7 @@ export const NavBar: React.FC<NavBarProps> = ({
           aria-hidden
         />
       )}
-    </>
+    </NavMobileMenuContext.Provider>
   );
 };
 

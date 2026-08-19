@@ -1,14 +1,7 @@
 'use client';
 import styles from './pricing-card.module.css';
 import React, { HTMLAttributes, ReactNode, useState } from 'react';
-import dynamic from 'next/dynamic';
-
-const CornerCutButton = dynamic(
-  () => import('@/app/components/neonblade-ui/corner-cut-button'),
-  {
-    ssr: false,
-  },
-);
+import CornerCutButton from '../corner-cut-button';
 import { Minus, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 // ---- Types -------------------------------------------------

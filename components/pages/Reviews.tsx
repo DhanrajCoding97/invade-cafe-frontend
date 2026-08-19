@@ -57,87 +57,87 @@ export default function TestimonialSection() {
     <section
       id='testimonials'
       ref={sectionRef}
-      className='overflow-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
+      className='overflow-hidden px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20'
     >
       <div className='mx-auto mt-8 md:mt-10 lg:mt-12 max-w-6xl'>
         <div className='my-4 flex items-center gap-4'>
-          {/* <LineReveal triggerRef={sectionRef} delay={0}>
-          </LineReveal> */}
-          <div className='h-px w-8 bg-[#00d4ff]' />
-          {/* <TextReveal triggerRef={sectionRef} delay={0.25}>
-          </TextReveal> */}
-          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            WHAT PLAYERS SAY
-          </span>
+          <LineReveal triggerRef={sectionRef} delay={0}>
+            <div className='h-px w-8 bg-[#00d4ff]' />
+          </LineReveal>
+          <TextReveal triggerRef={sectionRef} delay={0.25}>
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              WHAT PLAYERS SAY
+            </span>
+          </TextReveal>
         </div>
         {/* main title */}
-        {/* <TextReveal triggerRef={sectionRef} delay={0.25}>
-        </TextReveal> */}
-        <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-          <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-            Testimonials
-          </span>
-        </h2>
-        {/* <TextReveal triggerRef={sectionRef} delay={0.55}>
-        </TextReveal> */}
-        <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
-          Our regulars keep coming back for the setups, the atmosphere, and the
-          community — here's what real customers have to say about their
-          experience at Invade Gaming Cafe.
-        </p>
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Testimonials
+            </span>
+          </h2>
+        </TextReveal>
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            Our regulars keep coming back for the setups, the atmosphere, and
+            the community — here's what real customers have to say about their
+            experience at Invade Gaming Cafe.
+          </p>
+        </TextReveal>
       </div>
-      <div className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'>
-        <Marquee pauseOnHover className='[--duration:22s]'>
-          {firstRow.map((review, index) => (
-            <Link
-              aria-label='Google Review Link'
-              className='flex w-[clamp(260px,80vw,320px)] shrink-0'
-              key={index}
-              href='https://biturl.in/Home/Index/54F66B24'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <NeonGlowCornerCutCard
-                type='marquee'
-                colorA='cyan'
-                reviewerName={review.name}
-                reviewerInitial={review.name.at(0)}
-                reviewRating={review.rating}
-                reviewText={review.text}
-                hoverEffect='pulse'
-                glowIntensity='medium'
-              />
-            </Link>
-          ))}
-        </Marquee>
-        <Marquee reverse pauseOnHover className='[--duration:22s]'>
-          {secondRow.map((review, index) => (
-            <Link
-              aria-label='Google Review Link'
-              className='flex w-[clamp(260px,80vw,320px)] shrink-0'
-              key={index}
-              href='https://biturl.in/Home/Index/54F66B24'
-              target='_blank'
-              rel='noopener noreferrer'
-            >
-              <NeonGlowCornerCutCard
-                type='marquee'
-                colorA='cyan'
-                reviewerName={review.name}
-                reviewerInitial={review.name.at(0)}
-                reviewRating={review.rating}
-                reviewText={review.text}
-                hoverEffect='pulse'
-                glowIntensity='low'
-              />
-            </Link>
-          ))}
-        </Marquee>
-        <div className='pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-black to-transparent' />
-        <div className='pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-black to-transparent' />
-      </div>
-      {/* <LineReveal triggerRef={sectionRef} delay={0.75}>
-      </LineReveal> */}
+      <LineReveal triggerRef={sectionRef} delay={0.75}>
+        <div className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'>
+          <Marquee pauseOnHover className='[--duration:22s]'>
+            {firstRow.map((review, index) => (
+              <Link
+                aria-label='Google Review Link'
+                className='flex w-[clamp(260px,80vw,320px)] shrink-0'
+                key={index}
+                href='https://biturl.in/Home/Index/54F66B24'
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <NeonGlowCornerCutCard
+                  type='marquee'
+                  colorA='cyan'
+                  reviewerName={review.name}
+                  reviewerInitial={review.name.at(0)}
+                  reviewRating={review.rating}
+                  reviewText={review.text}
+                  hoverEffect='pulse'
+                  glowIntensity='medium'
+                />
+              </Link>
+            ))}
+          </Marquee>
+          <Marquee reverse pauseOnHover className='[--duration:22s]'>
+            {secondRow.map((review, index) => (
+              <Link
+                aria-label='Google Review Link'
+                className='flex w-[clamp(260px,80vw,320px)] shrink-0'
+                key={index}
+                href='https://biturl.in/Home/Index/54F66B24'
+                target='_blank'
+                rel='noopener noreferrer'
+              >
+                <NeonGlowCornerCutCard
+                  type='marquee'
+                  colorA='cyan'
+                  reviewerName={review.name}
+                  reviewerInitial={review.name.at(0)}
+                  reviewRating={review.rating}
+                  reviewText={review.text}
+                  hoverEffect='pulse'
+                  glowIntensity='low'
+                />
+              </Link>
+            ))}
+          </Marquee>
+          <div className='pointer-events-none absolute inset-y-0 left-0 w-1/4 bg-linear-to-r from-black to-transparent' />
+          <div className='pointer-events-none absolute inset-y-0 right-0 w-1/4 bg-linear-to-l from-black to-transparent' />
+        </div>
+      </LineReveal>
     </section>
   );
 }

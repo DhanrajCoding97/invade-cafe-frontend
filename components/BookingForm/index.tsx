@@ -14,13 +14,13 @@ import SummaryStep from './steps/SummaryStep';
 import PaymentStep from './steps/PaymentStep';
 import ConfirmedStep from './steps/ConfirmedStep';
 import dynamic from 'next/dynamic';
-
-const CornerCutButton = dynamic(
-  () => import('@/app/components/neonblade-ui/corner-cut-button'),
-  {
-    ssr: false,
-  },
-);
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
+// const CornerCutButton = dynamic(
+//   () => import('@/app/components/neonblade-ui/corner-cut-button'),
+//   {
+//     ssr: false,
+//   },
+// );
 import {
   clearBookingDraft,
   loadBookingDraft,
@@ -39,7 +39,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
-// gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, useGSAP);
+gsap.registerPlugin(ScrollToPlugin);
 
 export const STEPS = [
   'device',
@@ -71,7 +71,7 @@ const DEVICE_MAP: Record<string, BookingFormValues['device']> = {
   racing: 'racing',
 };
 
-export default function () {
+export default function BookingForm() {
   const queryClient = useQueryClient();
   const searchParams = useSearchParams();
   const supabase = createClient();
@@ -183,14 +183,14 @@ export default function () {
 
     const headerOffset = 80; // px — match your sticky header height
 
-    // gsap.to(window, {
-    //   duration: 0.6,
-    //   ease: 'power2.out',
-    //   scrollTo: {
-    //     y: formTopRef.current,
-    //     offsetY: headerOffset,
-    //   },
-    // });
+    gsap.to(window, {
+      duration: 0.6,
+      ease: 'power2.out',
+      scrollTo: {
+        y: formTopRef.current,
+        offsetY: headerOffset,
+      },
+    });
   }, [stepIndex]);
 
   // async function goNext() {
@@ -349,129 +349,131 @@ export default function () {
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
-            // <StepTransition stepKey={step} direction={direction}>
-            //   </StepTransition>
             <>
-              {step === 'device' && (
-                <DeviceStep
-                  formCardRef={cardRef}
-                  isFirstReveal={!hasRevealedDeviceStep.current}
-                />
-              )}
-              {step === 'options' && <OptionsStep />}
-              {step === 'station' && conflictMessage && (
-                <div className='mb-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-300'>
-                  {conflictMessage}
-                </div>
-              )}
-              {step === 'station' && <StationStep />}
-              {step === 'datetime' && <DateTimeStep />}
-              {step === 'summary' && (
-                <SummaryStep
-                  session={session}
-                  onGoogleLogin={handleGoogleLogin}
-                  onContinue={goNext}
-                  isSubmitting={submitting}
-                />
-              )}
-              {step === 'payment' && (
-                // <PaymentStep
-                //   onPaymentSuccess={(id) => {
-                //     setBookingId(id);
-                //     setStepIndex((i) => i + 1); // advance to confirmation
-                //     setDirection(1);
-                //   }}
-                //   onSlotConflict={(message) => {
-                //     setDirection(-1);
-                //     setStepIndex(STEPS.indexOf('datetime'));
-                //     form.setValue('startTime', '');
-                //     form.setValue('stationId', '');
-                //     setConflictMessage(message);
-                //     queryClient.invalidateQueries({
-                //       queryKey: ['bookings', form.getValues('stationId')],
-                //     });
-                //     queryClient.invalidateQueries({ queryKey: ['stations'] });
-                //   }}
-                // />
-                <PaymentStep
-                  onPaymentSuccess={(id) => {
-                    setBookingId(id);
-                    setDirection(1);
-                    setStepIndex((i) => i + 1);
-                  }}
-                  onSlotConflict={(message) => {
-                    // Keep all booking details except the station
-                    form.setValue('stationId', '');
+              <StepTransition stepKey={step} direction={direction}>
+                {step === 'device' && (
+                  <DeviceStep
+                    formCardRef={cardRef}
+                    isFirstReveal={!hasRevealedDeviceStep.current}
+                  />
+                )}
+                {step === 'options' && <OptionsStep />}
+                {step === 'station' && conflictMessage && (
+                  <div className='mb-4 rounded-lg border border-amber-400/40 bg-amber-400/10 p-3 text-sm text-amber-300'>
+                    {conflictMessage}
+                  </div>
+                )}
+                {step === 'station' && <StationStep />}
+                {step === 'datetime' && <DateTimeStep />}
+                {step === 'summary' && (
+                  <SummaryStep
+                    session={session}
+                    onGoogleLogin={handleGoogleLogin}
+                    onContinue={goNext}
+                    isSubmitting={submitting}
+                  />
+                )}
+                {step === 'payment' && (
+                  // <PaymentStep
+                  //   onPaymentSuccess={(id) => {
+                  //     setBookingId(id);
+                  //     setStepIndex((i) => i + 1); // advance to confirmation
+                  //     setDirection(1);
+                  //   }}
+                  //   onSlotConflict={(message) => {
+                  //     setDirection(-1);
+                  //     setStepIndex(STEPS.indexOf('datetime'));
+                  //     form.setValue('startTime', '');
+                  //     form.setValue('stationId', '');
+                  //     setConflictMessage(message);
+                  //     queryClient.invalidateQueries({
+                  //       queryKey: ['bookings', form.getValues('stationId')],
+                  //     });
+                  //     queryClient.invalidateQueries({ queryKey: ['stations'] });
+                  //   }}
+                  // />
+                  <PaymentStep
+                    onPaymentSuccess={(id) => {
+                      setBookingId(id);
+                      setDirection(1);
+                      setStepIndex((i) => i + 1);
+                    }}
+                    onSlotConflict={(message) => {
+                      // Keep all booking details except the station
+                      form.setValue('stationId', '');
 
-                    // Go back to Station selection
-                    setDirection(-1);
-                    setStepIndex(STEPS.indexOf('station'));
+                      // Go back to Station selection
+                      setDirection(-1);
+                      setStepIndex(STEPS.indexOf('station'));
 
-                    setConflictMessage(message);
+                      setConflictMessage(message);
 
-                    // Refresh station availability for the selected date/time
-                    queryClient.invalidateQueries({
-                      queryKey: [
-                        'stations',
-                        form.getValues('device'),
-                        form.getValues('tier'),
-                      ],
-                    });
+                      // Refresh station availability for the selected date/time
+                      queryClient.invalidateQueries({
+                        queryKey: [
+                          'stations',
+                          form.getValues('device'),
+                          form.getValues('tier'),
+                        ],
+                      });
 
-                    queryClient.invalidateQueries({
-                      queryKey: [
-                        'bookings',
-                        format(form.getValues('date'), 'yyyy-MM-dd'),
-                      ],
-                    });
-                  }}
-                />
-              )}
-              {step === 'confirmed' && <ConfirmedStep bookingId={bookingId} />}
-              {step !== 'confirmed' && (
-                <div
-                  ref={buttonContainerRef}
-                  className='mt-auto flex justify-between'
-                >
-                  {stepIndex > 0 && (
-                    <CornerCutButton
-                      type='button'
-                      onClick={goBack}
-                      color='cyan'
-                      variant='outline'
-                      showArrow
-                      arrowDirection='left'
-                      hoverEffect='shift'
-                      fullWidthOnMobile={false}
-                    >
-                      Back
-                    </CornerCutButton>
-                  )}
-                  {step !== 'payment' && step !== 'summary' && (
-                    // <button
-                    //   ref={nextButtonRef}
-                    //   type='button'
-                    //   onClick={goNext}
-                    //   className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
-                    // >
-                    //   Next
-                    // </button>
-                    <CornerCutButton
-                      className='ml-auto'
-                      type='button'
-                      disabled={isNextLoading}
-                      onClick={goNext}
-                      color='cyan'
-                      variant='outline'
-                      showArrow
-                      hoverEffect='shift'
-                      fullWidthOnMobile={false}
-                    >
-                      {isNextLoading ? 'Processing…' : `Next`}
-                    </CornerCutButton>
-                  )}
-                </div>
-              )}
+                      queryClient.invalidateQueries({
+                        queryKey: [
+                          'bookings',
+                          format(form.getValues('date'), 'yyyy-MM-dd'),
+                        ],
+                      });
+                    }}
+                  />
+                )}
+                {step === 'confirmed' && (
+                  <ConfirmedStep bookingId={bookingId} />
+                )}
+                {step !== 'confirmed' && (
+                  <div
+                    ref={buttonContainerRef}
+                    className='mt-auto flex justify-between'
+                  >
+                    {stepIndex > 0 && (
+                      <CornerCutButton
+                        type='button'
+                        onClick={goBack}
+                        color='cyan'
+                        variant='outline'
+                        showArrow
+                        arrowDirection='left'
+                        hoverEffect='shift'
+                        fullWidthOnMobile={false}
+                      >
+                        Back
+                      </CornerCutButton>
+                    )}
+                    {step !== 'payment' && step !== 'summary' && (
+                      // <button
+                      //   ref={nextButtonRef}
+                      //   type='button'
+                      //   onClick={goNext}
+                      //   className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
+                      // >
+                      //   Next
+                      // </button>
+                      <CornerCutButton
+                        className='ml-auto'
+                        type='button'
+                        disabled={isNextLoading}
+                        onClick={goNext}
+                        color='cyan'
+                        variant='outline'
+                        showArrow
+                        hoverEffect='shift'
+                        fullWidthOnMobile={false}
+                      >
+                        {isNextLoading ? 'Processing…' : `Next`}
+                      </CornerCutButton>
+                    )}
+                  </div>
+                )}
+              </StepTransition>
             </>
           )}
         </FormProvider>

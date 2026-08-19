@@ -2,10 +2,10 @@
 
 import React, { useRef } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+// import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
 
-gsap.registerPlugin(ScrollTrigger);
+// gsap.registerPlugin(ScrollTrigger);
 
 type CardsRevealProps = {
   children: React.ReactElement<{
@@ -67,6 +67,58 @@ type CardsRevealProps = {
 //   return React.cloneElement(children, { ref: containerRef });
 // }
 
+// export default function CardsReveal({
+//   children,
+//   delay = 0,
+//   stagger = 0.15,
+//   duration = 0.4,
+//   y = 48,
+//   start = 'top 80%',
+//   triggerRef,
+// }: CardsRevealProps) {
+//   const containerRef = useRef<HTMLDivElement>(null);
+//   const playedRef = useRef(false);
+
+//   useGSAP(
+//     () => {
+//       if (!containerRef.current) return;
+
+//       const cards = Array.from(containerRef.current.children);
+
+//       gsap.set(containerRef.current, { autoAlpha: 1 });
+
+//       // StrictMode's second mount: already played once, just force-show — don't re-hide and wait on a ScrollTrigger that already passed.
+//       if (playedRef.current) {
+//         gsap.set(cards, { autoAlpha: 1, y: 0 });
+//         return;
+//       }
+
+//       gsap.set(cards, { autoAlpha: 0, y });
+
+//       gsap.to(cards, {
+//         autoAlpha: 1,
+//         y: 0,
+//         duration,
+//         stagger,
+//         delay,
+//         ease: 'power4.out',
+//         clearProps: 'transform',
+//         scrollTrigger: {
+//           trigger: triggerRef?.current ?? containerRef.current,
+//           start,
+//           once: true,
+//         },
+//         onStart: () => {
+//           playedRef.current = true;
+//         },
+//       });
+//     },
+//     { scope: containerRef, dependencies: [delay, stagger, duration, y, start] },
+//   );
+
+//   return React.cloneElement(children, { ref: containerRef });
+// }
+// CardsReveal.tsx
 export default function CardsReveal({
   children,
   delay = 0,
@@ -107,6 +159,7 @@ export default function CardsReveal({
           trigger: triggerRef?.current ?? containerRef.current,
           start,
           once: true,
+          markers: true,
         },
         onStart: () => {
           playedRef.current = true;

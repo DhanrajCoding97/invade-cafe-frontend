@@ -1,14 +1,14 @@
 'use client';
-// import PricingCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard';
-import dynamic from 'next/dynamic';
+import PricingCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard';
+// import dynamic from 'next/dynamic';
 
-const PricingCard = dynamic(
-  () =>
-    import('@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard'),
-  {
-    ssr: false,
-  },
-);
+// const PricingCard = dynamic(
+//   () =>
+//     import('@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard'),
+//   {
+//     ssr: false,
+//   },
+// );
 import { useRouter } from 'next/navigation';
 import { VrIcon } from '../svgs';
 import { PsIcon } from '../svgs';
@@ -71,108 +71,106 @@ export default function PricingSection() {
     <section
       id='pricing'
       ref={sectionRef}
-      className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 bg-black'
+      className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20 '
     >
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          {/* <LineReveal delay={0} duration={0.5}>
-          </LineReveal> */}
-          <div className='h-px w-8 bg-[#00d4ff]' />
-          {/* <TextReveal triggerRef={sectionRef} delay={0.15}>
-          </TextReveal> */}
-          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-            WHAT IT COSTS
-          </span>
+          <LineReveal delay={0} duration={0.5}>
+            <div className='h-px w-8 bg-[#00d4ff]' />
+          </LineReveal>
+          <TextReveal triggerRef={sectionRef} delay={0.15}>
+            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+              WHAT IT COSTS
+            </span>
+          </TextReveal>
         </div>
         {/* main title */}
-        {/* <TextReveal triggerRef={sectionRef} delay={0.25}>
-        </TextReveal> */}
-        <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-          <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-            Pricing
-          </span>
-        </h2>
+        <TextReveal triggerRef={sectionRef} delay={0.25}>
+          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Pricing
+            </span>
+          </h2>
+        </TextReveal>
         {/* description */}
-        <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
-          We keep our rates simple and transparent, with no hidden fees or
-          membership requirements. PC gaming sessions start at ₹80, PS5 sessions
-          at ₹100, sim racing at ₹150, and VR experiences at ₹200. Pick your
-          setup, pay for your session, and start playing — that's it.
-        </p>
-        {/* <TextReveal triggerRef={sectionRef} delay={0.55}>
-        </TextReveal> */}
-        {/* <CardsReveal
-          triggerRef={sectionRef}
-          delay={0.75}
-          stagger={0.3}
-        ></CardsReveal> */}
-        <div className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '>
-          {/* PC Gaming */}
-          <PricingCard
-            onBook={() => goToBooking('pc')}
-            icon={<PcIcon className='h-16 w-16' />}
-            title='PC gaming'
-            subtitle='Per hour'
-            price={80}
-            currency='₹'
-            priceUnit='/hr'
-            pricingMode='fixed'
-            accentColor='cyan'
-          />
+        <TextReveal triggerRef={sectionRef} delay={0.55}>
+          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+            We keep our rates simple and transparent, with no hidden fees or
+            membership requirements. PC gaming sessions start at ₹80, PS5
+            sessions at ₹100, sim racing at ₹150, and VR experiences at ₹200.
+            Pick your setup, pay for your session, and start playing — that's
+            it.
+          </p>
+        </TextReveal>
+        <CardsReveal triggerRef={sectionRef} delay={0.75} stagger={0.3}>
+          <div className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '>
+            {/* PC Gaming */}
+            <PricingCard
+              onBook={() => goToBooking('pc')}
+              icon={<PcIcon className='h-16 w-16' />}
+              title='PC gaming'
+              subtitle='Per hour'
+              price={80}
+              currency='₹'
+              priceUnit='/hr'
+              pricingMode='fixed'
+              accentColor='cyan'
+            />
 
-          {/* PS5 — featured */}
-          <PricingCard
-            icon={<PsIcon className='h-16 w-16 text-white' />}
-            title='PS5'
-            subtitle='Price scales with players'
-            pricingMode='per-player'
-            playerPriceMap={{ 1: 100, 2: 160, 3: 240, 4: 300 }}
-            pricePerPlayer={100}
-            minPlayers={1}
-            maxPlayers={4}
-            currency='₹'
-            priceUnit='/hr'
-            featured
-            featuredLabel='Most popular'
-            accentColor='cyan'
-            onBook={({ players }) =>
-              goToBooking('ps5', { players: players ?? 1 })
-            }
-          />
+            {/* PS5 — featured */}
+            <PricingCard
+              icon={<PsIcon className='h-16 w-16 text-white' />}
+              title='PS5'
+              subtitle='Price scales with players'
+              pricingMode='per-player'
+              playerPriceMap={{ 1: 100, 2: 160, 3: 240, 4: 300 }}
+              pricePerPlayer={100}
+              minPlayers={1}
+              maxPlayers={4}
+              currency='₹'
+              priceUnit='/hr'
+              featured
+              featuredLabel='Most popular'
+              accentColor='cyan'
+              onBook={({ players }) =>
+                goToBooking('ps5', { players: players ?? 1 })
+              }
+            />
 
-          {/* Racing cockpit — tiered */}
-          <PricingCard
-            icon={<RacingSimIcon className='h-16 w-16' />}
-            title='Racing cockpit'
-            subtitle='Single or double rig'
-            pricingMode='tiered'
-            tiers={[
-              { label: 'Single Player', price: 150 },
-              { label: 'Multiplayer', price: 300 },
-            ]}
-            currency='₹'
-            accentColor='cyan'
-            onBook={({ tier }) =>
-              goToBooking('racing', {
-                tier: tier === 'Single Player' ? 'single' : 'multiplayer',
-              })
-            }
-          />
+            {/* Racing cockpit — tiered */}
+            <PricingCard
+              icon={<RacingSimIcon className='h-16 w-16' />}
+              title='Racing cockpit'
+              subtitle='Single or double rig'
+              pricingMode='tiered'
+              tiers={[
+                { label: 'Single Player', price: 150 },
+                { label: 'Multiplayer', price: 300 },
+              ]}
+              currency='₹'
+              accentColor='cyan'
+              onBook={({ tier }) =>
+                goToBooking('racing', {
+                  tier: tier === 'Single Player' ? 'single' : 'multiplayer',
+                })
+              }
+            />
 
-          {/* PSVR */}
-          <PricingCard
-            icon={<VrIcon className='h-16 w-16 text-white' />}
-            title='PSVR'
-            subtitle='Per hour'
-            price={200}
-            currency='₹'
-            priceUnit='/hr'
-            pricingMode='fixed'
-            accentColor='cyan'
-            onBook={() => goToBooking('vr')}
-          />
-        </div>
+            {/* PSVR */}
+            <PricingCard
+              icon={<VrIcon className='h-16 w-16 text-white' />}
+              title='PSVR'
+              subtitle='Per hour'
+              price={200}
+              currency='₹'
+              priceUnit='/hr'
+              pricingMode='fixed'
+              accentColor='cyan'
+              onBook={() => goToBooking('vr')}
+            />
+          </div>
+        </CardsReveal>
       </div>
     </section>
   );
