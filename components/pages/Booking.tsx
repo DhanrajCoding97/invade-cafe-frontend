@@ -85,7 +85,7 @@ export default function BookingSection() {
   function handleFormReady() {
     formReadyRef.current = true;
     maybePlay(); // call directly, no effect/state indirection needed
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    // requestAnimationFrame(() => ScrollTrigger.refresh());
   }
 
   return (
@@ -97,9 +97,9 @@ export default function BookingSection() {
       <div className='mx-auto max-w-6xl'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <LineReveal delay={0} duration={0.5}>
-            <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
-          </LineReveal>
+          {/* <LineReveal delay={0} duration={0.5}>
+          </LineReveal> */}
+          <div ref={eyebrowLineRef} className='h-px w-8 bg-[#00d4ff]' />
           {/* <GsapTextAnimation
             mode='controlled'
             onLinesReady={(lines) => {
@@ -107,11 +107,11 @@ export default function BookingSection() {
             }}
           >
           </GsapTextAnimation> */}
-          <TextReveal triggerRef={sectionRef} delay={0.15}>
-            <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
-              LOCK IN. LEVEL UP
-            </span>
-          </TextReveal>
+          {/* <TextReveal triggerRef={sectionRef} delay={0.15}>
+          </TextReveal> */}
+          <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
+            LOCK IN. LEVEL UP
+          </span>
         </div>
         {/* main title */}
         {/* <GsapTextAnimation
@@ -120,13 +120,13 @@ export default function BookingSection() {
             linesRef.current.heading = lines;
           }}
         >        </GsapTextAnimation> */}
-        <TextReveal triggerRef={sectionRef} delay={0.25}>
-          <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
-            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-              Claim Your Rig
-            </span>
-          </h2>
-        </TextReveal>
+        {/* <TextReveal triggerRef={sectionRef} delay={0.25}>
+        </TextReveal> */}
+        <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold'>
+          <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+            Claim Your Rig
+          </span>
+        </h2>
         {/* description */}
         {/* <GsapTextAnimation
           mode='controlled'
@@ -135,14 +135,14 @@ export default function BookingSection() {
           }}
         >
         </GsapTextAnimation> */}
-        <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
-            Ready to play? Reserve your station in advance — from competitive
-            gaming PCs to VR headsets and sim racing rigs — and skip the wait.
-            Booking online takes seconds and guarantees your setup is ready the
-            moment you arrive.
-          </p>
-        </TextReveal>
+        {/* <TextReveal triggerRef={sectionRef} delay={0.55}>
+        </TextReveal> */}
+        <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+          Ready to play? Reserve your station in advance — from competitive
+          gaming PCs to VR headsets and sim racing rigs — and skip the wait.
+          Booking online takes seconds and guarantees your setup is ready the
+          moment you arrive.
+        </p>
         <BookingForm />
       </div>
     </section>

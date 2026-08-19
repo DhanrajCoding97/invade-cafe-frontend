@@ -32,7 +32,7 @@ import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import { useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, useGSAP);
+// gsap.registerPlugin(ScrollTrigger, ScrollToPlugin, useGSAP);
 
 export const STEPS = [
   'device',
@@ -176,14 +176,14 @@ export default function () {
 
     const headerOffset = 80; // px — match your sticky header height
 
-    gsap.to(window, {
-      duration: 0.6,
-      ease: 'power2.out',
-      scrollTo: {
-        y: formTopRef.current,
-        offsetY: headerOffset,
-      },
-    });
+    // gsap.to(window, {
+    //   duration: 0.6,
+    //   ease: 'power2.out',
+    //   scrollTo: {
+    //     y: formTopRef.current,
+    //     offsetY: headerOffset,
+    //   },
+    // });
   }, [stepIndex]);
 
   // async function goNext() {
@@ -278,27 +278,27 @@ export default function () {
   const deviceTweenAddedRef = useRef(false);
   const hasRevealedDeviceStep = useRef(false);
 
-  useGSAP(
-    () => {
-      if (!cardRef.current) return;
-      gsap.fromTo(
-        cardRef.current,
-        { autoAlpha: 0, y: 40 },
-        {
-          autoAlpha: 1,
-          y: 0,
-          duration: 0.8,
-          ease: 'power4.out',
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: 'top 85%',
-            once: true,
-          },
-        },
-      );
-    },
-    { scope: cardRef },
-  );
+  // useGSAP(
+  //   () => {
+  //     if (!cardRef.current) return;
+  //     gsap.fromTo(
+  //       cardRef.current,
+  //       { autoAlpha: 0, y: 40 },
+  //       {
+  //         autoAlpha: 1,
+  //         y: 0,
+  //         duration: 0.8,
+  //         ease: 'power4.out',
+  //         scrollTrigger: {
+  //           trigger: cardRef.current,
+  //           start: 'top 85%',
+  //           once: true,
+  //         },
+  //       },
+  //     );
+  //   },
+  //   { scope: cardRef },
+  // );
 
   const isConfirmed = STEPS[stepIndex] === 'confirmed';
 
@@ -342,7 +342,9 @@ export default function () {
           {isRestoring ? (
             <BookingFormSkeleton />
           ) : (
-            <StepTransition stepKey={step} direction={direction}>
+            // <StepTransition stepKey={step} direction={direction}>
+            //   </StepTransition>
+            <>
               {step === 'device' && (
                 <DeviceStep
                   formCardRef={cardRef}
@@ -463,7 +465,7 @@ export default function () {
                   )}
                 </div>
               )}
-            </StepTransition>
+            </>
           )}
         </FormProvider>
       </div>

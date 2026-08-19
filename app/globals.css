@@ -36,10 +36,6 @@
   }
 }
 
-/* .hero-heading {
-  animation: heroFadeUp 1s cubic-bezier(0.76, 0, 0.24, 1.4) forwards;
-} */
-
 @keyframes lineReveal {
   from {
     transform: translateY(100%);
@@ -48,6 +44,10 @@
     transform: translateY(0%);
   }
 }
+
+/* .hero-heading {
+  animation: heroFadeUp 1s cubic-bezier(0.76, 0, 0.24, 1.4) forwards;
+} */
 /* 
 @theme inline {
   --font-sans: var(--font-orbitron);

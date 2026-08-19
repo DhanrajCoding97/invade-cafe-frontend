@@ -53,6 +53,8 @@ export default function LineReveal({
 
   return React.cloneElement(children, {
     ref: elRef,
-    className: [children.props.className, 'opacity-0'].filter(Boolean).join(' '),
+    className: [children.props.className, 'opacity-0']
+      .filter(Boolean)
+      .join(' '),
   });
 }

@@ -43,17 +43,19 @@ export default async function Page() {
             backgroundSize: '60px 50px, 50px 50px, 100% 100%, 100% 100%',
           }}
         />
-        <ServicesSection />
-        <GamesCatalogSection />
-        <PricingSection />
-        <GallerySection />
-        <TestimonialSection />
-        <BookingSection />
-        <Contact />
+        <div className='relative z-10'>
+          <ServicesSection />
+          <GamesCatalogSection />
+          <PricingSection />
+          <GallerySection />
+          <TestimonialSection />
+          <BookingSection />
+          <Contact />
 
-        <Separator />
+          <Separator />
+          {/* <Footer /> */}
+        </div>
       </div>
-      {/* <Footer /> */}
     </>
   );
 }
