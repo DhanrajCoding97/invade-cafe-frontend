@@ -157,7 +157,6 @@ export default function CardsReveal({
         clearProps: 'transform',
         scrollTrigger: {
           trigger: triggerRef?.current ?? containerRef.current,
-          start,
           once: true,
           markers: true,
         },
