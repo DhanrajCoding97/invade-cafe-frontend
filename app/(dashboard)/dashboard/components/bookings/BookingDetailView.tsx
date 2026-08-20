@@ -180,6 +180,7 @@ import {
   Users,
   IndianRupee,
   QrCode,
+  TvMinimalPlay,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { aggregateBookingTotals } from '@/lib/bookings/aggregate';
@@ -196,24 +197,45 @@ const paymentStyles: Record<string, string> = {
   paid: 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40',
 };
 
+// function DetailTile({
+//   icon,
+//   label,
+//   value,
+// }: {
+//   icon: ReactNode;
+//   label: string;
+//   value: string;
+// }) {
+//   return (
+//     <div className='flex items-center gap-2'>
+//       <div className='flex items-center gap-2 text-[#28F1FF]/70'>
+//         {icon}
+//         <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
+//           {label}
+//         </span>
+//       </div>
+//       <p className='font-mono text-sm text-white'>{value}</p>
+//     </div>
+//   );
+// }
 function DetailTile({
   icon,
   label,
   value,
 }: {
-  icon: ReactNode;
+  icon: React.ReactNode;
   label: string;
   value: string;
 }) {
   return (
-    <div className='flex items-center gap-2'>
-      <div className='flex items-center gap-2 text-[#28F1FF]/70'>
-        {icon}
-        <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
+    <div className='flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 sm:p-4'>
+      <div className='mt-0.5 shrink-0 text-[#28F1FF]/70'>{icon}</div>
+      <div className='min-w-0'>
+        <p className='font-mono text-[10px] uppercase tracking-wide text-white/40 mb-1'>
           {label}
-        </span>
+        </p>
+        <p className='font-mono text-sm text-white wrap-break-word'>{value}</p>
       </div>
-      <p className='font-mono text-sm text-white'>{value}</p>
     </div>
   );
 }
@@ -278,7 +300,7 @@ export function BookingDetailView({
       </div>
 
       {/* Customer card — unchanged */}
-      <div className='border border-[#28F1FF]/20 rounded-2xl p-5 mb-4 bg-gradient-to-b from-[#28F1FF]/5 to-transparent'>
+      <div className='border border-[#28F1FF]/20 rounded-2xl p-5 my-4 bg-gradient-to-b from-[#28F1FF]/5 to-transparent'>
         <p className='font-mono text-lg text-[#28F1FF]'>
           {booking?.customer_name ?? booking?.profiles?.full_name ?? 'Unknown'}
         </p>
@@ -333,7 +355,7 @@ export function BookingDetailView({
       )}
 
       {/* Booking details grid — duration now shows total including extensions */}
-      <div className='grid grid-cols-2 gap-3 mb-4'>
+      <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
         <DetailTile
           icon={<Monitor size={16} />}
           label='Device'
@@ -354,17 +376,22 @@ export function BookingDetailView({
           label='Players'
           value={String(booking?.players)}
         />
+        <DetailTile
+          icon={<TvMinimalPlay size={16} />}
+          label='Station'
+          value={booking.stations?.name ?? 'Unknown'}
+        />
       </div>
 
-      {booking?.station_id && (
+      {/* {booking?.station_id && (
         <div className='mb-4 border border-white/10 rounded-2xl p-5'>
           <p className='font-mono text-xs text-white/40 mb-1'>Station</p>
           <p className='font-mono text-sm text-white'>{booking.station_id}</p>
         </div>
-      )}
+      )} */}
 
       {/* Bill summary — now itemizes extensions and shows a real total */}
-      <div className='border border-white/10 rounded-2xl p-5 mb-4'>
+      <div className='border border-white/10 rounded-2xl p-5 my-4'>
         <p className='font-mono text-sm text-white mb-3 font-semibold'>
           Bill Summary
         </p>

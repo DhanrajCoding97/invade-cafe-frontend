@@ -7,8 +7,8 @@ import {
   IndianRupee,
   Monitor,
   Calendar,
+  TvMinimalPlay,
 } from 'lucide-react';
-// import Link from 'next/link';
 import { type BookingRow } from '@/types';
 import { CancelBookingButton } from '../../components/cancel-booking-button';
 import GoBackLink from '../../components/go-back-link';
@@ -17,7 +17,13 @@ async function fetchBookingById(id: string): Promise<BookingRow | null> {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from('bookings')
-    .select(`*, profiles:user_id (full_name, avatar_url, email, phone)`)
+    .select(
+      `
+      *,
+      profiles:user_id (full_name, avatar_url, email, phone),
+      stations:station_id (name, type)
+    `,
+    )
     .eq('id', id)
     .single();
 
@@ -49,7 +55,7 @@ export default async function CustomerBookingDetailPage({
 
   return (
     <div className='min-h-screen bg-black text-white px-4 py-6 md:px-8 md:py-10 max-w-3xl mx-auto'>
-      <h2 className='text-[clamp(2.5rem,.7174rem+3.913vw,3.75rem)] font-extrabold mb-2'>
+      <h2 className='text-[clamp(1.25rem,1rem+1.2vw,2.5rem)] font-extrabold whitespace-nowrap'>
         <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
           Booking Summary
         </span>
@@ -73,8 +79,7 @@ export default async function CustomerBookingDetailPage({
             )}
           </span>
         </div>
-
-        <div className='grid grid-cols-2 gap-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-3'>
           <DetailTile
             icon={<Monitor size={16} />}
             label='Device'
@@ -100,14 +105,46 @@ export default async function CustomerBookingDetailPage({
             label='Amount'
             value={`₹${booking.amount}`}
           />
+          <DetailTile
+            icon={<TvMinimalPlay size={16} />}
+            label='Station'
+            value={booking.stations?.name ?? 'Unknown'}
+          />
         </div>
 
-        {booking.station_id && (
-          <div className='border border-white/10 rounded-2xl p-5'>
-            <p className='font-mono text-xs text-white/40 mb-1'>Station</p>
-            <p className='font-mono text-sm text-white'>{booking.station_id}</p>
-          </div>
-        )}
+        {/* <div className='grid grid-cols-2 gap-3'>
+          <DetailTile
+            icon={<Monitor size={16} />}
+            label='Device'
+            value={booking.device}
+          />
+          <DetailTile
+            icon={<Calendar size={16} />}
+            label='Date & Time'
+            value={`${booking.date} · ${booking.start_time}`}
+          />
+          <DetailTile
+            icon={<Clock size={16} />}
+            label='Duration'
+            value={`${booking.duration_hours}h`}
+          />
+          <DetailTile
+            icon={<Users size={16} />}
+            label='Players'
+            value={String(booking.players)}
+          />
+          <DetailTile
+            icon={<IndianRupee size={16} />}
+            label='Amount'
+            value={`₹${booking.amount}`}
+          />
+          <DetailTile
+            icon={<TvMinimalPlay size={16} />}
+            label='Station'
+            value={booking.stations?.name ?? 'Unknown'}
+          />
+        </div> */}
+
         <ContactLink />
         <CancelBookingButton booking={booking} />
       </div>
@@ -125,14 +162,14 @@ function DetailTile({
   value: string;
 }) {
   return (
-    <div className='border border-white/10 rounded-2xl p-4 bg-white/[0.02]'>
-      <div className='flex items-center gap-2 text-[#28F1FF]/70 mb-2'>
-        {icon}
-        <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
+    <div className='flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 sm:p-4'>
+      <div className='mt-0.5 shrink-0 text-[#28F1FF]/70'>{icon}</div>
+      <div className='min-w-0'>
+        <p className='font-mono text-[10px] uppercase tracking-wide text-white/40 mb-1'>
           {label}
-        </span>
+        </p>
+        <p className='font-mono text-sm text-white break-words'>{value}</p>
       </div>
-      <p className='font-mono text-sm text-white'>{value}</p>
     </div>
   );
 }

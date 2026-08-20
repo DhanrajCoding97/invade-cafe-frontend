@@ -211,6 +211,7 @@ export function VideoImageCarousel({
                     loop
                     playsInline
                     preload='none'
+                    aria-hidden='true'
                     className='h-full w-full object-cover'
                   />
                 )}

@@ -174,24 +174,25 @@ export default function BookingForm() {
   }, [supabase]);
 
   //set scroll to formTop
-  useEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    if (!formTopRef.current) return;
+  // useEffect(() => {
+  //   if (!hasMounted.current) {
+  //     hasMounted.current = true;
+  //     return;
+  //   }
 
-    const headerOffset = 80; // px — match your sticky header height
+  //   if (!formTopRef.current) return;
 
-    gsap.to(window, {
-      duration: 0.6,
-      ease: 'power2.out',
-      scrollTo: {
-        y: formTopRef.current,
-        offsetY: headerOffset,
-      },
-    });
-  }, [stepIndex]);
+  //   const headerOffset = 80;
+
+  //   gsap.to(window, {
+  //     duration: 0.6,
+  //     ease: 'power2.out',
+  //     scrollTo: {
+  //       y: formTopRef.current,
+  //       offsetY: headerOffset,
+  //     },
+  //   });
+  // }, [stepIndex]);
 
   // async function goNext() {
   //   if (step === 'options') {
@@ -216,6 +217,22 @@ export default function BookingForm() {
   //   setStepIndex(next);
   //   setDirection(1);
   // }
+  function scrollToForm() {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!formTopRef.current) return;
+
+        gsap.to(window, {
+          duration: 0.6,
+          ease: 'power2.out',
+          scrollTo: {
+            y: formTopRef.current,
+            offsetY: 80,
+          },
+        });
+      });
+    });
+  }
   async function goNext() {
     if (isNextLoading) return;
 
@@ -249,6 +266,7 @@ export default function BookingForm() {
 
       setStepIndex(next);
       setDirection(1);
+      scrollToForm();
     } finally {
       setIsNextLoading(false);
     }
@@ -262,6 +280,7 @@ export default function BookingForm() {
     setDirection(-1);
 
     setStepIndex(Math.max(prev, 0));
+    scrollToForm();
   }
 
   async function handleGoogleLogin() {
@@ -284,7 +303,7 @@ export default function BookingForm() {
   const nextButtonRef = useRef<HTMLButtonElement>(null);
   const deviceTweenAddedRef = useRef(false);
   const hasRevealedDeviceStep = useRef(false);
-
+  const hasMounted = useRef(false);
   // useGSAP(
   //   () => {
   //     if (!cardRef.current) return;

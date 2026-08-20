@@ -50,13 +50,20 @@ import { Separator } from '@/components/ui/separator';
 import { handleSignOut } from '@/lib/auth/oauth';
 import { aggregateBookingTotals } from '@/lib/bookings/aggregate';
 import { formatDuration } from 'date-fns';
+import CornerCutButton from '@/app/components/neonblade-ui/corner-cut-button';
 
 function hoursUntil(booking: BookingRow) {
   const start = new Date(`${booking.date}T${booking.start_time}`);
   return (start.getTime() - Date.now()) / 3_600_000;
 }
 
-function UpcomingCard({ booking }: { booking: BookingRow }) {
+function UpcomingCard({
+  booking,
+  onClick,
+}: {
+  booking: BookingRow;
+  onClick?: () => void;
+}) {
   const cancelMutation = useCancelMyBooking();
   const { data } = useRefundPercent();
 
@@ -67,7 +74,10 @@ function UpcomingCard({ booking }: { booking: BookingRow }) {
   const cancellingRef = useRef(false);
 
   return (
-    <Card className='bg-[#0C0C0D]'>
+    <Card
+      onClick={onClick}
+      className='bg-[#0C0C0D] cursor-pointer hover:bg-[#152123] transition-colors duration-300 ease-in'
+    >
       <CardHeader>
         <CardTitle>Upcoming Booking</CardTitle>
         <CardDescription>Your next gaming session</CardDescription>
@@ -156,13 +166,14 @@ function EmptyUpcoming() {
         <p className='mb-4 text-sm text-muted-foreground'>
           Book your next session.
         </p>
-        <Link
-          aria-label='Invade Gaming Booking Section'
-          href='/#booking'
-          className='inline-block rounded-tl-none rounded-tr-none rounded-bl-none rounded-br-lg bg-cyan-500 px-5 py-2 font-semibold text-black border-t'
+        <CornerCutButton
+          color='cyan'
+          variant='solid'
+          showArrow
+          hoverEffect='shift'
         >
-          Book Session
-        </Link>
+          <Link href='/#booking'>Book Session</Link>
+        </CornerCutButton>
       </CardContent>
     </Card>
   );
@@ -232,7 +243,7 @@ export default function CustomerDashboard() {
   }, [bookings]);
 
   return (
-    <div className='container mx-auto max-w-6xl py-8'>
+    <div className='container mx-auto  sm:max-w-6xl p-8'>
       <div className='mb-8 flex flex-col items-center justify-between'>
         <p className='text-xl text-muted-foreground tracking-wider'>
           Welcome back,
@@ -263,15 +274,24 @@ export default function CustomerDashboard() {
           ) : upcoming.length ? (
             <div className='flex flex-col gap-4'>
               {upcoming.map((b) => (
-                <UpcomingCard key={b.id} booking={b} />
+                <UpcomingCard
+                  onClick={() =>
+                    router.push(`/dashboard/customer/bookings/${b.id}`)
+                  }
+                  key={b.id}
+                  booking={b}
+                />
               ))}
-              <Link
-                aria-label='Invade Gaming Booking Section'
-                href='/#booking'
-                className='rounded-lg bg-cyan-500 px-5 py-2 font-semibold text-black'
+              <CornerCutButton
+                className='max-w-fit'
+                color='cyan'
+                variant='solid'
+                showArrow
+                hoverEffect='shift'
+                size='sm'
               >
-                Book Session
-              </Link>
+                <Link href='/#booking'>Book Session</Link>
+              </CornerCutButton>
             </div>
           ) : (
             <EmptyUpcoming />
@@ -288,7 +308,7 @@ export default function CustomerDashboard() {
                 return (
                   <Card
                     key={booking.id}
-                    className='bg-[#0C0C0D] hover:cursor-pointer'
+                    className='bg-[#0C0C0D] hover:cursor-pointer hover:bg-[#152123] transition-colors duration-300 ease-in'
                     onClick={() =>
                       router.push(`/dashboard/customer/bookings/${booking.id}`)
                     }
@@ -309,7 +329,8 @@ export default function CustomerDashboard() {
                     ${
                       booking.status === 'completed'
                         ? 'bg-green-500/15 text-green-400'
-                        : booking.status === 'cancelled'
+                        : booking.status === 'cancelled' ||
+                            booking.status === 'no_show'
                           ? 'bg-red-500/15 text-red-400'
                           : 'bg-cyan-500/15 text-cyan-400'
                     }`}

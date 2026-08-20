@@ -43,6 +43,10 @@ export async function getBookingById(id: string): Promise<BookingRow | null> {
         email,
         phone
       ),
+            stations:station_id (
+        name,
+        type
+      ),
       session_extensions (
         id,
         minutes,

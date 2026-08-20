@@ -134,6 +134,11 @@ export interface BookingRow {
     phone: string | null;
   } | null;
 
+  stations: {
+    name: string;
+    type: 'pc' | 'ps5' | 'racing' | 'vr';
+  } | null;
+
   session_extensions?: SessionExtension[] | null;
 }
 
