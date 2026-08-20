@@ -61,10 +61,10 @@ export default function TestimonialSection() {
     >
       <div className='mx-auto mt-8 md:mt-10 lg:mt-12 max-w-6xl'>
         <div className='my-4 flex items-center gap-4'>
-          <LineReveal triggerRef={sectionRef} delay={0}>
+          <LineReveal triggerRef={sectionRef} delay={0} duration={0.8}>
             <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
-          <TextReveal triggerRef={sectionRef} delay={0.25}>
+          <TextReveal triggerRef={sectionRef} delay={0.15} duration={0.8}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT PLAYERS SAY
             </span>

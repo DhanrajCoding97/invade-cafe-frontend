@@ -1,16 +1,11 @@
 'use client';
-
-import React, { useRef } from 'react';
-import gsap from 'gsap';
-// import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-// gsap.registerPlugin(ScrollTrigger);
-
+import React, { useRef, useEffect } from 'react';
+import { loadGsapCore, whenNearViewport } from '@/lib/gsap-loader';
 type CardsRevealProps = {
   children: React.ReactElement<{
     ref?: React.Ref<HTMLDivElement>;
     className?: string;
+    style?: React.CSSProperties;
   }>;
   delay?: number;
   stagger?: number;
@@ -20,105 +15,6 @@ type CardsRevealProps = {
   triggerRef?: React.RefObject<HTMLElement | null>;
 };
 
-// export default function CardsReveal({
-//   children,
-//   delay = 0,
-//   stagger = 0.15,
-//   duration = 0.4,
-//   y = 48,
-//   start = 'top 80%',
-//   triggerRef,
-// }: CardsRevealProps) {
-//   const containerRef = useRef<HTMLDivElement>(null);
-//   const playedRef = useRef(false); // survives StrictMode's mount-cleanup-mount cycle
-
-//   useGSAP(
-//     () => {
-//       if (!containerRef.current) return;
-
-//       const cards = Array.from(containerRef.current.children);
-
-//       // Container itself no longer needs to be hidden/shown — only the cards do.
-//       gsap.set(containerRef.current, { autoAlpha: 1 });
-//       gsap.set(cards, { autoAlpha: 0, y });
-
-//       gsap.to(cards, {
-//         autoAlpha: 1,
-//         y: 0,
-//         duration,
-//         stagger,
-//         delay,
-//         ease: 'power4.out',
-//         clearProps: 'transform',
-//         scrollTrigger: {
-//           trigger: triggerRef?.current ?? containerRef.current,
-//           start,
-//           once: true,
-//         },
-//         onStart: () => {
-//           playedRef.current = true;
-//         },
-//       });
-//     },
-//     { scope: containerRef, dependencies: [delay, stagger, duration, y, start] },
-//   );
-
-//   // No permanent Tailwind opacity-0 class — GSAP fully owns visibility.
-//   return React.cloneElement(children, { ref: containerRef });
-// }
-
-// export default function CardsReveal({
-//   children,
-//   delay = 0,
-//   stagger = 0.15,
-//   duration = 0.4,
-//   y = 48,
-//   start = 'top 80%',
-//   triggerRef,
-// }: CardsRevealProps) {
-//   const containerRef = useRef<HTMLDivElement>(null);
-//   const playedRef = useRef(false);
-
-//   useGSAP(
-//     () => {
-//       if (!containerRef.current) return;
-
-//       const cards = Array.from(containerRef.current.children);
-
-//       gsap.set(containerRef.current, { autoAlpha: 1 });
-
-//       // StrictMode's second mount: already played once, just force-show — don't re-hide and wait on a ScrollTrigger that already passed.
-//       if (playedRef.current) {
-//         gsap.set(cards, { autoAlpha: 1, y: 0 });
-//         return;
-//       }
-
-//       gsap.set(cards, { autoAlpha: 0, y });
-
-//       gsap.to(cards, {
-//         autoAlpha: 1,
-//         y: 0,
-//         duration,
-//         stagger,
-//         delay,
-//         ease: 'power4.out',
-//         clearProps: 'transform',
-//         scrollTrigger: {
-//           trigger: triggerRef?.current ?? containerRef.current,
-//           start,
-//           once: true,
-//         },
-//         onStart: () => {
-//           playedRef.current = true;
-//         },
-//       });
-//     },
-//     { scope: containerRef, dependencies: [delay, stagger, duration, y, start] },
-//   );
-
-//   return React.cloneElement(children, { ref: containerRef });
-// }
-// CardsReveal.tsx
 export default function CardsReveal({
   children,
   delay = 0,
@@ -131,42 +27,80 @@ export default function CardsReveal({
   const containerRef = useRef<HTMLDivElement>(null);
   const playedRef = useRef(false);
 
-  useGSAP(
-    () => {
-      if (!containerRef.current) return;
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
 
-      const cards = Array.from(containerRef.current.children);
+    let cancelled = false;
+    let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
-      gsap.set(containerRef.current, { autoAlpha: 1 });
-
-      // StrictMode's second mount: already played once, just force-show — don't re-hide and wait on a ScrollTrigger that already passed.
-      if (playedRef.current) {
-        gsap.set(cards, { autoAlpha: 1, y: 0 });
-        return;
-      }
-
-      gsap.set(cards, { autoAlpha: 0, y });
-
-      gsap.to(cards, {
-        autoAlpha: 1,
-        y: 0,
-        duration,
-        stagger,
-        delay,
-        ease: 'power4.out',
-        clearProps: 'transform',
-        scrollTrigger: {
-          trigger: triggerRef?.current ?? containerRef.current,
-          start,
-          once: true,
-        },
-        onStart: () => {
-          playedRef.current = true;
-        },
+    // Fail-open: if gsap never loads, force-reveal every card after a
+    // short wait instead of leaving the grid permanently hidden.
+    fallbackTimer = setTimeout(() => {
+      if (cancelled || !container) return;
+      Array.from(container.children).forEach((card) => {
+        (card as HTMLElement).style.visibility = 'visible';
+        (card as HTMLElement).style.opacity = '1';
       });
-    },
-    { scope: containerRef, dependencies: [delay, stagger, duration, y, start] },
-  );
+    }, 2500);
+
+    const stopWatching = whenNearViewport(container, () => {
+      loadGsapCore()
+        .then(({ gsap }) => {
+          if (cancelled || !containerRef.current) return;
+          clearTimeout(fallbackTimer);
+
+          const cards = Array.from(containerRef.current.children);
+
+          gsap.set(containerRef.current, { autoAlpha: 1 });
+
+          // StrictMode's second mount: already played once — force-show
+          // instead of re-hiding and waiting on a ScrollTrigger that
+          // already passed.
+          if (playedRef.current) {
+            gsap.set(cards, { autoAlpha: 1, y: 0 });
+            return;
+          }
+
+          // autoAlpha kept intentionally here (unlike LineReveal/TextReveal):
+          // these are interactive card elements, so we also want
+          // pointer-events/tab-focus disabled via visibility:hidden while
+          // off-screen, not just visually transparent.
+          gsap.set(cards, { autoAlpha: 0, y });
+
+          gsap.to(cards, {
+            autoAlpha: 1,
+            y: 0,
+            duration,
+            stagger,
+            delay,
+            ease: 'power4.out',
+            clearProps: 'transform',
+            scrollTrigger: {
+              trigger: triggerRef?.current ?? containerRef.current,
+              start,
+              once: true,
+            },
+            onStart: () => {
+              playedRef.current = true;
+            },
+          });
+        })
+        .catch(() => {
+          if (cancelled || !containerRef.current) return;
+          Array.from(containerRef.current.children).forEach((card) => {
+            (card as HTMLElement).style.visibility = 'visible';
+            (card as HTMLElement).style.opacity = '1';
+          });
+        });
+    });
+
+    return () => {
+      cancelled = true;
+      clearTimeout(fallbackTimer);
+      stopWatching();
+    };
+  }, [delay, stagger, duration, y, start, triggerRef]);
 
   return React.cloneElement(children, { ref: containerRef });
 }

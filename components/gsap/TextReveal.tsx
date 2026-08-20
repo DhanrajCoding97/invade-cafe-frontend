@@ -1,16 +1,12 @@
 'use client';
-import React, { useRef } from 'react';
-import gsap from 'gsap';
-import { SplitText } from 'gsap/SplitText';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useGSAP } from '@gsap/react';
-
-// gsap.registerPlugin(SplitText, ScrollTrigger);
+import React, { useRef, useEffect } from 'react';
+import { loadSplitText, whenNearViewport } from '@/lib/gsap-loader';
 
 type TextRevealProps = {
   children: React.ReactElement<{
     ref?: React.Ref<HTMLElement>;
     className?: string;
+    style?: React.CSSProperties;
   }>;
   delay?: number;
   triggerRef?: React.RefObject<HTMLElement | null>;
@@ -18,174 +14,84 @@ type TextRevealProps = {
   duration?: number;
 };
 
-// export default function TextReveal({
-//   children,
-//   delay = 0,
-//   triggerRef,
-//   start = 'top 80%',
-// }: TextRevealProps) {
-//   const containerRef = useRef<HTMLDivElement>(null);
-
-//   // useGSAP(
-//   //   () => {
-//   //     if (!containerRef.current) return;
-
-//   //     const split = SplitText.create(containerRef.current, {
-//   //       type: 'lines',
-//   //       mask: 'lines',
-//   //       linesClass: 'line++',
-//   //     });
-
-//   //     gsap.set(split.lines, { y: '100%' });
-//   //     gsap.set(containerRef.current, { opacity: 1 }); // reveal wrapper, lines still masked
-
-//   //     gsap.to(split.lines, {
-//   //       y: '0%',
-//   //       duration: 1,
-//   //       stagger: 0.1,
-//   //       ease: 'power4.out',
-//   //       delay,
-//   //       scrollTrigger: {
-//   //         trigger: triggerRef?.current ?? containerRef.current,
-//   //         start,
-//   //         once: true,
-//   //       },
-//   //     });
-
-//   //     return () => split.revert();
-//   //   },
-//   //   { scope: containerRef, dependencies: [delay, start] },
-//   // );
-//   useGSAP(
-//     () => {
-//       if (!containerRef.current) return;
-
-//       let ctx: gsap.Context | undefined;
-//       let split: SplitText | undefined;
-
-//       document.fonts.ready.then(() => {
-//         if (!containerRef.current) return; // unmounted before fonts resolved
-
-//         split = SplitText.create(containerRef.current, {
-//           type: 'lines',
-//           mask: 'lines',
-//           linesClass: 'line++',
-//         });
-
-//         gsap.set(split.lines, { y: '100%' });
-//         gsap.set(containerRef.current, { opacity: 1 });
-
-//         gsap.to(split.lines, {
-//           y: '0%',
-//           duration: 1,
-//           stagger: 0.1,
-//           ease: 'power4.out',
-//           delay,
-//           scrollTrigger: {
-//             trigger: triggerRef?.current ?? containerRef.current,
-//             start,
-//             once: true,
-//           },
-//         });
-//       });
-
-//       return () => split?.revert();
-//     },
-//     { scope: containerRef, dependencies: [delay, start] },
-//   );
-//   return React.cloneElement(children, {
-//     ref: containerRef,
-//     className: [children.props.className, 'opacity-0']
-//       .filter(Boolean)
-//       .join(' '),
-//   });
-// }
-// TextReveal.tsx
 export default function TextReveal({
   children,
   delay = 0,
+  duration = 0.9,
   triggerRef,
   start = 'top 80%',
-  duration,
 }: TextRevealProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // useGSAP(
-  //   () => {
-  //     if (!containerRef.current) return;
-  //     let cancelled = false;
-  //     let split: SplitText | undefined;
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-  //     Promise.all([
-  //       import('gsap/SplitText').then((m) => m.SplitText),
-  //       document.fonts.ready,
-  //     ]).then(([SplitText]) => {
-  //       if (cancelled || !containerRef.current) return;
+    let split: import('gsap/SplitText').SplitText | undefined;
+    let cancelled = false;
+    let fallbackTimer: ReturnType<typeof setTimeout> | undefined;
 
-  //       gsap.registerPlugin(SplitText); // idempotent, safe to call again
+    fallbackTimer = setTimeout(() => {
+      if (!cancelled && el) el.style.opacity = '1';
+    }, 2500);
 
-  //       split = SplitText.create(containerRef.current, {
-  //         type: 'lines',
-  //         mask: 'lines',
-  //         linesClass: 'line++',
-  //       });
+    const stopWatching = whenNearViewport(el, () => {
+      loadSplitText()
+        .then(async (SplitText) => {
+          if (cancelled || !containerRef.current) return;
+          const { gsap } = await import('gsap');
 
-  //       gsap.set(split.lines, { y: '100%' });
-  //       gsap.set(containerRef.current, { opacity: 1 });
+          await document.fonts.ready;
+          if (cancelled || !containerRef.current) return;
 
-  //       gsap.to(split.lines, {
-  //         y: '0%',
-  //         duration,
-  //         stagger: 0.1,
-  //         ease: 'power4.out',
-  //         delay,
-  //         scrollTrigger: {
-  //           trigger: triggerRef?.current ?? containerRef.current,
-  //           start,
-  //           once: true,
-  //         },
-  //       });
-  //     });
+          split = SplitText.create(containerRef.current, {
+            type: 'lines',
+            mask: 'lines',
+            linesClass: 'line++',
+          });
 
-  //     return () => {
-  //       cancelled = true;
-  //       split?.revert();
-  //     };
-  //   },
-  //   { scope: containerRef, dependencies: [delay, start] },
-  // );
-  useGSAP(
-    () => {
-      if (!containerRef.current) return;
+          clearTimeout(fallbackTimer);
 
-      const split = SplitText.create(containerRef.current, {
-        type: 'lines',
-        mask: 'lines',
-        linesClass: 'line++',
-      });
+          gsap.set(containerRef.current, { opacity: 1 });
 
-      gsap.set(split.lines, { y: '100%' });
-      gsap.set(containerRef.current, { opacity: 1 });
+          gsap.set(split.lines, {
+            y: '110%',
+            opacity: 0,
+            filter: 'blur(6px)',
+          });
 
-      gsap.to(split.lines, {
-        y: '0%',
-        duration,
-        stagger: 0.1,
-        ease: 'power4.out',
-        delay,
-        scrollTrigger: {
-          trigger: triggerRef?.current ?? containerRef.current,
-          start,
-          once: true,
-        },
-      });
+          gsap.to(split.lines, {
+            y: '0%',
+            opacity: 1,
+            filter: 'blur(0px)',
+            duration,
+            delay,
+            stagger: 0.12,
+            ease: 'power4.out',
+            scrollTrigger: {
+              trigger: triggerRef?.current ?? containerRef.current,
+              start,
+              once: true,
+            },
+          });
+        })
+        .catch(() => {
+          if (!cancelled && containerRef.current) {
+            containerRef.current.style.opacity = '1';
+          }
+        });
+    });
 
-      return () => split.revert();
-    },
-    {
-      scope: containerRef,
-      dependencies: [delay, duration, start],
-    },
-  );
-  return React.cloneElement(children, { ref: containerRef }); // no className hack
+    return () => {
+      cancelled = true;
+      clearTimeout(fallbackTimer);
+      stopWatching();
+      split?.revert();
+    };
+  }, [delay, duration, start, triggerRef]);
+
+  return React.cloneElement(children, {
+    ref: containerRef,
+    style: { opacity: 0 },
+  });
 }

@@ -10,10 +10,6 @@ import { GameCardSkeleton } from '../skeletons/GameSkeleton';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';
 import LineReveal from '../gsap/LineReveal';
-// import { ScrollTrigger } from 'gsap/ScrollTrigger';
-// import gsap from 'gsap';
-
-// gsap.registerPlugin(ScrollTrigger);
 
 export default function GamesCatalogSection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -50,10 +46,10 @@ export default function GamesCatalogSection() {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <LineReveal triggerRef={sectionRef} delay={0}>
+          <LineReveal triggerRef={sectionRef} delay={0} duration={0.8}>
             <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
-          <TextReveal triggerRef={sectionRef} delay={0.15}>
+          <TextReveal triggerRef={sectionRef} delay={0.15} duration={0.8}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               GAME LIBRARY
             </span>

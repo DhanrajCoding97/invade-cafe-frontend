@@ -1,14 +1,5 @@
 'use client';
 import PricingCard from '@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard';
-// import dynamic from 'next/dynamic';
-
-// const PricingCard = dynamic(
-//   () =>
-//     import('@/app/components/neonblade-ui/neon-glow-corner-cut-card/PricingCard'),
-//   {
-//     ssr: false,
-//   },
-// );
 import { useRouter } from 'next/navigation';
 import { VrIcon } from '../svgs';
 import { PsIcon } from '../svgs';
@@ -17,14 +8,9 @@ import { PcIcon } from '../svgs';
 import { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import GsapTextAnimation from '../GsapTextAnimation';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';
 import LineReveal from '../gsap/LineReveal';
-
-// gsap.registerPlugin(ScrollTrigger);
-// ScrollTrigger.config({ ignoreMobileResize: true });
 
 export default function PricingSection() {
   const router = useRouter();
@@ -42,30 +28,30 @@ export default function PricingSection() {
 
   const sectionRef = useRef<HTMLElement>(null);
   const descRef = useRef<HTMLParagraphElement>(null);
-  const cardsRef = useRef<HTMLDivElement>(null);
+  // const cardsRef = useRef<HTMLDivElement>(null);
 
-  useGSAP(
-    () => {
-      const cards = cardsRef.current?.children;
-      if (!cards) return;
+  // useGSAP(
+  //   () => {
+  //     const cards = cardsRef.current?.children;
+  //     if (!cards) return;
 
-      gsap.set(cards, { autoAlpha: 0, y: 48 });
-      gsap.to(cards, {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.4,
-        ease: 'power4.out',
-        stagger: 0.15,
-        clearProps: 'transform',
-        scrollTrigger: {
-          trigger: cardsRef.current,
-          start: 'top 80%',
-          once: true,
-        },
-      });
-    },
-    { scope: sectionRef },
-  );
+  //     gsap.set(cards, { autoAlpha: 0, y: 48 });
+  //     gsap.to(cards, {
+  //       autoAlpha: 1,
+  //       y: 0,
+  //       duration: 0.4,
+  //       ease: 'power4.out',
+  //       stagger: 0.15,
+  //       clearProps: 'transform',
+  //       scrollTrigger: {
+  //         trigger: cardsRef.current,
+  //         start: 'top 80%',
+  //         once: true,
+  //       },
+  //     });
+  //   },
+  //   { scope: sectionRef },
+  // );
 
   return (
     <section
@@ -76,10 +62,10 @@ export default function PricingSection() {
       <div className='mx-auto max-w-7xl px-4 sm:px-6 lg:px-8'>
         {/* sub title */}
         <div className='my-4 flex items-center gap-4'>
-          <LineReveal delay={0} duration={0.5}>
+          <LineReveal delay={0} duration={0.8}>
             <div className='h-px w-8 bg-[#00d4ff]' />
           </LineReveal>
-          <TextReveal triggerRef={sectionRef} delay={0.15}>
+          <TextReveal triggerRef={sectionRef} delay={0.15} duration={0.8}>
             <span className='text-[10px] leading-3.75 text-[#00d4ff]'>
               WHAT IT COSTS
             </span>
