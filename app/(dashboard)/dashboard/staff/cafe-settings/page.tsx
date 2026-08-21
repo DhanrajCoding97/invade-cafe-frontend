@@ -1,4 +1,5 @@
 import CafeSettingsForm from '../../components/cafe-settings/CafeSettingsForm';
+import ExtensionPricingForm from '../../components/cafe-settings/ExtensionPricingForm';
 
 export default async function CafeSettingsPage() {
   return (
@@ -9,6 +10,7 @@ export default async function CafeSettingsPage() {
       </div>
 
       <CafeSettingsForm />
+      <ExtensionPricingForm />
     </div>
   );
 }

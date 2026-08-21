@@ -1,7 +1,6 @@
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import {
-  ArrowLeft,
   Clock,
   Users,
   IndianRupee,
@@ -111,40 +110,6 @@ export default async function CustomerBookingDetailPage({
             value={booking.stations?.name ?? 'Unknown'}
           />
         </div>
-
-        {/* <div className='grid grid-cols-2 gap-3'>
-          <DetailTile
-            icon={<Monitor size={16} />}
-            label='Device'
-            value={booking.device}
-          />
-          <DetailTile
-            icon={<Calendar size={16} />}
-            label='Date & Time'
-            value={`${booking.date} · ${booking.start_time}`}
-          />
-          <DetailTile
-            icon={<Clock size={16} />}
-            label='Duration'
-            value={`${booking.duration_hours}h`}
-          />
-          <DetailTile
-            icon={<Users size={16} />}
-            label='Players'
-            value={String(booking.players)}
-          />
-          <DetailTile
-            icon={<IndianRupee size={16} />}
-            label='Amount'
-            value={`₹${booking.amount}`}
-          />
-          <DetailTile
-            icon={<TvMinimalPlay size={16} />}
-            label='Station'
-            value={booking.stations?.name ?? 'Unknown'}
-          />
-        </div> */}
-
         <ContactLink />
         <CancelBookingButton booking={booking} />
       </div>
@@ -168,7 +133,7 @@ function DetailTile({
         <p className='font-mono text-[10px] uppercase tracking-wide text-white/40 mb-1'>
           {label}
         </p>
-        <p className='font-mono text-sm text-white break-words'>{value}</p>
+        <p className='font-mono text-sm text-white wrap-break-word'>{value}</p>
       </div>
     </div>
   );

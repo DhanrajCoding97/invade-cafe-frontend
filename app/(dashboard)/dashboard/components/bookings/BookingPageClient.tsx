@@ -5,6 +5,9 @@ import { fetchBookings, bookingKeys } from '@/lib/queries/bookings';
 import { bookingColumns } from '../../components/columns/bookingColumns';
 import { BookingsTable } from '../../components/BookingsTable';
 import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
+import { BookingsTableSkeleton } from '@/components/skeletons/BookingsTableSkeleton';
+
+const BOOKING_STALE_TIME = 30_000;
 
 export default function BookingsPageClient({
   role,
@@ -19,6 +22,7 @@ export default function BookingsPageClient({
   } = useQuery({
     queryKey: bookingKeys.all,
     queryFn: fetchBookings,
+    staleTime: BOOKING_STALE_TIME,
   });
 
   // isLoading will now be false on first render — data arrives pre-hydrated
@@ -26,7 +30,7 @@ export default function BookingsPageClient({
   // refetch that somehow beats cache (rare) or a hard client navigation
   // without the server wrapper.
   if (isLoading) {
-    return <div>Loading bookings...</div>;
+    return <BookingsTableSkeleton />;
   }
 
   if (error) {

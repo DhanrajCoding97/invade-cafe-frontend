@@ -1,6 +1,5 @@
 import { getDashboardData } from '@/lib/queries/dashboard';
 import { KpiCard } from '../components/KpiCard';
-// import { RevenueChart } from '../components/charts/RevenueChart';
 import { RevenueChartClient } from '../components/charts/RevenueChartClient';
 import Link from 'next/link';
 import { formatIST } from '@/lib/date-list';

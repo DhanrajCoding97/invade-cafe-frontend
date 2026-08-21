@@ -16,6 +16,7 @@ export default async function LandingPageLayout({
   const navItems = [
     { label: 'Home', href: '/#hero' },
     { label: 'Services', href: '/#services' },
+    { label: 'Games', href: '/#games' },
     { label: 'Pricing', href: '/#pricing' },
     { label: 'Gallery', href: '/#gallery' },
     { label: 'Testimonials', href: '/#testimonials' },
@@ -23,12 +24,6 @@ export default async function LandingPageLayout({
     { label: 'Contact', href: '/#contact' },
   ];
 
-  if (user) {
-    navItems.push({
-      label: 'Dashboard',
-      href: '/dashboard',
-    });
-  }
   return (
     <main className={orbitron.className}>
       <NavBar

@@ -133,15 +133,15 @@ export function StationCard({
             : 'upcoming';
 
   const [selected, setSelected] = useState<number>(30);
-  const [customMinutes, setCustomMinutes] = useState('');
 
   const options = [
+    { label: '15 min', value: 15 },
     { label: '30 min', value: 30 },
     { label: '1 hour', value: 60 },
     { label: '2 hours', value: 120 },
   ];
 
-  const finalMinutes = selected === -1 ? Number(customMinutes) || 0 : selected;
+  const finalMinutes = selected;
 
   const actionStyles = {
     extend:
@@ -219,8 +219,6 @@ export function StationCard({
 
   return (
     <div
-      // className={`rounded-xl border p-3 min-w-0 transitioaymn-all duration-300 sm:p-3.5 ${hud.shell}`}
-      // className={`relative min-w-0 overflow-hidden border p-3 transition-all duration-300 before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-[''] sm:p-3.5 ${hud.shell}`}
       className={`flex flex-col  relative min-w-0 overflow-hidden  border p-3 transition-all duration-300 before:absolute before:inset-y-0 before:left-0 before:w-1 before:content-[''] sm:p-3.5 ${hud.shell}`}
     >
       {/* header row — dot (free only) + name, status pill */}
@@ -478,7 +476,7 @@ export function StationCard({
                           Quick extension
                         </p>
 
-                        <div className='grid grid-cols-2 gap-2'>
+                        {/* <div className='grid grid-cols-2 gap-2'>
                           {options.map((opt) => {
                             const isSelected = selected === opt.value;
                             return (
@@ -489,7 +487,7 @@ export function StationCard({
                                 className={`relative flex h-12 items-center justify-center rounded-lg border font-mono text-sm transition-all duration-150 ${
                                   isSelected
                                     ? 'border-cyan-400 bg-cyan-400/10 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.10)]'
-                                    : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04] hover:text-white'
+                                    : 'border-white/10 bg-white/2 text-white/60 hover:border-white/20 hover:bg-white/4 hover:text-white'
                                 }`}
                               >
                                 {opt.label}
@@ -508,15 +506,39 @@ export function StationCard({
                             className={`flex h-12 items-center justify-center rounded-lg border font-mono text-sm transition-all duration-150 ${
                               selected === -1
                                 ? 'border-cyan-400 bg-cyan-400/10 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.10)]'
-                                : 'border-white/10 bg-white/[0.02] text-white/60 hover:border-white/20 hover:bg-white/[0.04] hover:text-white'
+                                : 'border-white/10 bg-white/2 text-white/60 hover:border-white/20 hover:bg-white/4 hover:text-white'
                             }`}
                           >
                             Custom
                           </button>
+                        </div> */}
+                        <div className='grid grid-cols-2 gap-2'>
+                          {options.map((opt) => {
+                            const isSelected = selected === opt.value;
+                            return (
+                              <button
+                                key={opt.value}
+                                type='button'
+                                onClick={() => setSelected(opt.value)}
+                                className={`relative flex h-12 items-center justify-center rounded-lg border font-mono text-sm transition-all duration-150 ${
+                                  isSelected
+                                    ? 'border-cyan-400 bg-cyan-400/10 text-cyan-200 shadow-[0_0_14px_rgba(34,211,238,0.10)]'
+                                    : 'border-white/10 bg-white/2 text-white/60 hover:border-white/20 hover:bg-white/4 hover:text-white'
+                                }`}
+                              >
+                                {opt.label}
+                                {isSelected && (
+                                  <span className='absolute right-2 top-2 text-[10px] text-cyan-300'>
+                                    ✓
+                                  </span>
+                                )}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
 
-                      {selected === -1 && (
+                      {/* {selected === -1 && (
                         <div className='space-y-2'>
                           <label className='font-mono text-[10px] font-medium uppercase tracking-[0.15em] text-white/40'>
                             Extra minutes
@@ -536,7 +558,7 @@ export function StationCard({
                             </span>
                           </div>
                         </div>
-                      )}
+                      )} */}
 
                       {finalMinutes > 0 && (
                         <div className='flex items-center justify-between rounded-lg border border-cyan-400/10 bg-cyan-400/[0.04] px-3 py-2.5'>

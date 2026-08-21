@@ -149,11 +149,11 @@ export function BookingsTable<TData>({
   const isMobile = useIsMobile();
   const router = useRouter();
   // default to today
-  const [dateRange, setDateRange] = useState<DateRange | undefined>({
-    from: new Date(),
-    to: new Date(),
-  });
-
+  // const [dateRange, setDateRange] = useState<DateRange | undefined>({
+  //   from: new Date(),
+  //   to: new Date(),
+  // });
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
   const tableData = useMemo(() => {
@@ -434,69 +434,69 @@ export function BookingsTable<TData>({
               </CollapsibleContent>
             </Collapsible>
           </div>
-          {isMobile ? (
-            <div className='flex flex-col gap-3'>
-              {table.getRowModel().rows.map((row) => (
-                <BookingCard key={row.id} booking={row.original} role={role} />
-              ))}
-            </div>
-          ) : (
-            <div className='overflow-x-auto rounded-lg border'>
-              <table className='w-full text-sm border-collapse shadow-lg'>
-                <thead className='bg-muted/50'>
-                  {table.getHeaderGroups().map((headerGroup) => (
-                    <tr key={headerGroup.id}>
-                      {headerGroup.headers.map((header) => (
-                        <th
-                          key={header.id}
-                          onClick={header.column.getToggleSortingHandler()}
-                          className='cursor-pointer select-none px-4 py-2 text-left font-medium min-w-30'
-                        >
-                          <div className='flex items-center gap-1 whitespace-nowrap'>
-                            {flexRender(
-                              header.column.columnDef.header,
-                              header.getContext(),
-                            )}
-                            <span className='shrink-0'>
-                              {{
-                                asc: '↑',
-                                desc: '↓',
-                              }[header.column.getIsSorted() as string] ?? ''}
-                            </span>
-                          </div>
-                        </th>
+
+          <div className='flex flex-col gap-3 md:hidden'>
+            {table.getRowModel().rows.map((row) => (
+              <BookingCard key={row.id} booking={row.original} role={role} />
+            ))}
+          </div>
+
+          <div className='hidden md:block overflow-x-auto rounded-lg border'>
+            <table className='w-full text-sm border-collapse shadow-lg'>
+              <thead className='bg-muted/50'>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th
+                        key={header.id}
+                        onClick={header.column.getToggleSortingHandler()}
+                        className='cursor-pointer select-none px-4 py-2 text-left font-medium min-w-30'
+                      >
+                        <div className='flex items-center gap-1 whitespace-nowrap'>
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
+                          <span className='shrink-0'>
+                            {{
+                              asc: '↑',
+                              desc: '↓',
+                            }[header.column.getIsSorted() as string] ?? ''}
+                          </span>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                ))}
+              </thead>
+              <tbody>
+                {table.getRowModel().rows.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <tr key={row.id} className='border-t hover:bg-muted/30'>
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id} className='px-4 py-2'>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
                       ))}
                     </tr>
-                  ))}
-                </thead>
-                <tbody>
-                  {table.getRowModel().rows.length ? (
-                    table.getRowModel().rows.map((row) => (
-                      <tr key={row.id} className='border-t hover:bg-muted/30'>
-                        {row.getVisibleCells().map((cell) => (
-                          <td key={cell.id} className='px-4 py-2'>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan={columns.length}
-                        className='px-4 py-6 text-center text-muted-foreground'
-                      >
-                        No bookings found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  ))
+                ) : (
+                  <tr>
+                    <td
+                      colSpan={columns.length}
+                      className='px-4 py-6 text-center text-muted-foreground'
+                    >
+                      No bookings found.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+
           <div className='flex flex-wrap items-center justify-between gap-3'>
             {/* Page size selector */}
             <div className='flex items-center gap-2 text-sm text-gray-500'>

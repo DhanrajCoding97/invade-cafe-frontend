@@ -65,8 +65,12 @@ export async function getBookingById(id: string): Promise<BookingRow | null> {
   return data as BookingRow | null;
 }
 
-const BOOKING_SELECT = `*, profiles:user_id (full_name, avatar_url, email, phone)`;
-
+// const BOOKING_SELECT = `*, profiles:user_id (full_name, avatar_url, email, phone)`;
+const BOOKING_SELECT = `
+  *,
+  profiles:user_id (full_name, avatar_url, email, phone),
+  session_extensions (id, amount, payment_status)
+`;
 export async function fetchBookingsServer(): Promise<BookingRow[]> {
   const { createClient } = await import('@/lib/supabase/server');
   const supabase = await createClient();

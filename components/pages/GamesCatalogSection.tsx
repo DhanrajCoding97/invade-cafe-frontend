@@ -40,6 +40,7 @@ export default function GamesCatalogSection() {
   // }, [isLoading]);
   return (
     <section
+      id='games'
       ref={sectionRef}
       className='px-4 sm:px-6 lg:px-8 py-8 sm:py-12 md:py:16 lg:py-20'
     >

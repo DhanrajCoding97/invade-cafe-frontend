@@ -17,7 +17,7 @@ type TextRevealProps = {
 export default function TextReveal({
   children,
   delay = 0,
-  duration = 0.9,
+  duration = 0.4,
   triggerRef,
   start = 'top 80%',
 }: TextRevealProps) {

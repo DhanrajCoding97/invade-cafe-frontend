@@ -195,7 +195,6 @@ export default function DateTimeStep() {
   const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
 
   useEffect(() => {
-    console.log('CafeTimings', openHour, closeHour);
     const lenis = getLenisInstance();
 
     if (!lenis) return;

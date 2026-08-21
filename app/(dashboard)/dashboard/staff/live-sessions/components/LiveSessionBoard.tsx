@@ -16,6 +16,7 @@ import {
 import { toast } from 'sonner';
 import { PushNotificationToggle } from './PushNotificationToggle';
 import { cn } from '@/lib/utils';
+import { useRealtimeSessionBoard } from '@/hooks/use-realtime-session-board';
 
 function getTimeLeft(endIso: string) {
   return Math.max(
@@ -23,7 +24,7 @@ function getTimeLeft(endIso: string) {
     Math.round((new Date(endIso).getTime() - Date.now()) / 60_000),
   );
 }
-type Booking = {
+export type Booking = {
   id: string;
   station_id: string;
   date: string;
@@ -69,6 +70,7 @@ export default function LiveSessionBoard({
   const markExtensionPaid = useMarkExtensionPaid();
 
   const AUDIO_UNLOCKED_KEY = 'live-session-audio-unlocked';
+  useRealtimeSessionBoard(setBookings);
 
   useDueSessions(bookings);
 
@@ -175,34 +177,34 @@ export default function LiveSessionBoard({
     }
   }, []);
 
-  useEffect(() => {
-    const channel = supabase
-      .channel('bookings-live')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'bookings' },
-        (payload) => {
-          setBookings((prev) => {
-            if (payload.eventType === 'INSERT')
-              return [...prev, payload.new as Booking];
-            if (payload.eventType === 'UPDATE')
-              return prev.map((b) =>
-                b.id === payload.new.id
-                  ? ({ ...b, ...payload.new } as Booking)
-                  : b,
-              );
-            if (payload.eventType === 'DELETE')
-              return prev.filter((b) => b.id !== payload.old.id);
-            return prev;
-          });
-        },
-      )
-      .subscribe();
+  // useEffect(() => {
+  //   const channel = supabase
+  //     .channel('bookings-live')
+  //     .on(
+  //       'postgres_changes',
+  //       { event: '*', schema: 'public', table: 'bookings' },
+  //       (payload) => {
+  //         setBookings((prev) => {
+  //           if (payload.eventType === 'INSERT')
+  //             return [...prev, payload.new as Booking];
+  //           if (payload.eventType === 'UPDATE')
+  //             return prev.map((b) =>
+  //               b.id === payload.new.id
+  //                 ? ({ ...b, ...payload.new } as Booking)
+  //                 : b,
+  //             );
+  //           if (payload.eventType === 'DELETE')
+  //             return prev.filter((b) => b.id !== payload.old.id);
+  //           return prev;
+  //         });
+  //       },
+  //     )
+  //     .subscribe();
 
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [supabase]);
+  //   return () => {
+  //     supabase.removeChannel(channel);
+  //   };
+  // }, [supabase]);
 
   const currentBookingFor = (stationId: string) =>
     bookings
