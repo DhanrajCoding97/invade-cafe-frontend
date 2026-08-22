@@ -1,7 +1,6 @@
 import { requireRole } from '@/lib/auth/requrireRole';
 import React from 'react';
 import { rajdhani } from '@/lib/fonts';
-
 import {
   SidebarProvider,
   SidebarInset,

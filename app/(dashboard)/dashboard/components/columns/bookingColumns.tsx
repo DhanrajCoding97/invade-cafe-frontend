@@ -212,8 +212,10 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row, table }) => (
-      <BookingActions booking={row.original} role={table.options?.meta?.role} />
-    ),
+    cell: ({ row, table }) => {
+      const { role, user } = table.options.meta!;
+
+      return <BookingActions user={user} booking={row.original} role={role} />;
+    },
   },
 ];

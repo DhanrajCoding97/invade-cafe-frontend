@@ -1,4 +1,3 @@
-// app/(dashboard)/dashboard/staff/customers/page.tsx
 import { getCustomers } from '@/lib/queries/customers';
 import { customerColumns } from '../../components/columns/customerColumns';
 import { CustomersTable } from '../../components/CustomerTable';

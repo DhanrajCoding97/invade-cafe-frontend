@@ -41,10 +41,12 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { BookingCard } from './BookingCard';
 import type { RowData } from '@tanstack/react-table';
 import { todayIST } from '@/lib/date-list';
+import { User } from '@supabase/supabase-js';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
     role: 'owner' | 'staff';
+    user: User;
   }
 }
 
@@ -55,6 +57,7 @@ interface DataTableProps<TData> {
   error?: string | null;
   onRetry?: () => void;
   role: 'owner' | 'staff';
+  user: User;
 }
 
 function exportBookingsToCSV(rows: any[]) {
@@ -130,6 +133,7 @@ function exportBookingsToCSV(rows: any[]) {
 }
 
 export function BookingsTable<TData>({
+  user,
   columns,
   data,
   loading = false,
@@ -190,7 +194,7 @@ export function BookingsTable<TData>({
   const table = useReactTable({
     data: tableData,
     columns: tableColumns,
-    meta: { role },
+    meta: { role, user },
     state: {
       sorting,
       globalFilter,
@@ -227,84 +231,6 @@ export function BookingsTable<TData>({
         </div>
       ) : (
         <div className='flex flex-col gap-4'>
-          {/* <div className='flex flex-col justify-center gap-3'>
-            <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-              <h1 className='text-2xl font-bold'>Bookings Table</h1>
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() =>
-                  exportBookingsToCSV(
-                    table.getFilteredRowModel().rows.map((r) => r.original),
-                  )
-                }
-                disabled={table.getFilteredRowModel().rows.length === 0}
-              >
-                Export CSV
-              </Button>
-            </div>
-            <p className='text-sm text-muted-foreground'>
-              Total bookings: {table.getFilteredRowModel().rows.length}
-            </p>
-            <div className='flex flex-wrap items-center gap-3'>
-              <div className='relative w-full max-w-sm'>
-                <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#28F1FF]/70' />
-                <Input
-                  type='text'
-                  value={globalFilter}
-                  onChange={(e) => setGlobalFilter(e.target.value)}
-                  placeholder='Search customer, phone, device...'
-                  className='
-              h-10
-              rounded-lg
-              border border-[#28F1FF]/20
-              bg-white/5
-              text-white
-              placeholder:text-white/40
-              pl-10
-              pr-10
-              transition-all
-              focus:border-[#28F1FF]
-              focus:ring-2
-              focus:ring-[#28F1FF]/20
-            '
-                />
-
-                {globalFilter && (
-                  <button
-                    type='button'
-                    onClick={() => setGlobalFilter('')}
-                    className='absolute right-3 top-1/2 -translate-y-1/2 text-white/40 transition hover:text-white'
-                  >
-                    ✕
-                  </button>
-                )}
-              </div>
-              <BookingDateFilter date={dateRange} onChange={setDateRange} />
-              <BookingStatusFilter
-                value={statusFilter}
-                onChange={setStatusFilter}
-              />
-              <BookingPaymentFilter
-                value={paymentFilter}
-                onChange={setPaymentFilter}
-              />
-              {hasActiveFilters && (
-                <Button
-                  variant='ghost'
-                  size='sm'
-                  onClick={() => {
-                    setStatusFilter('all');
-                    setPaymentFilter('all');
-                    setDateRange(undefined);
-                    setGlobalFilter('');
-                  }}
-                >
-                  Clear filters
-                </Button>
-              )}
-            </div>
-          </div> */}
           <div className='space-y-5'>
             {/* Header */}
             <div className='flex items-start justify-between gap-3'>

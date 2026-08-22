@@ -1,11 +1,5 @@
 'use server';
 
-// import Razorpay from 'razorpay';
-
-// const razorpay = new Razorpay({
-//   key_id: process.env.RAZORPAY_KEY_ID!,
-//   key_secret: process.env.RAZORPAY_KEY_SECRET!,
-// });
 import { refundPayment } from '@/app/actions/refund';
 import { createClient } from '@/lib/supabase/server';
 import { createServiceRoleClient } from '@/lib/supabase/service-role';
@@ -139,87 +133,3 @@ export async function cancelMyBooking(
 
   return { success: true, refundPercent };
 }
-
-// export async function cancelMyBooking(bookingId: string) {
-//   const supabase = await createClient();
-//   const {
-//     data: { user },
-//   } = await supabase.auth.getUser();
-//   if (!user) throw new Error('Not authenticated');
-
-//   const { data: booking, error: fetchError } = await supabase
-//     .from('bookings')
-//     .select(
-//       'id, user_id, date, start_time, status, payment_status, payment_method, razorpay_payment_id, amount',
-//     )
-//     .eq('id', bookingId)
-//     .single();
-
-//   if (fetchError || !booking) throw new Error('Booking not found');
-//   if (booking.user_id !== user.id) throw new Error('Not your booking');
-//   if (booking.status === 'cancelled') throw new Error('Already cancelled');
-
-//   const sessionStart = new Date(`${booking.date}T${booking.start_time}`);
-//   const hoursUntilStart = (sessionStart.getTime() - Date.now()) / 3_600_000;
-//   if (hoursUntilStart < 2) {
-//     throw new Error(
-//       'Cancellation window has passed. Contact the cafe to cancel.',
-//     );
-//   }
-
-//   const admin = createServiceRoleClient();
-//   const startOfDay = new Date();
-//   startOfDay.setHours(0, 0, 0, 0);
-//   const startOfMonth = new Date();
-//   startOfMonth.setDate(1);
-//   startOfMonth.setHours(0, 0, 0, 0);
-
-//   const { count: todayCount, error: todayErr } = await admin
-//     .from('bookings')
-//     .select('*', { count: 'exact', head: true })
-//     .eq('user_id', user.id)
-//     .eq('status', 'cancelled')
-//     .gte('cancelled_at', startOfDay.toISOString());
-//   if (todayErr) throw new Error(todayErr.message);
-//   if ((todayCount ?? 0) >= 1) {
-//     throw new Error(
-//       'Only one cancellation allowed per day. Contact the cafe for further help.',
-//     );
-//   }
-
-//   const { count: monthCount, error: monthErr } = await admin
-//     .from('bookings')
-//     .select('*', { count: 'exact', head: true })
-//     .eq('user_id', user.id)
-//     .eq('status', 'cancelled')
-//     .gte('cancelled_at', startOfMonth.toISOString());
-//   if (monthErr) throw new Error(monthErr.message);
-
-//   const refundPercent = getRefundPercentForCount(monthCount ?? 0);
-
-//   const shouldRefund =
-//     booking.payment_status === 'paid' &&
-//     booking.payment_method === 'razorpay' &&
-//     !!booking.razorpay_payment_id;
-
-//   if (shouldRefund) {
-//     const refundAmountPaise = Math.round(
-//       (booking.amount * 100 * refundPercent) / 100,
-//     );
-//     await refundPayment(booking.razorpay_payment_id!, {
-//       amount: refundAmountPaise,
-//       refundedBy: user.id,
-//       reason: `customer_self_cancel_${refundPercent}pct`,
-//     });
-//   }
-
-//   const { error } = await supabase
-//     .from('bookings')
-//     .update({ status: 'cancelled', cancelled_at: new Date().toISOString() })
-//     // payment_status is already updated inside refundPayment — don't set it here too
-//     .eq('id', bookingId);
-
-//   if (error) throw new Error(error.message);
-
-//   return { refundPercent };
-// }

@@ -1,171 +1,3 @@
-// export function BookingDetailView({
-//   booking,
-//   //   backButton,
-//   actions,
-// }: {
-//   booking: any;
-//   //   backButton: React.ReactNode;
-//   /** Admin-only action row. Omit on customer route. */
-//   actions?: ReactNode;
-// }) {
-//   const isOnlineBooking = booking.payment_method === 'razorpay';
-//   return (
-//     <div
-//       className='p-3 sm:p-4 lg:p-6 border rounded-2xl'
-//       // className='min-h-screen bg-black text-white px-4 py-6 md:px-8 md:py-10 max-w-3xl mx-auto'
-//     >
-//       {/* Header */}
-//       {/* <button
-//         onClick={backButton}
-//         className='flex items-center gap-2 text-[#28F1FF] hover:text-white transition-colors font-mono text-sm mb-6'
-//       >
-//         <ArrowLeft size={16} />
-//         Back
-//       </button> */}
-
-//       {/* Confirmation banner - district style */}
-//       <div className=''>
-//         {/* {backButton} */}
-//         <div className='flex items-center gap-2 mb-1'>
-//           <h1 className='font-mono text-xl text-white font-semibold'>
-//             {booking?.status === 'confirmed'
-//               ? 'Booking Confirmed'
-//               : 'Booking Details'}
-//           </h1>
-//           {booking?.status === 'confirmed' && (
-//             <span className='text-emerald-400 text-lg'>✓</span>
-//           )}
-//         </div>
-//         <p className='font-mono text-xs text-white/40'>
-//           Booking Date: {booking?.created_at}
-//         </p>
-//         {isOnlineBooking && (
-//           <p className='font-mono text-xs text-white/40'>
-//             Razorpay Order ID: {booking?.razorpay_order_id}
-//           </p>
-//         )}
-//       </div>
-
-//       {/* Customer card */}
-//       <div className='border border-[#28F1FF]/20 rounded-2xl p-5 mb-4 bg-gradient-to-b from-[#28F1FF]/5 to-transparent'>
-//         <p className='font-mono text-lg text-[#28F1FF]'>
-//           {booking?.customer_name ?? booking?.profiles?.full_name ?? 'Unknown'}
-//         </p>
-//         <p className='font-mono text-sm text-white/50 mt-1'>
-//           {booking?.customer_phone ??
-//             booking?.profiles?.phone ??
-//             'Contact info not provided'}
-//         </p>
-//         {booking?.profiles?.email && (
-//           <p className='font-mono text-xs text-white/40 mt-0.5'>
-//             {booking.profiles.email}
-//           </p>
-//         )}
-//       </div>
-
-//       {/* Status + Payment pills */}
-//       <div className='flex gap-3 mb-4'>
-//         <span
-//           className={`font-mono text-xs px-4 py-1.5 rounded-full border ${statusStyles[booking?.status] ?? 'border-white/20 text-white/70'}`}
-//         >
-//           {booking?.status}
-//         </span>
-//         <span
-//           className={`font-mono text-xs px-4 py-1.5 rounded-full border ${paymentStyles[booking?.payment_status] ?? 'border-white/20 text-white/70'}`}
-//         >
-//           {booking?.payment_status}
-//           {booking?.payment_method && (
-//             <span className='text-white/40 ml-1'>
-//               · {booking.payment_method}
-//             </span>
-//           )}
-//         </span>
-//       </div>
-
-//       {/* QR block - district style */}
-//       {booking?.qr_code && (
-//         <div className='border border-white/10 rounded-2xl p-6 mb-4 flex flex-col items-center'>
-//           <p className='font-mono text-xs text-white/40 mb-4 uppercase tracking-wide'>
-//             Scan this QR code at venue
-//           </p>
-//           <div className='bg-white p-3 rounded-xl'>
-//             {/* swap for real QR render (e.g. qrcode.react) */}
-//             <QrCode size={140} className='text-black' />
-//           </div>
-//           <p className='font-mono text-xs text-white/40 mt-4'>Booking ID</p>
-//           <p className='font-mono text-sm text-white'>{booking?.id}</p>
-//         </div>
-//       )}
-
-//       {/* Booking details grid */}
-//       <div className='grid grid-cols-2 gap-3 mb-4'>
-//         <DetailTile
-//           icon={<Monitor size={16} />}
-//           label='Device'
-//           value={booking?.device}
-//         />
-//         <DetailTile
-//           icon={<Calendar size={16} />}
-//           label='Date & Time'
-//           value={`${booking?.date} · ${booking?.start_time}`}
-//         />
-//         <DetailTile
-//           icon={<Clock size={16} />}
-//           label='Duration'
-//           value={`${booking?.duration_hours}h`}
-//         />
-//         <DetailTile
-//           icon={<Users size={16} />}
-//           label='Players'
-//           value={String(booking?.players)}
-//         />
-//       </div>
-
-//       {booking?.station_id && (
-//         <div className='mb-4 border border-white/10 rounded-2xl p-5'>
-//           <p className='font-mono text-xs text-white/40 mb-1'>Station</p>
-//           <p className='font-mono text-sm text-white'>{booking.station_id}</p>
-//         </div>
-//       )}
-
-//       {/* Bill summary - district style */}
-//       <div className='border border-white/10 rounded-2xl p-5 mb-4'>
-//         <p className='font-mono text-sm text-white mb-3 font-semibold'>
-//           Bill Summary
-//         </p>
-//         <div className='flex justify-between font-mono text-sm text-white/60 mb-2'>
-//           <span>Session charges</span>
-//           <span>₹{booking?.amount}</span>
-//         </div>
-//         <div className='border-t border-white/10 pt-3 flex justify-between font-mono text-sm text-white font-semibold'>
-//           <span>Total Amount Paid</span>
-//           <span className='flex items-center gap-1'>
-//             <IndianRupee size={14} />
-//             {booking?.amount}
-//           </span>
-//         </div>
-//       </div>
-
-//       {/* Payment details */}
-//       <div className='border border-white/10 rounded-2xl p-5 mb-6'>
-//         <p className='font-mono text-sm text-white mb-1 font-semibold'>
-//           Payment Details
-//         </p>
-//         <p className='font-mono text-xs text-white/40 mb-3'>
-//           Transaction ID: {booking?.transaction_id ?? '—'}
-//         </p>
-//         <div className='flex justify-between font-mono text-sm text-white/70'>
-//           <span>{booking?.payment_method ?? 'Wallet'}</span>
-//           <span>₹{booking?.amount}</span>
-//         </div>
-//       </div>
-
-//       {/* Admin actions slot - customer route just won't pass this */}
-//       {actions && <div className='flex gap-2 flex-wrap'>{actions}</div>}
-//     </div>
-//   );
-// }
-// components/bookings/BookingDetailView.tsx
 'use client';
 import { type User } from '@supabase/supabase-js';
 import {
@@ -197,27 +29,6 @@ const paymentStyles: Record<string, string> = {
   paid: 'bg-emerald-600/20 text-emerald-300 border-emerald-500/40',
 };
 
-// function DetailTile({
-//   icon,
-//   label,
-//   value,
-// }: {
-//   icon: ReactNode;
-//   label: string;
-//   value: string;
-// }) {
-//   return (
-//     <div className='flex items-center gap-2'>
-//       <div className='flex items-center gap-2 text-[#28F1FF]/70'>
-//         {icon}
-//         <span className='font-mono text-xs text-white/40 uppercase tracking-wide'>
-//           {label}
-//         </span>
-//       </div>
-//       <p className='font-mono text-sm text-white'>{value}</p>
-//     </div>
-//   );
-// }
 function DetailTile({
   icon,
   label,
@@ -228,7 +39,7 @@ function DetailTile({
   value: string;
 }) {
   return (
-    <div className='flex items-start gap-3 rounded-lg border border-white/10 bg-white/[0.02] p-3 sm:p-4'>
+    <div className='flex items-start gap-3 rounded-lg border border-white/10 bg-white/2 p-3 sm:p-4'>
       <div className='mt-0.5 shrink-0 text-[#28F1FF]/70'>{icon}</div>
       <div className='min-w-0'>
         <p className='font-mono text-[10px] uppercase tracking-wide text-white/40 mb-1'>
@@ -300,7 +111,7 @@ export function BookingDetailView({
       </div>
 
       {/* Customer card — unchanged */}
-      <div className='border border-[#28F1FF]/20 rounded-2xl p-5 my-4 bg-gradient-to-b from-[#28F1FF]/5 to-transparent'>
+      <div className='border border-[#28F1FF]/20 rounded-2xl p-5 my-4 bg-linear-to-b from-[#28F1FF]/5 to-transparent'>
         <p className='font-mono text-lg text-[#28F1FF]'>
           {booking?.customer_name ?? booking?.profiles?.full_name ?? 'Unknown'}
         </p>
@@ -382,14 +193,6 @@ export function BookingDetailView({
           value={booking.stations?.name ?? 'Unknown'}
         />
       </div>
-
-      {/* {booking?.station_id && (
-        <div className='mb-4 border border-white/10 rounded-2xl p-5'>
-          <p className='font-mono text-xs text-white/40 mb-1'>Station</p>
-          <p className='font-mono text-sm text-white'>{booking.station_id}</p>
-        </div>
-      )} */}
-
       {/* Bill summary — now itemizes extensions and shows a real total */}
       <div className='border border-white/10 rounded-2xl p-5 my-4'>
         <p className='font-mono text-sm text-white mb-3 font-semibold'>
@@ -413,75 +216,6 @@ export function BookingDetailView({
             </span>
             <div className='flex items-center gap-3'>
               <span>₹{ext.amount}</span>
-              {/* {ext.payment_status === 'pending' && (
-                <button
-                  onClick={() =>
-                    markExtensionPaid.mutate({
-                      extensionId: ext.id,
-                      markedPaidBy: user.id, // swap for actual staff user id
-                    })
-                  }
-                  disabled={markExtensionPaid.isPending}
-                  className='text-xs px-2 py-1 rounded-full border border-emerald-400/40 text-emerald-300 hover:border-emerald-400 transition-colors'
-                >
-                  {markExtensionPaid.isPending ? '...' : 'Mark Paid'}
-                </button>
-              )} */}
-              {/* Only show per-line Mark Paid for online bookings.
-          For cash/walk-in, the bottom button handles both together. */}
-              {/* {isOnlineBooking && ext.payment_status === 'pending' && (
-                <button
-                  onClick={() =>
-                    markBookingAndExtensionPaid.mutate({
-                      bookingId: booking.id,
-                      method: paymentMethod,
-                    })
-                  }
-                  disabled={markBookingAndExtensionPaid.isPending}
-                >
-                  {markBookingAndExtensionPaid.isPending
-                    ? 'Processing...'
-                    : `Mark Paid ${booking.payment_method ?? 'cash'}`}
-                </button>
-              )} */}
-              {/* for offline booking with session extension show markBookingAndExtensionPaid and for online booking extensions show  markExtensionPaid*/}
-              {/* {ext.payment_status === 'pending' && (
-                <>
-                  {isOnlineBooking ? (
-                    // Online booking → only mark the extension as paid
-                    <button
-                      onClick={() =>
-                        markExtensionPaid.mutate({
-                          extensionId: ext.id,
-                          markedPaidBy: user.id,
-                        })
-                      }
-                      disabled={markExtensionPaid.isPending}
-                      className='text-xs px-2 py-1 rounded-md border border-emerald-400/40 text-emerald-300 hover:border-emerald-400 transition-colors'
-                    >
-                      {markExtensionPaid.isPending
-                        ? 'Processing...'
-                        : 'Mark Paid'}
-                    </button>
-                  ) : (
-                    // Manual/walk-in booking → booking + extensions are paid together
-                    <button
-                      onClick={() =>
-                        markBookingAndExtensionPaid.mutate({
-                          bookingId: booking.id,
-                          method: paymentMethod,
-                        })
-                      }
-                      disabled={markBookingAndExtensionPaid.isPending}
-                      className='text-xs px-2 py-1 rounded-md border border-emerald-400/40 text-emerald-300 hover:border-emerald-400 transition-colors'
-                    >
-                      {markBookingAndExtensionPaid.isPending
-                        ? 'Processing...'
-                        : 'Mark Paid'}
-                    </button>
-                  )}
-                </>
-              )} */}
             </div>
           </div>
         ))}
@@ -495,19 +229,7 @@ export function BookingDetailView({
         </div>
       </div>
 
-      {/* Payment details — unchanged */}
-      {/* <div className='border border-white/10 rounded-2xl p-5 mb-6'>
-        <p className='font-mono text-sm text-white mb-1 font-semibold'>
-          Payment Details
-        </p>
-        <p className='font-mono text-xs text-white/40 mb-3'>
-          Transaction ID: {booking?.transaction_id ?? '—'}
-        </p>
-        <div className='flex justify-between font-mono text-sm text-white/70'>
-          <span>{booking?.payment_method ?? 'Wallet'}</span>
-          <span>₹{booking?.amount}</span>
-        </div>
-      </div> */}
+      {/* Payment details  */}
       <div className='mb-6 rounded-2xl border border-white/10 p-5'>
         <p className='mb-1 font-mono text-sm font-semibold text-white'>
           Payment Details

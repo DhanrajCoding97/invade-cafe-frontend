@@ -177,35 +177,6 @@ export default function LiveSessionBoard({
     }
   }, []);
 
-  // useEffect(() => {
-  //   const channel = supabase
-  //     .channel('bookings-live')
-  //     .on(
-  //       'postgres_changes',
-  //       { event: '*', schema: 'public', table: 'bookings' },
-  //       (payload) => {
-  //         setBookings((prev) => {
-  //           if (payload.eventType === 'INSERT')
-  //             return [...prev, payload.new as Booking];
-  //           if (payload.eventType === 'UPDATE')
-  //             return prev.map((b) =>
-  //               b.id === payload.new.id
-  //                 ? ({ ...b, ...payload.new } as Booking)
-  //                 : b,
-  //             );
-  //           if (payload.eventType === 'DELETE')
-  //             return prev.filter((b) => b.id !== payload.old.id);
-  //           return prev;
-  //         });
-  //       },
-  //     )
-  //     .subscribe();
-
-  //   return () => {
-  //     supabase.removeChannel(channel);
-  //   };
-  // }, [supabase]);
-
   const currentBookingFor = (stationId: string) =>
     bookings
       .filter((b) => b.station_id === stationId && b.status === 'confirmed')
@@ -217,19 +188,6 @@ export default function LiveSessionBoard({
     stations: stations.filter((s) => s.type === key),
   }));
 
-  // quick "active count" per group so staff glance the tab to see where the action is
-  // const activeCountFor = (type: StationType) =>
-  //   stations
-  //     .filter((s) => s.type === type)
-  //     .filter((s) => {
-  //       const b = currentBookingFor(s.id);
-  //       return !!b?.session_started_at && !b?.session_ended_at;
-  //     }).length;
-
-  // const totalActive = STATION_TYPES.reduce(
-  //   (sum, t) => sum + activeCountFor(t.key),
-  //   0,
-  // );
   const isActive = (station: Station) => {
     const b = currentBookingFor(station.id);
     return !!b?.session_started_at && !b?.session_ended_at;
@@ -287,32 +245,6 @@ export default function LiveSessionBoard({
 
   return (
     <>
-      {/* {!audioUnlocked && (
-        <div className='sticky top-0 z-40 mb-6 flex flex-col sm:flex-row items-center justify-between gap-4 border border-amber-400/30 bg-[#0d0d0f]/95 px-4 py-3 shadow-[0_0_24px_-8px_rgba(251,191,36,0.45)] backdrop-blur-md'>
-          <div className='flex min-w-0 items-center gap-3'>
-            <div className='flex size-8 shrink-0 items-center justify-center border border-amber-400/30 bg-amber-400/10'>
-              <span className='text-sm'>🔊</span>
-            </div>
-
-            <div className='min-w-0'>
-              <p className='font-mono text-xs font-semibold uppercase tracking-[0.15em] text-amber-300'>
-                Sound Alerts Disabled
-              </p>
-
-              <p className='mt-0.5 truncate text-[11px] text-neutral-500'>
-                Enable sound to hear due and overdue session alerts.
-              </p>
-            </div>
-          </div>
-
-          <button
-            onClick={unlockAudio}
-            className='shrink-0 border border-amber-400/40 bg-amber-400/10 px-3 py-2 font-mono text-[10px] uppercase tracking-[0.15em] text-amber-300 transition hover:bg-amber-400/20'
-          >
-            Enable Sound
-          </button>
-        </div>
-      )} */}
       {audioUnlocked === false && (
         <div
           className={cn(
@@ -362,73 +294,22 @@ export default function LiveSessionBoard({
           </button>
         </div>
       )}
-      {/* HUD header */}
-      {/* <div className='flex min-w-0 items-center justify-between'>
-        <div className='flex gap-2 items-center'>
-          <div className='flex size-8 shrink-0 items-center justify-center border border-[#28F1FF]/40'>
-            <div className='size-3 animate-pulse bg-green-400' />
-          </div>
-          <h2 className='text-[clamp(1.5rem,1.15rem+1.5vw,2.5rem)] font-extrabold'>
-            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-              Live Session Terminal
-            </span>
-          </h2>
-          {hasLiveCounts ? (
-            <div className='ml-8 flex items-center gap-2'>
-              {totalActive > 0 && (
-                <div className='flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-1.5'>
-                  <span className='font-mono text-xs font-semibold text-cyan-400'>
-                    {String(totalActive).padStart(2, '0')}
-                  </span>
-
-                  <span className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>
-                    Active
-                  </span>
-                </div>
-              )}
-
-              {totalDue > 0 && (
-                <div className='flex items-center gap-2 border border-amber-400/20 bg-amber-400/5 px-3 py-1.5'>
-                  <span className='font-mono text-xs font-semibold text-amber-400'>
-                    {String(totalDue).padStart(2, '0')}
-                  </span>
-
-                  <span className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>
-                    Due
-                  </span>
-                </div>
-              )}
-
-              {totalOverdue > 0 && (
-                <div className='flex items-center gap-2 border border-orange-400/20 bg-orange-400/5 px-3 py-1.5'>
-                  <span className='font-mono text-xs font-semibold text-orange-400'>
-                    {String(totalOverdue).padStart(2, '0')}
-                  </span>
-
-                  <span className='font-mono text-[10px] uppercase tracking-wider text-neutral-500'>
-                    Overdue
-                  </span>
-                </div>
-              )}
+      <div className='flex flex-col md:flex-row flex-wrap items-start justify-between gap-3 min-w-0'>
+        <div className='flex flex-col md:flex-row items-start md:items-center gap-2 min-w-0'>
+          <div className='flex items-center gap-2'>
+            <div className='flex size-8 shrink-0 items-center justify-center border border-[#28F1FF]/40'>
+              <div className='size-3 animate-pulse bg-green-400' />
             </div>
-          ) : null}
-        </div>
-        <PushNotificationToggle />
-      </div> */}
-      <div className='flex flex-wrap items-start justify-between gap-3 min-w-0'>
-        <div className='flex flex-wrap items-center gap-2 min-w-0'>
-          <div className='flex size-8 shrink-0 items-center justify-center border border-[#28F1FF]/40'>
-            <div className='size-3 animate-pulse bg-green-400' />
+
+            <h2 className='text-[clamp(1.25rem,1rem+1.2vw,2.5rem)] font-extrabold whitespace-nowrap'>
+              <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+                Live Session Terminal
+              </span>
+            </h2>
           </div>
 
-          <h2 className='text-[clamp(1.25rem,1rem+1.2vw,2.5rem)] font-extrabold whitespace-nowrap'>
-            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-              Live Session Terminal
-            </span>
-          </h2>
-
           {hasLiveCounts ? (
-            <div className='flex flex-wrap items-center gap-2 sm:ml-4'>
+            <div className='flex flex-wrap items-center gap-2 md:self-center'>
               {totalActive > 0 && (
                 <div className='flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-1.5'>
                   <span className='font-mono text-xs font-semibold text-cyan-400'>

@@ -6,12 +6,14 @@ import { bookingColumns } from '../../components/columns/bookingColumns';
 import { BookingsTable } from '../../components/BookingsTable';
 import { useRealtimeBookings } from '@/hooks/use-realtime-booking';
 import { BookingsTableSkeleton } from '@/components/skeletons/BookingsTableSkeleton';
-
+import { type User } from '@supabase/supabase-js';
 const BOOKING_STALE_TIME = 30_000;
 
 export default function BookingsPageClient({
+  user,
   role,
 }: {
+  user: User;
   role: 'owner' | 'staff';
 }) {
   useRealtimeBookings();
@@ -38,6 +40,11 @@ export default function BookingsPageClient({
   }
 
   return (
-    <BookingsTable columns={bookingColumns} data={bookings ?? []} role={role} />
+    <BookingsTable
+      columns={bookingColumns}
+      data={bookings ?? []}
+      role={role}
+      user={user}
+    />
   );
 }

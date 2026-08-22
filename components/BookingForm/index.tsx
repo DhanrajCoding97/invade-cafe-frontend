@@ -456,9 +456,10 @@ export default function BookingForm() {
                     {stepIndex > 0 && (
                       <CornerCutButton
                         type='button'
+                        size='xs'
                         onClick={goBack}
                         color='cyan'
-                        variant='outline'
+                        variant='ghost'
                         showArrow
                         arrowDirection='left'
                         hoverEffect='shift'
@@ -478,11 +479,12 @@ export default function BookingForm() {
                       // </button>
                       <CornerCutButton
                         className='ml-auto'
+                        size='xs'
                         type='button'
                         disabled={isNextLoading}
                         onClick={goNext}
                         color='cyan'
-                        variant='outline'
+                        variant='ghost'
                         showArrow
                         hoverEffect='shift'
                         fullWidthOnMobile={false}

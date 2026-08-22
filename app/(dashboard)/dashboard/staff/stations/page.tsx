@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import StationForm from '../../components/stations/StationForm';
@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
+import { StationsSkeleton } from '@/components/skeletons/StationSkeleton';
 
 const TYPE_LABELS: Record<StationType, string> = {
   pc: 'PC',
@@ -36,13 +37,34 @@ export default function StationsPage() {
 
   // const deleteMutation = useDeleteStation();
   const operationalStatusMutation = useUpdateStationOperationalStatus();
+  const grouped = useMemo(() => {
+    const result = stations.reduce<Record<string, StationRow[]>>(
+      (acc, station) => {
+        (acc[station.type] ??= []).push(station);
+        return acc;
+      },
+      {},
+    );
 
-  const grouped = stations.reduce<Record<string, StationRow[]>>((acc, s) => {
-    (acc[s.type] ??= []).push(s);
-    return acc;
-  }, {});
+    Object.values(result).forEach((group) => {
+      group.sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        }),
+      );
+    });
 
-  const types = Object.keys(grouped) as StationType[];
+    return result;
+  }, [stations]);
+  // const grouped = stations.reduce<Record<string, StationRow[]>>((acc, s) => {
+  //   (acc[s.type] ??= []).push(s);
+  //   return acc;
+  // }, {});
+  const TYPE_ORDER: StationType[] = ['pc', 'ps5', 'vr', 'racing'];
+
+  const types = TYPE_ORDER.filter((type) => grouped[type]?.length);
+  // const types = Object.keys(grouped) as StationType[];
 
   function openAdd() {
     setEditingStation(undefined);
@@ -66,7 +88,7 @@ export default function StationsPage() {
   }
 
   return (
-    <div className='p-6'>
+    <>
       <div className='mb-6 flex items-center justify-between flex-col-direction-column '>
         <h1 className='text-2xl font-bold text-white'>Stations</h1>
         <button
@@ -78,7 +100,7 @@ export default function StationsPage() {
       </div>
 
       {isLoading ? (
-        <p className='text-white/50'>Loading...</p>
+        <StationsSkeleton />
       ) : (
         <>
           {/* Mobile: tabbed by type, < md */}
@@ -113,9 +135,14 @@ export default function StationsPage() {
           <div className='hidden md:block'>
             {types.map((type) => (
               <div key={type} className='mb-8'>
-                <h2 className='mb-3 text-sm font-bold uppercase tracking-wider text-fuchsia-400'>
-                  {TYPE_LABELS[type]}
-                </h2>
+                <div className='mb-3 flex items-center gap-3'>
+                  <h3 className='text-[11px] font-semibold uppercase tracking-[0.3em] text-cyan-400/70'>
+                    {TYPE_LABELS[type]}
+                  </h3>
+                  <span className='h-px flex-1 bg-linear-to-r from-cyan-500/30 to-transparent' />
+                </div>
+
+                {/* <h2 className='mb-3 text-sm font-bold uppercase tracking-wider text-fuchsia-400'></h2> */}
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
                   {grouped[type].map((station) => (
                     <StationCard
@@ -142,6 +169,6 @@ export default function StationsPage() {
           <StationForm station={editingStation} onSuccess={handleFormSuccess} />
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

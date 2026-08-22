@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/popover';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { CafeSettingsSkeleton } from '@/components/skeletons/CafeSettingsSkeleton';
 // function FieldLabel({ children }: { children: React.ReactNode }) {
 //   return (
 //     <label className='block text-cyan-400 text-xs font-mono tracking-wider uppercase mb-2'>
@@ -98,38 +99,33 @@ export default function CafeSettingsForm() {
   });
 
   if (isLoading) {
-    return (
-      <div className='flex items-center justify-center min-h-[40vh]'>
-        <div className='h-8 w-8 border-2 border-cyan-500/30 border-t-cyan-400 rounded-full animate-spin' />
-      </div>
-    );
+    return <CafeSettingsSkeleton />;
   }
 
   return (
-    <div className='w-full sm:max-w-3xl bg-[#080a0d] border border-cyan-500/10 rounded-2xl overflow-hidden'>
+    <div className='@container w-full sm:max-w-4xl bg-[#080a0d] border border-cyan-500/10 rounded-2xl overflow-hidden'>
       {/* Header */}
-      <div className='flex items-center justify-between px-6 py-5 border-b border-cyan-500/10'>
+      <div className='flex items-center justify-between px-3 sm:px-5 lg:px-6 py-5 border-b border-cyan-500/10'>
         <div className='flex items-center gap-3'>
           <div className='h-8 w-8 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center'>
             <Settings2 size={16} className='text-cyan-400' />
           </div>
           <div>
-            <p className='font-mono text-sm text-white tracking-wider font-semibold'>
+            <h2 className='font-mono text-xs sm:text-sm text-white tracking-wider font-semibold'>
               CAFE_SETTINGS
-            </p>
+            </h2>
             <p className='font-mono text-[10px] text-white/40 tracking-wide'>
               OWNER_ACCESS_ONLY
             </p>
           </div>
         </div>
-        <span className='font-mono text-[10px] text-white/50 border border-white/15 rounded px-3 py-1.5 tracking-wide'>
+        <span className='font-mono text-[9px] sm:text-[10px] text-white/50 border border-white/15 rounded px-3 py-1.5 tracking-wide'>
           OWNER
         </span>
       </div>
-
       <form
         onSubmit={handleSubmit((values) => mutation.mutate(values))}
-        className='px-6 py-6'
+        className='px-3 sm:px-5 lg:px-6 py-6'
       >
         {/* Section 01 — PRICING */}
         <div className='flex items-center gap-3 mb-6'>
@@ -219,7 +215,7 @@ export default function CafeSettingsForm() {
           <div className='flex-1 h-px bg-cyan-500/15' />
         </div>
 
-        <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 mb-8'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5 mb-5 @2xl:mb-8'>
           <Controller
             name='opening_time'
             control={control}
@@ -307,20 +303,19 @@ export default function CafeSettingsForm() {
         </div>
 
         {/* Footer — TIMELINE-style CTA bar */}
-        <div className='flex flex-col overflow-hidden rounded-lg border border-cyan-500/30 sm:flex-row sm:items-center sm:justify-between'>
-          {/* Unsaved changes message */}
-          <div className='px-4 py-3 sm:px-5 sm:py-4'>
+        <div className='flex flex-col overflow-hidden rounded-lg border border-cyan-500/30 @2xl:flex-row @2xl:items-center @2xl:justify-between'>
+          <div className='px-4 py-3 @2xl:px-5 @2xl:py-4'>
             <p className='font-mono text-[10px] uppercase tracking-wide text-white/40'>
               Unsaved changes are not applied
             </p>
           </div>
 
           {/* Actions */}
-          <div className='flex w-full border-t border-cyan-500/20 sm:w-auto sm:border-t-0'>
+          <div className='flex w-full border-t border-cyan-500/20 @2xl:w-auto @2xl:border-t-0'>
             <button
               type='button'
               onClick={() => reset(data)}
-              className='flex-1 px-4 py-3 font-mono text-xs tracking-wider text-white/50 transition-colors hover:text-white sm:flex-none sm:px-5 sm:py-4'
+              className='flex-1 px-4 py-3 font-mono text-xs tracking-wider text-white/50 transition-colors hover:text-white @2xl:flex-none @2xl:px-5 @2xl:py-4'
             >
               RESET
             </button>
@@ -328,7 +323,7 @@ export default function CafeSettingsForm() {
             <button
               type='submit'
               disabled={mutation.isPending}
-              className='flex-1 border-l border-cyan-500/30 bg-cyan-500/10 px-4 py-3 font-mono text-xs tracking-wider text-cyan-400 transition-colors hover:bg-cyan-500/20 disabled:opacity-50 sm:flex-none sm:px-6 sm:py-4 sm:text-sm'
+              className='flex-1 border-l border-cyan-500/30 bg-cyan-500/10 px-4 py-3 font-mono text-xs tracking-wider text-cyan-400 transition-colors hover:bg-cyan-500/20 disabled:opacity-50 @2xl:flex-none @2xl:px-6 @2xl:py-4 @2xl:text-sm'
               style={{
                 clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%)',
               }}

@@ -2,6 +2,8 @@
 'use client';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { getCustomersClient, customerKeys } from '@/lib/queries/customers';
+
 import {
   flexRender,
   getCoreRowModel,
@@ -14,7 +16,10 @@ import { type PaginationState, SortingState } from '@tanstack/react-table';
 import { useMemo, useState } from 'react';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
-
+import CustomerCard from './CustomerCard';
+import { CustomerRow } from '@/types';
+import { useRealtimeCustomers } from '@/hooks/use-realtime-customers';
+import { useQuery } from '@tanstack/react-query';
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[];
   data: TData[];
@@ -23,13 +28,20 @@ interface DataTableProps<TData> {
   onRetry?: () => void;
 }
 
-export function CustomersTable<TData>({
+export function CustomersTable({
   columns,
-  data,
-  loading = false,
+  data: initialData,
+  loading: externalLoading = false,
   error = null,
   onRetry,
-}: DataTableProps<TData>) {
+}: DataTableProps<CustomerRow>) {
+  useRealtimeCustomers();
+  const { data = [], isLoading } = useQuery({
+    queryKey: customerKeys.all,
+    queryFn: getCustomersClient,
+    initialData,
+  });
+
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
   const [pagination, setPagination] = useState<PaginationState>({
@@ -53,9 +65,10 @@ export function CustomersTable<TData>({
     getPaginationRowModel: getPaginationRowModel(),
   });
 
+  const rows = table.getRowModel().rows;
   return (
     <>
-      {loading && (
+      {isLoading && (
         <div className='mb-4 flex items-center gap-3 text-gray-400'>
           <svg
             className='h-5 w-5 animate-spin'
@@ -93,7 +106,7 @@ export function CustomersTable<TData>({
         </div>
       )}
 
-      {!loading && (
+      {!isLoading && (
         <>
           <div className='relative w-full max-w-sm mb-4'>
             <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#28F1FF]/70' />
@@ -115,7 +128,23 @@ export function CustomersTable<TData>({
             )}
           </div>
 
-          <div className='overflow-x-auto rounded-lg border'>
+          {/* ---------- Mobile: cards (below md) ---------- */}
+          <div className='flex flex-col gap-3 md:hidden'>
+            {rows.length ? (
+              rows.map((row) => (
+                <CustomerCard
+                  key={row.id}
+                  customer={row.original as unknown as CustomerRow}
+                />
+              ))
+            ) : (
+              <div className='rounded-lg border border-white/10 px-4 py-6 text-center text-sm text-muted-foreground'>
+                No customers found.
+              </div>
+            )}
+          </div>
+          {/*/* ---------- Desktop: table (md and up) ---------- */}
+          <div className='hidden md:block overflow-x-auto rounded-lg border'>
             <table className='w-full text-sm border-collapse shadow-lg'>
               <thead className='bg-muted/50'>
                 {table.getHeaderGroups().map((headerGroup) => (

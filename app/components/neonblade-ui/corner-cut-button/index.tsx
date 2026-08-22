@@ -380,32 +380,29 @@ export const CornerCutButton: React.FC<CornerCutButtonProps> = ({
         {/* Content sits above decorative layers */}
         <span
           className={[
-            'relative z-10 flex justify-center sm:justify-start items-center gap-2',
+            'relative z-10 flex items-center justify-center gap-2 sm:justify-start',
             fullWidthOnMobile ? 'justify-center' : '',
           ]
             .filter(Boolean)
             .join(' ')}
         >
+          {showArrow && arrowDirection === 'left' && (
+            <span
+              className='inline-block transition-transform group-hover:-translate-x-1'
+              aria-hidden='true'
+            >
+              <MoveLeft />
+            </span>
+          )}
+
           {children}
-          {/* {showArrow && (
+
+          {showArrow && arrowDirection !== 'left' && (
             <span
               className='inline-block transition-transform group-hover:translate-x-1'
               aria-hidden='true'
             >
-              →
-            </span>
-          )} */}
-          {showArrow && (
-            <span
-              className={cn(
-                'inline-block transition-transform',
-                arrowDirection === 'left'
-                  ? 'group-hover:-translate-x-1'
-                  : 'group-hover:translate-x-1',
-              )}
-              aria-hidden='true'
-            >
-              {arrowDirection === 'left' ? <MoveLeft /> : <MoveRight />}
+              <MoveRight />
             </span>
           )}
         </span>

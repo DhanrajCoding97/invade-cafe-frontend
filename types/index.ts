@@ -267,3 +267,13 @@ export interface RateArgs {
   fallbackRate: number;
   settings: CafeSettings;
 }
+
+export type Profile = {
+  id: string;
+  role: UserRole | null;
+  full_name: string | null;
+  avatar_url: string | null;
+  created_at: string | null;
+  email: string | null;
+  phone: string | null;
+};

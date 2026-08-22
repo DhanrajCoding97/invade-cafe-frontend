@@ -9,7 +9,7 @@ import BookingsPageClient from '../../components/bookings/BookingPageClient';
 import { requireRole } from '@/lib/auth/requrireRole';
 const BOOKING_STALE_TIME = 30_000;
 export default async function BookingsPage() {
-  const { role } = await requireRole(['owner', 'staff']);
+  const { user, role } = await requireRole(['owner', 'staff']);
   const queryClient = new QueryClient();
 
   await queryClient.prefetchQuery({
@@ -20,7 +20,7 @@ export default async function BookingsPage() {
 
   return (
     <HydrationBoundary state={dehydrate(queryClient)}>
-      <BookingsPageClient role={role} />
+      <BookingsPageClient role={role} user={user} />
     </HydrationBoundary>
   );
 }

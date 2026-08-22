@@ -10,6 +10,7 @@ import StationStepSkeleton from '@/components/skeletons/StationStepSkeleton';
 import { useRealtimeBookingSync } from '@/hooks/useRealtimeBookingSync';
 import { format } from 'date-fns';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
+import { useMemo } from 'react';
 
 interface Station {
   id: string;
@@ -131,6 +132,17 @@ export default function StationStep() {
     refetchOnWindowFocus: true,
   });
 
+  const sortedStations = useMemo(
+    () =>
+      [...stations].sort((a, b) =>
+        a.name.localeCompare(b.name, undefined, {
+          numeric: true,
+          sensitivity: 'base',
+        }),
+      ),
+    [stations],
+  );
+
   if (isLoading) return <StationStepSkeleton />;
   if (error)
     return <p className='text-sm text-red-400'>Couldn't load stations</p>;
@@ -143,7 +155,7 @@ export default function StationStep() {
         <Field data-invalid={fieldState.invalid}>
           <FieldLabel>Choose your preferred station</FieldLabel>
           <div className='space-y-2'>
-            {stations.map((station) => {
+            {sortedStations.map((station) => {
               const selected = field.value === station.id;
               // const isMaintenance = station.status === 'maintenance';
               const rate =

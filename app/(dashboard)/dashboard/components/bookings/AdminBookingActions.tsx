@@ -1,16 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import {
-  BadgeCheck,
-  Wallet,
-  Ban,
-  Pencil,
-  RotateCcw,
-  MoreVertical,
-  Eye,
-  Trash2Icon,
-  WalletIcon,
-} from 'lucide-react';
+import { BadgeCheck, Wallet, Ban, Pencil } from 'lucide-react';
 import { type BookingRow } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
@@ -104,7 +94,7 @@ export default function AdminBookingActions({
           Edit Booking
         </Button>
       </DialogTrigger>
-      <DialogContent className='max-h-[90vh] overflow-y-auto p-6 sm:max-w-3xl'>
+      <DialogContent className='max-h-[90vh] overflow-y-auto p-0 sm:max-w-3xl'>
         <ManualBookingForm
           mode='edit'
           bookingId={booking.id}
@@ -134,119 +124,6 @@ export default function AdminBookingActions({
     </Dialog>
   );
 
-  //   mark payment as paid button
-  // const markPaidDailog = canMarkPaid && (
-  //   <AlertDialog>
-  //     <AlertDialogTrigger asChild>
-  //       <Button
-  //         disabled={markPaid.isPending}
-  //         className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500  text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 active:translate-y-0'
-  //       >
-  //         <BadgeCheck className='size-5 transition-all duration-300 ease-in group-hover:text-green-500' />{' '}
-  //         Mark Paid
-  //       </Button>
-  //     </AlertDialogTrigger>
-  //     <AlertDialogContent size='default'>
-  //       <AlertDialogHeader>
-  //         <AlertDialogTitle>Confirm payment received?</AlertDialogTitle>
-  //         <AlertDialogDescription>
-  //           This will mark the booking as <strong>Paid</strong>. Ensure you've
-  //           received the payment via cash, UPI, or card before continuing.
-  //         </AlertDialogDescription>
-  //       </AlertDialogHeader>
-  //       <AlertDialogFooter>
-  //         <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-  //         <AlertDialogAction
-  //           disabled={markPaid.isPending}
-  //           onClick={() =>
-  //             markPaid.mutate({
-  //               bookingId: booking.id,
-  //               method: booking.payment_method ?? 'cash',
-  //             })
-  //           }
-  //         >
-  //           {markPaid.isPending ? 'Processing...' : 'Mark as Paid'}
-  //         </AlertDialogAction>
-  //       </AlertDialogFooter>
-  //     </AlertDialogContent>
-  //   </AlertDialog>
-  // );
-
-  //for offline booking without session extension
-  // const markPaidDailog = canMarkPaid && !hasPendingExtension && (
-  //   <AlertDialog>
-  //     <AlertDialogTrigger asChild>
-  //       <Button
-  //         disabled={markPaid.isPending}
-  //         className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:shadow-[0_0_18px_rgba(239,68,68,0.35)] hover:-translate-y-0.5 active:translate-y-0'
-  //       >
-  //         <BadgeCheck className='size-5 transition-all duration-300 ease-in group-hover:text-green-500' />
-  //         Mark Paid
-  //       </Button>
-  //     </AlertDialogTrigger>
-
-  //     <AlertDialogContent size='default'>
-  //       <AlertDialogHeader>
-  //         <AlertDialogTitle>Confirm payment received?</AlertDialogTitle>
-
-  //         <AlertDialogDescription>
-  //           Select the payment method actually received from the customer.
-  //         </AlertDialogDescription>
-  //       </AlertDialogHeader>
-
-  //       <div className='space-y-2 py-2'>
-  //         <label className='text-xs font-mono uppercase tracking-wider text-white/60'>
-  //           Payment Method
-  //         </label>
-
-  //         <Select
-  //           value={paymentMethod}
-  //           onValueChange={(value) =>
-  //             setPaymentMethod(value as 'cash' | 'upi_manual' | 'complimentary')
-  //           }
-  //           disabled={markPaid.isPending}
-  //         >
-  //           <SelectTrigger className='h-11 w-full border-cyan-500/30 bg-white/[0.03] font-mono text-sm text-white'>
-  //             <SelectValue placeholder='Select payment method' />
-  //           </SelectTrigger>
-
-  //           <SelectContent>
-  //             <SelectItem value='cash'>Cash</SelectItem>
-
-  //             <SelectItem value='upi_manual'>UPI</SelectItem>
-
-  //             <SelectItem value='complimentary'>Complimentary</SelectItem>
-  //           </SelectContent>
-  //         </Select>
-  //       </div>
-
-  //       {paymentMethod === 'complimentary' && (
-  //         <div className='rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2'>
-  //           <p className='text-xs leading-relaxed text-amber-300'>
-  //             This will mark the booking as paid without collecting any payment
-  //             from the customer.
-  //           </p>
-  //         </div>
-  //       )}
-
-  //       <AlertDialogFooter>
-  //         <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-
-  //         <AlertDialogAction
-  //           disabled={markPaid.isPending}
-  //           onClick={() =>
-  //             markPaid.mutate({
-  //               bookingId: booking.id,
-  //               method: paymentMethod,
-  //             })
-  //           }
-  //         >
-  //           {markPaid.isPending ? 'Processing...' : 'Mark as Paid'}
-  //         </AlertDialogAction>
-  //       </AlertDialogFooter>
-  //     </AlertDialogContent>
-  //   </AlertDialog>
-  // );
   //   mark payment as paid button
   const markPaidDialog = canMarkPaid && !hasPendingExtension && (
     <AlertDialog>
@@ -287,6 +164,8 @@ export default function AdminBookingActions({
       </AlertDialogContent>
     </AlertDialog>
   );
+
+  //bookings/[id]/page.tsx
   //for online booking sesion extension payment
   const markExtensionPaidDialog = canMarkExtensionPaid && (
     <AlertDialog>

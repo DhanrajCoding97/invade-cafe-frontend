@@ -250,7 +250,7 @@ export default async function AdminBookingDetailPage({ params }: Props) {
   }
 
   return (
-    <div className='flex flex-col items-center justify-center'>
+    <div className='flex flex-col w-full max-w-4xl'>
       {/* <h1>Manage this booking</h1> */}
       <BookingDetailView
         booking={booking}

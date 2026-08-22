@@ -245,7 +245,7 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
   const management: NavItem[] = [
     {
       title: 'Profile settings',
-      url: '/dashboard/staff/stations',
+      url: '/dashboard/staff/profile-settings',
       icon: User2,
     },
   ];

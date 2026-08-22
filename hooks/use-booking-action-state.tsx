@@ -32,11 +32,6 @@ export function useBookingActionState(
     (ext) => ext.payment_status === 'pending',
   );
 
-  // const canMarkPaid =
-  //   booking.payment_status === 'pending' &&
-  //   booking.payment_method !== 'razorpay';
-
-  // const canMarkBookingAndExtensionsPaid = canMarkPaid && hasPendingExtensions;
   const canMarkPaid = booking.payment_status === 'pending' && isManualBooking;
 
   const canMarkBookingAndExtensionsPaid =
@@ -50,8 +45,7 @@ export function useBookingActionState(
     booking.status !== 'no_show' &&
     (role === 'owner' || (role === 'staff' && !isOnlineBooking));
 
-  const canEdit =
-    booking.status !== 'completed' && booking.status !== 'no_show';
+  const canEdit = true;
 
   const canRefund =
     (booking.status === 'completed' || booking.status === 'no_show') &&
