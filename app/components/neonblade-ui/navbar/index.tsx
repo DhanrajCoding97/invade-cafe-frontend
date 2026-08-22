@@ -792,7 +792,7 @@ export const NavBar: React.FC<NavBarProps> = ({
 
           {/* Desktop nav items */}
           <div
-            className={`hidden flex-1 items-center gap-0 md:flex ${ALIGN_CLASSES[navAlign]}`}
+            className={`hidden items-center gap-0 min-[880px]:flex ${ALIGN_CLASSES[navAlign]}`}
           >
             {items.map((item, idx) => (
               <NavDesktopItem
@@ -816,12 +816,14 @@ export const NavBar: React.FC<NavBarProps> = ({
               />
             )}
 
-            {authSlot && <div className='hidden md:block'>{authSlot}</div>}
+            {authSlot && (
+              <div className='hidden min-[880px]:block'>{authSlot}</div>
+            )}
 
             <button
               className={cn(
                 styles['nbr-hamburger'],
-                'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-280 md:hidden',
+                'flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center border-none bg-transparent p-1.5 text-white/65 transition-colors duration-280 min-[880px]:hidden',
               )}
               onClick={() => setMobileOpen((v) => !v)}
               aria-label={mobileOpen ? 'Close navigation' : 'Open navigation'}
@@ -956,7 +958,7 @@ export const NavBar: React.FC<NavBarProps> = ({
         {authSlot && (
           <div
             className={cn(
-              'px-5 pb-3.5 md:hidden bg-black',
+              'px-5 pb-3.5 min-[880px]:hidden bg-black',
               mobileOpen ? 'block' : 'hidden',
             )}
           >

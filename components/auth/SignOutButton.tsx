@@ -59,7 +59,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
       {/* =========================
           MOBILE — < 768px
           ========================= */}
-      <div className='flex flex-col md:hidden'>
+      <div className='flex flex-col min-[880px]:hidden'>
         {/* Account */}
         <div className='flex items-center gap-3 px-2 py-3'>
           <Avatar className='relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full border border-cyan-400/60 bg-black text-sm font-bold text-cyan-400'>
@@ -96,7 +96,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
       {/* =========================
           DESKTOP — >= 768px
           ========================= */}
-      <div className='relative hidden md:block'>
+      <div className='relative hidden min-[880px]:block'>
         <Avatar
           onClick={() => setOpen((value) => !value)}
           aria-label='User account menu'

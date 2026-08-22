@@ -419,7 +419,13 @@
   background-color: black;
 }
 
-@media (min-width: 768px) {
+@media (max-width: 954px) {
+  .nbr-nav-item {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+@media (min-width: 880px) {
   .nbr-mobile-menu {
     display: none;
   }
