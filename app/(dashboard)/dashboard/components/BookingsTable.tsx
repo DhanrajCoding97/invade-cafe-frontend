@@ -1,5 +1,4 @@
 'use client';
-import { useRouter } from 'next/navigation';
 import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { type DateRange } from 'react-day-picker';
@@ -37,7 +36,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { BookingCard } from './BookingCard';
 import type { RowData } from '@tanstack/react-table';
 import { todayIST } from '@/lib/date-list';
@@ -150,13 +148,6 @@ export function BookingsTable<TData>({
     pageSize: 5,
   });
 
-  const isMobile = useIsMobile();
-  const router = useRouter();
-  // default to today
-  // const [dateRange, setDateRange] = useState<DateRange | undefined>({
-  //   from: new Date(),
-  //   to: new Date(),
-  // });
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
@@ -363,7 +354,12 @@ export function BookingsTable<TData>({
 
           <div className='flex flex-col gap-3 md:hidden'>
             {table.getRowModel().rows.map((row) => (
-              <BookingCard key={row.id} booking={row.original} role={role} />
+              <BookingCard
+                key={row.id}
+                booking={row.original}
+                role={role}
+                user={user}
+              />
             ))}
           </div>
 

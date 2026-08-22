@@ -21,6 +21,7 @@ const Badge = dynamic(() => import('@/app/components/neonblade-ui/badge'), {
 });
 import type { BookingRow } from '@/types';
 import { BookingActions } from '@/app/actions/booking-actions';
+import { User } from '@supabase/supabase-js';
 
 const STATUS_COLOR: Record<
   BookingRow['status'],
@@ -219,9 +220,11 @@ const STATUS_COLOR: Record<
 export function BookingCard({
   booking,
   role,
+  user,
 }: {
   booking: BookingRow;
   role: 'owner' | 'staff' | undefined;
+  user: User;
 }) {
   if (!booking) return null;
 
@@ -301,7 +304,12 @@ export function BookingCard({
 
       {/* action stub */}
       <div className='px-4 pb-4 pt-2'>
-        <BookingActions role={role} booking={booking} layout='compact' />
+        <BookingActions
+          user={user}
+          role={role}
+          booking={booking}
+          layout='compact'
+        />
       </div>
     </div>
   );
