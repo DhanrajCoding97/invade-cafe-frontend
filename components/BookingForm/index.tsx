@@ -173,50 +173,19 @@ export default function BookingForm() {
     return () => sub.subscription.unsubscribe();
   }, [supabase]);
 
-  //set scroll to formTop
-  // useEffect(() => {
-  //   if (!hasMounted.current) {
-  //     hasMounted.current = true;
-  //     return;
-  //   }
+  useEffect(() => {
+    if (!cardRef.current) return;
 
-  //   if (!formTopRef.current) return;
+    gsap.set(cardRef.current, { autoAlpha: 0, y: 24 });
 
-  //   const headerOffset = 80;
+    gsap.to(cardRef.current, {
+      autoAlpha: 1,
+      y: 0,
+      duration: 0.6,
+      ease: 'power4.out',
+    });
+  }, []);
 
-  //   gsap.to(window, {
-  //     duration: 0.6,
-  //     ease: 'power2.out',
-  //     scrollTo: {
-  //       y: formTopRef.current,
-  //       offsetY: headerOffset,
-  //     },
-  //   });
-  // }, [stepIndex]);
-
-  // async function goNext() {
-  //   if (step === 'options') {
-  //     const device = form.getValues('device');
-  //     const field =
-  //       device === 'ps5' ? 'players' : device === 'racing' ? 'tier' : null;
-  //     if (field) {
-  //       const valid = await form.trigger(field);
-  //       if (!valid) return;
-  //     }
-  //   } else {
-  //     const fields = STEP_FIELDS[step];
-  //     if (fields && !(await form.trigger(fields))) return;
-  //   }
-
-  //   let next = stepIndex + 1;
-  //   const device = form.getValues('device');
-
-  //   if (STEPS[next] === 'options' && !needsOptionsStep(device)) next++;
-  //   // if (STEPS[next] === 'login' && session) next++;
-
-  //   setStepIndex(next);
-  //   setDirection(1);
-  // }
   function scrollToForm() {
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -304,27 +273,6 @@ export default function BookingForm() {
   const deviceTweenAddedRef = useRef(false);
   const hasRevealedDeviceStep = useRef(false);
   const hasMounted = useRef(false);
-  // useGSAP(
-  //   () => {
-  //     if (!cardRef.current) return;
-  //     gsap.fromTo(
-  //       cardRef.current,
-  //       { autoAlpha: 0, y: 40 },
-  //       {
-  //         autoAlpha: 1,
-  //         y: 0,
-  //         duration: 0.8,
-  //         ease: 'power4.out',
-  //         scrollTrigger: {
-  //           trigger: cardRef.current,
-  //           start: 'top 85%',
-  //           once: true,
-  //         },
-  //       },
-  //     );
-  //   },
-  //   { scope: cardRef },
-  // );
 
   const isConfirmed = STEPS[stepIndex] === 'confirmed';
 
@@ -393,24 +341,6 @@ export default function BookingForm() {
                   />
                 )}
                 {step === 'payment' && (
-                  // <PaymentStep
-                  //   onPaymentSuccess={(id) => {
-                  //     setBookingId(id);
-                  //     setStepIndex((i) => i + 1); // advance to confirmation
-                  //     setDirection(1);
-                  //   }}
-                  //   onSlotConflict={(message) => {
-                  //     setDirection(-1);
-                  //     setStepIndex(STEPS.indexOf('datetime'));
-                  //     form.setValue('startTime', '');
-                  //     form.setValue('stationId', '');
-                  //     setConflictMessage(message);
-                  //     queryClient.invalidateQueries({
-                  //       queryKey: ['bookings', form.getValues('stationId')],
-                  //     });
-                  //     queryClient.invalidateQueries({ queryKey: ['stations'] });
-                  //   }}
-                  // />
                   <PaymentStep
                     onPaymentSuccess={(id) => {
                       setBookingId(id);
@@ -469,14 +399,6 @@ export default function BookingForm() {
                       </CornerCutButton>
                     )}
                     {step !== 'payment' && step !== 'summary' && (
-                      // <button
-                      //   ref={nextButtonRef}
-                      //   type='button'
-                      //   onClick={goNext}
-                      //   className='ml-auto rounded-lg bg-cyan-400 px-4 py-2 text-black'
-                      // >
-                      //   Next
-                      // </button>
                       <CornerCutButton
                         className='ml-auto'
                         size='xs'

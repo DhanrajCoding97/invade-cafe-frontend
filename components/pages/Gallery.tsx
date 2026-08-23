@@ -70,7 +70,7 @@ export default function GallerySection() {
             atmosphere before you visit.
           </p>
         </TextReveal>
-        <LineReveal triggerRef={sectionRef} delay={0.75}>
+        <LineReveal triggerRef={sectionRef} delay={0.95}>
           <div className='opactiy-0 mt-8 md:mt-10 lg:mt-12 h-[60svh]'>
             <VideoImageCarousel slides={CarouselSlides} />
           </div>

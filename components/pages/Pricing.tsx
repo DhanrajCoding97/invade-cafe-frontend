@@ -6,8 +6,6 @@ import { PsIcon } from '../svgs';
 import { RacingSimIcon } from '../svgs';
 import { PcIcon } from '../svgs';
 import { useRef } from 'react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
 import TextReveal from '../gsap/TextReveal';
 import CardsReveal from '../gsap/CardReveal';
 import LineReveal from '../gsap/LineReveal';
@@ -89,7 +87,7 @@ export default function PricingSection() {
             it.
           </p>
         </TextReveal>
-        <CardsReveal triggerRef={sectionRef} delay={0.95} stagger={0.3}>
+        <CardsReveal triggerRef={sectionRef} delay={1} stagger={0.4}>
           <div className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '>
             {/* PC Gaming */}
             <PricingCard

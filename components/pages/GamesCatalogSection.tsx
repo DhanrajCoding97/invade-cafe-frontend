@@ -12,9 +12,10 @@ import CardsReveal from '../gsap/CardReveal';
 import LineReveal from '../gsap/LineReveal';
 
 export default function GamesCatalogSection() {
-  const sectionRef = useRef<HTMLElement>(null);
+  const sectionRef = useRef(null);
   const buttonsRef = useRef(null);
-  const cardsRef = useRef(null);
+  const mobileCardsRef = useRef(null);
+  const desktopCardsRef = useRef(null);
   const ViewBtnRef = useRef(null);
   const [active, setActive] = useState<GameCategory>('all');
   const { data: games = [], isLoading } = useQuery({
@@ -32,12 +33,6 @@ export default function GamesCatalogSection() {
 
   const skeletons = Array.from({ length: PREVIEW_LIMIT });
 
-  // useEffect(() => {
-  //   if (!isLoading) {
-  //     // let the DOM paint the real cards first, then recalc trigger positions
-  //     requestAnimationFrame(() => ScrollTrigger.refresh());
-  //   }
-  // }, [isLoading]);
   return (
     <section
       id='games'
@@ -68,7 +63,7 @@ export default function GamesCatalogSection() {
 
         {/* description */}
         <TextReveal triggerRef={sectionRef} delay={0.55}>
-          <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
+          <p className='pt-2 pb-5 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
             {/* Every title, every setup. Filter by device and jump in. */}
             Our library spans every major genre and platform — competitive
             shooters, racing sims, sports titles, and VR experiences. Filter by
@@ -79,9 +74,9 @@ export default function GamesCatalogSection() {
         </TextReveal>
 
         {/* category filters */}
-        <div ref={buttonsRef}>
-          <CardsReveal triggerRef={buttonsRef} delay={0.0} stagger={0.1}>
-            <div className='relative z-10 mb-8 flex flex-wrap gap-2'>
+        <div ref={sectionRef}>
+          <CardsReveal triggerRef={sectionRef} delay={0.5} stagger={0.3}>
+            <div className='relative z-10 mb-3 flex flex-wrap gap-2'>
               {CATEGORIES.map((cat) => (
                 <button
                   key={cat.value}
@@ -126,9 +121,9 @@ export default function GamesCatalogSection() {
           <>
             {/* Mobile */}
             <ScrollArea className='-mx-6 px-6 sm:hidden'>
-              <CardsReveal triggerRef={sectionRef} delay={0.85} stagger={0.3}>
+              <CardsReveal triggerRef={sectionRef} delay={0.95} stagger={0.3}>
                 <div
-                  ref={cardsRef}
+                  ref={mobileCardsRef}
                   className='grid grid-flow-col grid-rows-2 gap-3 pb-4'
                   style={{ gridAutoColumns: '180px' }}
                 >
@@ -141,8 +136,8 @@ export default function GamesCatalogSection() {
             </ScrollArea>
 
             {/* Desktop / Tablet */}
-            <div ref={cardsRef}>
-              <CardsReveal triggerRef={cardsRef} delay={0.3} stagger={0.3}>
+            <div ref={desktopCardsRef}>
+              <CardsReveal triggerRef={desktopCardsRef} delay={1} stagger={0.3}>
                 <div className='hidden sm:grid sm:grid-cols-3 sm:gap-4 lg:grid-cols-4'>
                   {preview.map((game) => (
                     <GameCard key={game.id} game={game} />
@@ -153,7 +148,7 @@ export default function GamesCatalogSection() {
 
             {/* View All */}
             {hasMore && (
-              <LineReveal triggerRef={ViewBtnRef} delay={0.95}>
+              <LineReveal triggerRef={buttonsRef} delay={0.5}>
                 <div className='mt-8 flex justify-center'>
                   <Link
                     href='/games'

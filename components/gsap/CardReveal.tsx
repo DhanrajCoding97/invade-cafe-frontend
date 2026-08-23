@@ -17,7 +17,7 @@ type CardsRevealProps = {
 
 export default function CardsReveal({
   children,
-  delay,
+  delay = 0,
   stagger = 0.15,
   duration = 0.4,
   y = 48,
@@ -74,7 +74,7 @@ export default function CardsReveal({
             duration,
             stagger,
             delay,
-            ease: 'power4.out',
+            ease: 'power4.inOut',
             clearProps: 'transform',
             scrollTrigger: {
               trigger: triggerRef?.current ?? containerRef.current,

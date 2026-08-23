@@ -27,6 +27,7 @@ import {
   RotateCcw,
   MoreVertical,
   Eye,
+  X,
 } from 'lucide-react';
 import { type BookingRow } from '@/types';
 import ManualBookingForm from '../(dashboard)/dashboard/staff/components/ManualBookingForm';
@@ -36,11 +37,12 @@ import {
   TooltipContent,
 } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent } from '@/components/ui/dialog';
 import { Trash2Icon, WalletIcon } from 'lucide-react';
 import { useBookingActionState } from '@/hooks/use-booking-action-state';
 import Link from 'next/link';
 import { User } from '@supabase/supabase-js';
+import { cn } from '@/lib/utils';
 
 export function BookingActions({
   booking,
@@ -157,19 +159,186 @@ export function BookingActions({
       </Tooltip>
     ));
 
+  // const markExtensionPaidBtn = canMarkExtensionPaid && (
+  //   <AlertDialog key='ext-paid'>
+  //     <AlertDialogTrigger asChild>
+  //       {isCompact ? (
+  //         <AlertDialogTrigger asChild>
+  //           <Button
+  //             disabled={markExtensionPaid.isPending}
+  //             className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
+  //           >
+  //             <BadgeCheck aria-hidden='true' className='size-5' />
+  //             Mark Extension Paid
+  //           </Button>
+  //         </AlertDialogTrigger>
+  //       ) : (
+  //         <Tooltip>
+  //           <TooltipTrigger asChild>
+  //             <AlertDialogTrigger asChild>
+  //               <Button
+  //                 disabled={markExtensionPaid.isPending}
+  //                 variant='action'
+  //                 aria-label='Mark extension paid'
+  //               >
+  //                 <BadgeCheck
+  //                   aria-hidden='true'
+  //                   className='size-5 transition-all duration-300 ease-in group-hover:text-green-500'
+  //                 />
+  //               </Button>
+  //             </AlertDialogTrigger>
+  //           </TooltipTrigger>
+  //           <TooltipContent>Mark pending extension as paid</TooltipContent>
+  //         </Tooltip>
+  //       )}
+  //     </AlertDialogTrigger>
+
+  //     <AlertDialogContent size='default'>
+  //       <AlertDialogHeader>
+  //         <AlertDialogTitle>
+  //           Confirm extension payment received?
+  //         </AlertDialogTitle>
+  //         <AlertDialogDescription>
+  //           This booking has a pending session extension charge. Confirm payment
+  //           was collected at the counter.
+  //         </AlertDialogDescription>
+  //       </AlertDialogHeader>
+  //       <AlertDialogFooter>
+  //         <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
+  //         <AlertDialogAction
+  //           disabled={markExtensionPaid.isPending}
+  //           onClick={() => {
+  //             console.log('clicked');
+  //             const pendingExt = (booking.session_extensions ?? []).find(
+  //               (e: any) => e.payment_status === 'pending',
+  //             );
+  //             if (pendingExt) {
+  //               markExtensionPaid.mutate({
+  //                 extensionId: pendingExt.id,
+  //                 markedPaidBy: user.id,
+  //               });
+  //             }
+  //           }}
+  //         >
+  //           {markExtensionPaid.isPending
+  //             ? 'Processing...'
+  //             : 'Mark Extension Paid'}
+  //         </AlertDialogAction>
+  //       </AlertDialogFooter>
+  //     </AlertDialogContent>
+  //   </AlertDialog>
+  // );
+
+  // //for offline booking with session extension
+  // const markBookingAndExtensionsPaidBtn = canMarkBookingAndExtensionsPaid && (
+  //   <AlertDialog key='all-paid'>
+  //     <AlertDialogTrigger asChild>
+  //       {isCompact ? (
+  //         <Button
+  //           disabled={markBookingAndExtensionsPaid.isPending}
+  //           className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
+  //         >
+  //           <BadgeCheck aria-hidden='true' className='size-5' />
+  //           Mark All Paid
+  //         </Button>
+  //       ) : (
+  //         <Tooltip>
+  //           <TooltipTrigger asChild>
+  //             <AlertDialogTrigger asChild>
+  //               <Button
+  //                 disabled={markBookingAndExtensionsPaid.isPending}
+  //                 variant='action'
+  //                 aria-label='Mark booking and extensions paid'
+  //               >
+  //                 <BadgeCheck
+  //                   aria-hidden='true'
+  //                   className='size-5 transition-all duration-300 ease-in group-hover:text-green-500'
+  //                 />
+  //               </Button>
+  //             </AlertDialogTrigger>
+  //           </TooltipTrigger>
+  //           <TooltipContent>Mark booking and extensions as paid</TooltipContent>
+  //         </Tooltip>
+  //       )}
+  //     </AlertDialogTrigger>
+
+  //     <AlertDialogContent size='default'>
+  //       <AlertDialogHeader>
+  //         <AlertDialogTitle>Confirm payment received?</AlertDialogTitle>
+
+  //         <AlertDialogDescription>
+  //           This booking has one or more unpaid session extensions. Select the
+  //           payment method actually received from the customer.
+  //         </AlertDialogDescription>
+  //       </AlertDialogHeader>
+
+  //       <div className='space-y-2 py-2'>
+  //         <label className='text-xs font-mono uppercase tracking-wider text-white/60'>
+  //           Payment Method
+  //         </label>
+
+  //         <Select
+  //           value={paymentMethod}
+  //           onValueChange={(value) =>
+  //             setPaymentMethod(value as 'cash' | 'upi_manual' | 'complimentary')
+  //           }
+  //           disabled={markBookingAndExtensionsPaid.isPending}
+  //         >
+  //           <SelectTrigger className='h-11 w-full border-cyan-500/30 bg-white/3 font-mono text-sm text-white'>
+  //             <SelectValue placeholder='Select payment method' />
+  //           </SelectTrigger>
+
+  //           <SelectContent>
+  //             <SelectItem value='cash'>Cash</SelectItem>
+  //             <SelectItem value='upi_manual'>UPI</SelectItem>
+  //             <SelectItem value='complimentary'>Complimentary</SelectItem>
+  //           </SelectContent>
+  //         </Select>
+  //       </div>
+
+  //       {paymentMethod === 'complimentary' && (
+  //         <div className='rounded-md border border-amber-500/30 bg-amber-500/5 px-3 py-2'>
+  //           <p className='text-xs leading-relaxed text-amber-300'>
+  //             This will mark the booking and all pending extensions as paid
+  //             without collecting payment from the customer.
+  //           </p>
+  //         </div>
+  //       )}
+
+  //       <AlertDialogFooter>
+  //         <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
+
+  //         <AlertDialogAction
+  //           disabled={markBookingAndExtensionsPaid.isPending}
+  //           onClick={() =>
+  //             markBookingAndExtensionsPaid.mutate({
+  //               bookingId: booking.id,
+  //               method: paymentMethod,
+  //             })
+  //           }
+  //         >
+  //           {markBookingAndExtensionsPaid.isPending
+  //             ? 'Processing...'
+  //             : 'Mark All as Paid'}
+  //         </AlertDialogAction>
+  //       </AlertDialogFooter>
+  //     </AlertDialogContent>
+  //   </AlertDialog>
+  // );
   const markExtensionPaidBtn = canMarkExtensionPaid && (
     <AlertDialog key='ext-paid'>
       <AlertDialogTrigger asChild>
         {isCompact ? (
-          <AlertDialogTrigger asChild>
-            <Button
-              disabled={markExtensionPaid.isPending}
-              className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
-            >
-              <BadgeCheck aria-hidden='true' className='size-5' />
+          <Button
+            disabled={markExtensionPaid.isPending}
+            aria-label='Mark extension paid'
+            className={cn(stubBtn, 'text-green-500 hover:text-green-400')}
+          >
+            <BadgeCheck aria-hidden='true' className='size-4' />
+            <span className='whitespace-normal text-center text-[10px] leading-tight'>
               Mark Extension Paid
-            </Button>
-          </AlertDialogTrigger>
+            </span>
+          </Button>
         ) : (
           <Tooltip>
             <TooltipTrigger asChild>
@@ -206,7 +375,6 @@ export function BookingActions({
           <AlertDialogAction
             disabled={markExtensionPaid.isPending}
             onClick={() => {
-              console.log('clicked');
               const pendingExt = (booking.session_extensions ?? []).find(
                 (e: any) => e.payment_status === 'pending',
               );
@@ -227,17 +395,19 @@ export function BookingActions({
     </AlertDialog>
   );
 
-  //for offline booking with session extension
   const markBookingAndExtensionsPaidBtn = canMarkBookingAndExtensionsPaid && (
     <AlertDialog key='all-paid'>
       <AlertDialogTrigger asChild>
         {isCompact ? (
           <Button
             disabled={markBookingAndExtensionsPaid.isPending}
-            className='group min-h-9 h-11 flex-1 gap-2 rounded-md bg-green-500 text-sm font-semibold uppercase tracking-wider text-black transition-all duration-200 hover:bg-green-700 hover:-translate-y-0.5 active:translate-y-0'
+            aria-label='Mark booking and extensions paid'
+            className={cn(stubBtn, 'text-green-500 hover:text-green-400')}
           >
-            <BadgeCheck aria-hidden='true' className='size-5' />
-            Mark All Paid
+            <BadgeCheck aria-hidden='true' className='size-4' />
+            <span className='whitespace-normal text-center text-[10px] leading-tight'>
+              Mark All Paid
+            </span>
           </Button>
         ) : (
           <Tooltip>
@@ -263,7 +433,6 @@ export function BookingActions({
       <AlertDialogContent size='default'>
         <AlertDialogHeader>
           <AlertDialogTitle>Confirm payment received?</AlertDialogTitle>
-
           <AlertDialogDescription>
             This booking has one or more unpaid session extensions. Select the
             payment method actually received from the customer.
@@ -305,7 +474,6 @@ export function BookingActions({
 
         <AlertDialogFooter>
           <AlertDialogCancel variant='ghost'>Cancel</AlertDialogCancel>
-
           <AlertDialogAction
             disabled={markBookingAndExtensionsPaid.isPending}
             onClick={() =>
@@ -323,7 +491,6 @@ export function BookingActions({
       </AlertDialogContent>
     </AlertDialog>
   );
-
   const editButton =
     canEdit &&
     (isCompact ? (
@@ -357,7 +524,15 @@ export function BookingActions({
   // dialog lives outside the layout branches so it's always mounted once
   const editDialog = canEdit && (
     <Dialog open={editOpen} onOpenChange={setEditOpen}>
-      <DialogContent className='max-h-[90vh] overflow-y-auto p-0 sm:max-w-3xl '>
+      <DialogContent className='max-h-[90vh] overflow-y-auto p-6 sm:max-w-3xl '>
+        {/* <DialogClose asChild>
+          <button
+            aria-label='Close'
+            className='h-4 w-5 grid place-content-center rounded-full absolute right-1 top-1 z-60 bg-black/40 p-1.5 text-white/60 backdrop-blur-sm transition-colors hover:bg-destructive hover:text-white'
+          >
+            <X className='size-3' />
+          </button>
+        </DialogClose> */}
         <ManualBookingForm
           mode='edit'
           bookingId={booking.id}

@@ -86,7 +86,7 @@ export default function TestimonialSection() {
           </p>
         </TextReveal>
       </div>
-      <LineReveal triggerRef={sectionRef} delay={0.75}>
+      <LineReveal triggerRef={sectionRef} delay={0.85}>
         <div className='mt-8 md:mt-10 lg:mt-12 relative flex w-full flex-col items-center justify-center overflow-hidden'>
           <Marquee pauseOnHover className='[--duration:22s]'>
             {firstRow.map((review, index) => (
