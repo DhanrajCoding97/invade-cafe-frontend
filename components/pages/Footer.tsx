@@ -131,14 +131,14 @@ export function Footer() {
           </p>
           <div className='flex items-center gap-3'>
             <Link
-              href='#privacy'
+              href='/privacy'
               className='transition-colors hover:text-neon-cyan'
             >
               Privacy
             </Link>
             <span aria-hidden>·</span>
             <Link
-              href='#terms'
+              href='/terms-and-conditions'
               className='transition-colors hover:text-neon-cyan'
             >
               Terms

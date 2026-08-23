@@ -4,6 +4,7 @@ import { useNavMobileMenu } from '@/app//components/neonblade-ui/navbar/navbar-c
 import { FcGoogle } from 'react-icons/fc';
 import { handleOAuthLogin } from '@/lib/auth/oauth';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useIsMobile } from '@/hooks/use-mobile';
 import {
   Dialog,
@@ -117,19 +118,21 @@ export default function SignInWithGoogle() {
               <span className='text-primary/70'>Authorized use only</span>
               <br />
               Read{' '}
-              <a
-                href='#'
+              <Link
+                onClick={() => SetLoginOpen(false)}
+                href='/terms-and-conditions'
                 className='text-foreground underline decoration-primary/30 transition-colors hover:text-primary'
               >
                 Terms
-              </a>{' '}
+              </Link>{' '}
               &amp;{' '}
-              <a
-                href='#'
+              <Link
+                onClick={() => SetLoginOpen(false)}
+                href='/privacy'
                 className='text-foreground underline decoration-primary/30 transition-colors hover:text-primary'
               >
                 Privacy
-              </a>{' '}
+              </Link>{' '}
               policies
             </p>
           </div>
