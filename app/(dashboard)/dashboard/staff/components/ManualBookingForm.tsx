@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { useQueryClient } from '@tanstack/react-query';
 import { getDisplayRate, calculateTotal } from '@/lib/pricing';
 import { useAvailableStations } from '@/hooks/UseAvailableStation';
+import { toast } from 'sonner';
 const CornerCutButton = dynamic(
   () => import('@/app/components/neonblade-ui/corner-cut-button'),
   {
@@ -266,14 +267,18 @@ export default function ManualBookingForm({
       if (mode === 'create') {
         const newId = await createManualBooking(values);
         onSuccess?.(newId);
+        toast.success('New Booking Added!');
       } else {
         await updateManualBooking(bookingId!, values);
         onSuccess?.(bookingId!);
+        toast.success('Booking Updated!');
       }
     } catch (err) {
-      setServerError(
-        err instanceof Error ? err.message : 'Something went wrong',
-      );
+      const message =
+        err instanceof Error ? err.message : 'Something went wrong';
+
+      setServerError(message);
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -309,7 +314,14 @@ export default function ManualBookingForm({
 
   return (
     <form
-      onSubmit={handleSubmit(onSubmit)}
+      onSubmit={handleSubmit(onSubmit, (errors) => {
+        const firstError = Object.values(errors)[0];
+        if (firstError?.message) {
+          toast.error(firstError.message as string);
+        } else {
+          toast.error('Please fix the highlighted fields');
+        }
+      })}
       className={cn(
         'relative flex w-full max-w-4xl flex-col bg-black sm:max-w-3xl',
         mode === 'create' && 'border border-[#28F1FF]/15',

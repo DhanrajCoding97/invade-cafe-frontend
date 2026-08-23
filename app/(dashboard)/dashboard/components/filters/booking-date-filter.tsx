@@ -32,12 +32,12 @@ export function BookingDateFilter({
   onChange: (range: DateRange | undefined) => void;
 }) {
   return (
-    <div className='flex items-center gap-2'>
+    <div className='flex flex-1 md:flex-none items-center gap-2'>
       <Popover>
         <PopoverTrigger asChild>
           <Button
             variant='outline'
-            className='justify-start px-2.5 font-normal'
+            className='justify-start px-2.5 font-normal flex-1 md:flex-none'
           >
             <CalendarIcon className='mr-2 h-4 w-4' />
             {date?.from ? (

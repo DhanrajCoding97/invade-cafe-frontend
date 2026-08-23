@@ -7,7 +7,7 @@ import PricingSection from '@/components/pages/Pricing';
 import GallerySection from '@/components/pages/Gallery';
 import Contact from '@/components/pages/Contact';
 import BookingSection from '@/components/pages/Booking';
-// import Footer from '@/components/Footer';
+import { Footer } from '@/components/pages/Footer';
 import { Separator } from '@/components/ui/separator';
 import { GallerySkeleton } from '@/components/skeletons/GallerySkeleton';
 // const Gallery = dynamic(() => import('@/components/pages/Gallery'), {
@@ -82,6 +82,7 @@ export default async function Page() {
           <BookingSection />
           <Contact />
           <Separator />
+          <Footer />
         </div>
       </div>
     </>

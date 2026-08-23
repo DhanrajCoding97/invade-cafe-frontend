@@ -145,6 +145,21 @@ let lenis: Lenis | null = null;
 let resizeObserver: ResizeObserver | null = null;
 let tickerCallback: ((time: number) => void) | null = null;
 
+let scrollNormalizer: ReturnType<typeof ScrollTrigger.normalizeScroll> | null =
+  null;
+
+export function setScrollNormalizer(instance: typeof scrollNormalizer) {
+  scrollNormalizer = instance;
+}
+
+export function pauseScrollNormalizer() {
+  scrollNormalizer?.disable();
+}
+
+export function resumeScrollNormalizer() {
+  scrollNormalizer?.enable();
+}
+
 export function isTouchDevice() {
   return (
     typeof window !== 'undefined' &&

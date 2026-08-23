@@ -40,6 +40,7 @@ import { BookingCard } from './BookingCard';
 import type { RowData } from '@tanstack/react-table';
 import { todayIST } from '@/lib/date-list';
 import { User } from '@supabase/supabase-js';
+import { BookingsTableSkeleton } from '@/components/skeletons/BookingsTableSkeleton';
 
 declare module '@tanstack/react-table' {
   interface TableMeta<TData extends RowData> {
@@ -206,10 +207,11 @@ export function BookingsTable<TData>({
     <>
       {/* Loading spinner */}
       {loading ? (
-        <div className='flex items-center gap-3 text-gray-600 py-8 justify-center'>
-          <svg className='h-5 w-5 animate-spin' /* ... */ />
-          Loading bookings…
-        </div>
+        // <div className='flex items-center gap-3 text-gray-600 py-8 justify-center'>
+        //   <svg className='h-5 w-5 animate-spin' /* ... */ />
+        //   Loading bookings…
+        // </div>
+        <BookingsTableSkeleton />
       ) : error ? (
         <div className='mb-4 rounded border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-800'>
           <span className='font-medium'>Error:</span> {error}
@@ -226,11 +228,16 @@ export function BookingsTable<TData>({
             {/* Header */}
             <div className='flex items-start justify-between gap-3'>
               <div>
-                <h1 className='text-2xl font-bold'>Bookings</h1>
-
-                <p className='mt-1 text-sm text-muted-foreground'>
-                  {table.getFilteredRowModel().rows.length} bookings
-                </p>
+                <div>
+                  <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2.25rem)] font-extrabold '>
+                    <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+                      Bookings
+                    </span>
+                  </h2>
+                  <p className='max-w-[80ch] text-[clamp(0.875rem,0.8rem+0.3vw,1rem)] leading-6 text-[#bcbcbc]'>
+                    View, manage, and track all customer bookings.
+                  </p>
+                </div>
               </div>
 
               {/* Desktop only */}
@@ -321,7 +328,7 @@ export function BookingsTable<TData>({
                 </Button>
               </CollapsibleTrigger>
 
-              <CollapsibleContent className='mt-3 space-y-3'>
+              <CollapsibleContent className='mt-3 flex flex-col xs:flex-row gap-3 flex-wrap'>
                 <BookingDateFilter date={dateRange} onChange={setDateRange} />
 
                 <BookingStatusFilter

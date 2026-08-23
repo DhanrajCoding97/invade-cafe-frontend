@@ -38,7 +38,7 @@ export default function ServicesSection() {
           </h2>
         </TextReveal>
         {/* description */}
-        <TextReveal triggerRef={sectionRef} delay={0.55}>
+        <TextReveal triggerRef={sectionRef} delay={0.35}>
           <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
             From high-performance gaming PCs running the latest esports titles
             to PS5 consoles, immersive VR headsets, and full sim racing rigs
@@ -49,7 +49,7 @@ export default function ServicesSection() {
         </TextReveal>
         {/* Everything you need for the ultimate gaming experience. */}
         {/* snacks badge */}
-        <LineReveal triggerRef={sectionRef} delay={0.65} duration={0.4}>
+        <LineReveal triggerRef={sectionRef} delay={0.95} duration={0.4}>
           <div className='flex justify-start pt-2'>
             <span className='inline-flex items-center gap-2 rounded-full border border-green-400/40 bg-green-400/5 px-4 py-1.5 text-xs text-green-400'>
               <FriesIcon className='h-4 w-4' /> Snacks & drinks available
@@ -57,7 +57,7 @@ export default function ServicesSection() {
             </span>
           </div>
         </LineReveal>
-        <CardsReveal triggerRef={sectionRef} delay={0.85} stagger={0.45}>
+        <CardsReveal triggerRef={sectionRef} delay={1} stagger={0.45}>
           <div className='mt-8 md:mt-10 lg:mt-12 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 '>
             {services.map((service) => (
               <NeonGlowCornerCutCard

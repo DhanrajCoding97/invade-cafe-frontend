@@ -53,6 +53,7 @@ import {
   getLenisInstance,
   destroyLenis,
   isTouchDevice,
+  setScrollNormalizer,
 } from '@/lib/lenisInstance';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -69,7 +70,11 @@ export default function SmoothScroll({
         allowNestedScroll: true,
         ignore: '.embla__root,.wheel-picker-wrapper',
       });
-      return () => normalizer?.kill();
+      setScrollNormalizer(normalizer);
+      return () => {
+        normalizer?.kill();
+        setScrollNormalizer(null);
+      };
     }
 
     // Use the same singleton the navbar uses

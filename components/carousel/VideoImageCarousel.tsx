@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useRef, useId, useState } from 'react';
+import { useCallback, useEffect, useRef, useId, useState } from 'react';
 import type { EmblaCarouselType, EmblaOptionsType } from 'embla-carousel';
 import useEmblaCarousel from 'embla-carousel-react';
 import Ssr from 'embla-carousel-ssr';
@@ -12,6 +12,10 @@ import {
 import { DotButton, useDotButton } from './EmblaCarouselDotButton';
 import Image from 'next/image';
 import { cn } from '@/lib/utils';
+import {
+  pauseScrollNormalizer,
+  resumeScrollNormalizer,
+} from '@/lib/lenisInstance';
 
 const TWEEN_FACTOR_BASE = 0.84;
 
@@ -106,41 +110,6 @@ export function VideoImageCarousel({
     [],
   );
 
-  // const tweenOpacity = useCallback(
-  //   (emblaApi: EmblaCarouselType, isScrollEvent = false) => {
-  //     const engine = emblaApi.internalEngine();
-  //     const scrollProgress = emblaApi.scrollProgress();
-  //     const slidesInView = emblaApi.slidesInView();
-
-  //     emblaApi.snapList().forEach((scrollSnap: number, snapIndex: number) => {
-  //       let diffToTarget = scrollSnap - scrollProgress;
-  //       const slidesInSnap = [snapIndex];
-
-  //       slidesInSnap.forEach((slideIndex: number) => {
-  //         if (isScrollEvent && !slidesInView.includes(slideIndex)) return;
-
-  //         if (engine.options.loop) {
-  //           engine.slideLooper.loopPoints.forEach((loopItem) => {
-  //             const target = loopItem.target();
-  //             if (slideIndex === loopItem.index && target !== 0) {
-  //               const sign = Math.sign(target);
-  //               if (sign === -1)
-  //                 diffToTarget = scrollSnap - (1 + scrollProgress);
-  //               if (sign === 1)
-  //                 diffToTarget = scrollSnap + (1 - scrollProgress);
-  //             }
-  //           });
-  //         }
-
-  //         const tweenValue = 1 - Math.abs(diffToTarget * tweenFactor.current);
-  //         const opacity = numberWithinRange(tweenValue, 0.3, 1).toString();
-  //         emblaApi.slideNodes()[slideIndex].style.opacity = opacity;
-  //       });
-  //     });
-  //   },
-  //   [],
-  // );
-
   useEffect(() => {
     if (!emblaApi) return;
 
@@ -176,7 +145,14 @@ export function VideoImageCarousel({
             .ssr?.getStyles(`#${carouselId}`, '.embla__slide')}
         </style>
       )}
-      <div className='overflow-hidden h-full embla__root' ref={emblaRef}>
+      <div
+        className='overflow-hidden h-full embla__root'
+        ref={emblaRef}
+        onPointerDown={pauseScrollNormalizer}
+        onPointerUp={resumeScrollNormalizer}
+        onPointerCancel={resumeScrollNormalizer}
+        onPointerLeave={resumeScrollNormalizer}
+      >
         <div className='flex h-full'>
           {slides.map((slide, index) => (
             <div
@@ -234,14 +210,16 @@ export function VideoImageCarousel({
 
       <div className='mt-4 flex items-center justify-between'>
         <PrevButton onClick={onPrevButtonClick} disabled={prevBtnDisabled} />
-        <div className='flex gap-2'>
+        <div className='flex gap-0.5'>
+          {' '}
+          {/* was gap-2 — tighter gap now that the button itself is smaller */}
           {scrollSnaps.map((_, index) => (
             <DotButton
               slide={slides[index]}
               isSelected={index === selectedIndex}
               key={index}
               onClick={() => onDotButtonClick(index)}
-              dotClassName={`h-3 w-3 rounded-full transition-colors duration-300 ease-in ${
+              dotClassName={`h-2 w-2 rounded-full transition-colors duration-300 ease-in ${
                 index === selectedIndex
                   ? 'bg-cyan-400'
                   : 'bg-white/25 hover:bg-cyan-400'

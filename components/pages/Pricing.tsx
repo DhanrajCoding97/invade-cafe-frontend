@@ -80,7 +80,7 @@ export default function PricingSection() {
           </h2>
         </TextReveal>
         {/* description */}
-        <TextReveal triggerRef={sectionRef} delay={0.55}>
+        <TextReveal triggerRef={sectionRef} delay={0.35}>
           <p className='py-2 max-w-[80ch] text-left text-[clamp(0.78rem,2.2vw,1.125rem)] leading-[1.65] text-[#bcbcbc]'>
             We keep our rates simple and transparent, with no hidden fees or
             membership requirements. PC gaming sessions start at ₹80, PS5
@@ -89,7 +89,7 @@ export default function PricingSection() {
             it.
           </p>
         </TextReveal>
-        <CardsReveal triggerRef={sectionRef} delay={0.75} stagger={0.3}>
+        <CardsReveal triggerRef={sectionRef} delay={0.95} stagger={0.3}>
           <div className='mt-8 md:mt-10 lg:mt-12 grid w-full max-w-6xl grid-cols-1 items-start gap-6 sm:grid-cols-2 lg:grid-cols-4 '>
             {/* PC Gaming */}
             <PricingCard

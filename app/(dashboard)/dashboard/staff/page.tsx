@@ -3,15 +3,23 @@ import { KpiCard } from '../components/KpiCard';
 import { RevenueChartClient } from '../components/charts/RevenueChartClient';
 import Link from 'next/link';
 import { formatIST } from '@/lib/date-list';
-
+import { getCurrentUserRole } from '@/lib/auth/getCurrentUserRole';
 export default async function StaffDashboardPage() {
+  const { user } = await getCurrentUserRole();
+  console.log(user.user_metadata.full_name);
   const data = await getDashboardData();
   const today = formatIST(new Date(), 'd MMM • EEEE');
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-white'>Welcome back, Dhanraj</h1>
-        <p className='text-sm text-white/50'>{today}</p>
+    <div className='space-y-4 lg:space-y-6'>
+      <div>
+        <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2.25rem)] font-extrabold'>
+          <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+            Welcome back&#44; {user.user_metadata.full_name}
+          </span>
+        </h2>
+        <p className='max-w-[80ch] text-[clamp(0.875rem,0.8rem+0.3vw,1rem)] leading-6 text-[#bcbcbc]'>
+          Here's an overview of your cafe's bookings, revenue, and activity.
+        </p>
       </div>
 
       <div className='grid grid-cols-2 sm:grid-cols-4 gap-4'>
@@ -28,7 +36,6 @@ export default async function StaffDashboardPage() {
           subtext={`${data.liveCount} / ${data.totalStations} stations`}
         />
       </div>
-
       <RevenueChartClient data={data.revenueTrend} />
       <div className='rounded-xl border border-white/10 bg-white/5 p-4'>
         <div className='flex items-center justify-between mb-3'>
@@ -72,7 +79,6 @@ export default async function StaffDashboardPage() {
           )}
         </div>
       </div>
-
       <div className='flex flex-wrap gap-3'>
         <Link
           href='/dashboard/staff/bookings/new'

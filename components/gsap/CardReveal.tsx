@@ -17,7 +17,7 @@ type CardsRevealProps = {
 
 export default function CardsReveal({
   children,
-  delay = 0,
+  delay,
   stagger = 0.15,
   duration = 0.4,
   y = 48,

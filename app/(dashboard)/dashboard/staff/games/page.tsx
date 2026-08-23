@@ -73,15 +73,27 @@ export default function AdminGamesPage() {
   }
 
   return (
-    <>
-      <div className='mb-6 flex items-center justify-between'>
-        <h1 className='text-2xl font-bold text-white'>Games</h1>
-        <button
+    <div className='@container flex flex-col gap-5'>
+      <div className='@2xl:flex-row flex flex-col @2xl:items-center justify-between gap-2'>
+        <div>
+          <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2.25rem)] font-extrabold '>
+            <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+              Games
+            </span>
+          </h2>
+          <p className='max-w-[80ch] text-[clamp(0.875rem,0.8rem+0.3vw,1rem)] leading-6 text-[#bcbcbc]'>
+            Manage the games available across your gaming stations.
+          </p>
+        </div>
+        <Button
+          variant='cyber'
+          glow={false}
           onClick={openAdd}
-          className='flex items-center gap-1.5 rounded-md bg-cyan-400 px-4 py-2 text-sm font-bold text-black hover:bg-cyan-300'
+          className='max-w-fit border-emerald-400/50 bg-[#0a160f] text-emerald-400 [text-shadow:0_0_8px_rgba(52,211,153,0.7)] hover:border-emerald-400 hover:bg-emerald-400/10 flex items-center gap-1.5 px-4 py-2 text-sm font-bold'
         >
-          <Plus className='h-4 w-4' aria-hidden='true' /> Add game
-        </button>
+          <span>Add game</span>
+          <Plus className='h-4 w-4' aria-hidden='true' />
+        </Button>
       </div>
 
       {isLoading ? (
@@ -156,7 +168,7 @@ export default function AdminGamesPage() {
       )}
 
       <Dialog open={modalOpen} onOpenChange={setModalOpen}>
-        <DialogContent className='max-h-[90vh] overflow-y-auto border-cyan-400/40 bg-slate-950 overflow-x-hidden'>
+        <DialogContent className='max-h-[90vh] overflow-y-auto bg-[#080a0d] border border-cyan-500/10 overflow-x-hidden'>
           <DialogHeader>
             <DialogTitle className='text-white'>
               {editingGame ? 'Edit game' : 'Add game'}
@@ -165,6 +177,6 @@ export default function AdminGamesPage() {
           <GameForm game={editingGame} onSuccess={handleFormSuccess} />
         </DialogContent>
       </Dialog>
-    </>
+    </div>
   );
 }

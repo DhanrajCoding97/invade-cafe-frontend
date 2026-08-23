@@ -26,7 +26,7 @@ export function BookingStatusFilter({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className='w-40'>
+      <SelectTrigger className='md:w-40 flex-1 w-full md:flex-none'>
         <SelectValue placeholder='Status' />
       </SelectTrigger>
       <SelectContent>

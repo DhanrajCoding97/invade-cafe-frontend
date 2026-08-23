@@ -296,22 +296,29 @@ export default function LiveSessionBoard({
       )}
       <div className='flex flex-col md:flex-row flex-wrap items-start justify-between gap-3 min-w-0'>
         <div className='flex flex-col md:flex-row items-start md:items-center gap-2 min-w-0'>
-          <div className='flex items-center gap-2'>
-            <div className='flex size-8 shrink-0 items-center justify-center border border-[#28F1FF]/40'>
+          <div className='flex items-start gap-2'>
+            <div className='flex size-8 shrink-0 items-center justify-center border border-[#28F1FF]/40 mt-2.25 md:mt-3'>
               <div className='size-3 animate-pulse bg-green-400' />
             </div>
+            <div>
+              <h2 className='text-[clamp(1.5rem,1.2rem+1vw,2.25rem)] font-extrabold '>
+                <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
+                  Live Session Terminal
+                </span>
+              </h2>
 
-            <h2 className='text-[clamp(1.25rem,1rem+1.2vw,2.5rem)] font-extrabold whitespace-nowrap'>
-              <span className='bg-linear-to-r from-[#28F1FF] to-[#FE11FF] bg-clip-text text-transparent [-webkit-background-clip:text] [-webkit-text-fill-color:transparent]'>
-                Live Session Terminal
-              </span>
-            </h2>
+              <p className='max-w-[80ch] text-[clamp(0.875rem,0.8rem+0.3vw,1rem)] leading-6 text-[#bcbcbc]'>
+                Monitor active sessions, track remaining time, and manage
+                stations in real time.
+              </p>
+            </div>
           </div>
-
+        </div>
+        <div className='shrink-0 flex gap-2'>
           {hasLiveCounts ? (
-            <div className='flex flex-wrap items-center gap-2 md:self-center'>
+            <div className='flex flex-wrap items-center gap-2 md:self-baseline'>
               {totalActive > 0 && (
-                <div className='flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-1.5'>
+                <div className='min-h-[42px] flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-2'>
                   <span className='font-mono text-xs font-semibold text-cyan-400'>
                     {String(totalActive).padStart(2, '0')}
                   </span>
@@ -344,9 +351,6 @@ export default function LiveSessionBoard({
               )}
             </div>
           ) : null}
-        </div>
-
-        <div className='shrink-0'>
           <PushNotificationToggle />
         </div>
       </div>

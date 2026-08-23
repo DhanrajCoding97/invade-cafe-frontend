@@ -60,14 +60,14 @@ export const useDotButton = (
 export const DotButton: React.FC<DotButtonProps> = ({
   slide,
   isSelected,
-  dotClassName, // renamed — styles the visual dot, not the button
+  dotClassName,
   ...restProps
 }) => {
   const label = slide.alt ?? (slide.type === 'video' ? 'video slide' : 'slide');
 
   return (
     <button
-      className='flex h-11 w-8 shrink-0 items-center justify-center' // touch target — never overridden
+      className='cursor-pointer flex h-8 w-8 shrink-0 items-center justify-center'
       aria-label={`Go to ${label}`}
       aria-current={isSelected ? 'true' : undefined}
       type='button'
