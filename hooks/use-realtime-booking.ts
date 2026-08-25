@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -19,6 +20,19 @@ export function useRealtimeBookings() {
           event: '*',
           schema: 'public',
           table: 'bookings',
+        },
+        () => {
+          queryClient.invalidateQueries({
+            queryKey: bookingKeys.all,
+          });
+        },
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'session_extensions',
         },
         () => {
           queryClient.invalidateQueries({

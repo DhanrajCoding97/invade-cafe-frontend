@@ -84,13 +84,35 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
     },
   },
   {
-    id: 'duration',
-    header: 'Duration',
-    cell: ({ row }) => {
-      const h = row.original.duration_hours ?? row.original.duration;
-      return h ? `${h}h` : '—';
-    },
+  id: 'duration',
+  header: 'Duration',
+  cell: ({ row }) => {
+    const b = row.original;
+    const baseHours = b.duration_hours ?? b.duration;
+    if (!baseHours) return '—';
+
+    const extensions = b.session_extensions ?? [];
+    const extraMinutes = extensions.reduce((sum, e) => sum + e.minutes, 0);
+
+    const baseMinutes = Number(baseHours) * 60;
+    const totalMinutes = baseMinutes + extraMinutes;
+
+    const hrs = Math.floor(totalMinutes / 60);
+    const mins = totalMinutes % 60;
+    const label = mins > 0 ? `${hrs}h ${mins}m` : `${hrs}h`;
+
+    const hasPendingExt = extensions.some((e) => e.payment_status === 'pending');
+
+    return (
+      <div className='flex flex-col gap-0.5'>
+        <span>{label}</span>
+        {hasPendingExt && (
+          <span className='text-[10px] text-amber-400'>ext pending</span>
+        )}
+      </div>
+    );
   },
+},
   {
     accessorKey: 'players',
     header: 'Players',
