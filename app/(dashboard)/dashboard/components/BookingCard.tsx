@@ -227,6 +227,7 @@ function ReceiptLine({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
 export function BookingCard({
   booking,
   role,
