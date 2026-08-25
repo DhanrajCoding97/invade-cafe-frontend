@@ -92,7 +92,10 @@ export const bookingColumns: ColumnDef<BookingRow>[] = [
     if (!baseHours) return '—';
 
     const extensions = b.session_extensions ?? [];
-    const extraMinutes = extensions.reduce((sum, e) => sum + e.minutes, 0);
+    const extraMinutes = extensions.reduce(
+      (sum, e) => sum + Number(e.minutes),
+      0,
+    );
 
     const baseMinutes = Number(baseHours) * 60;
     const totalMinutes = baseMinutes + extraMinutes;
