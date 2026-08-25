@@ -203,18 +203,13 @@ export async function extendSession(
     booking.tier,
   );
 
-  let priceQuery = supabase
+  const { data: priceRow, error: priceError } = await supabase
     .from('extension_pricing')
     .select('price')
     .eq('device', booking.device)
-    .eq('duration_minutes', minutes);
-
-  priceQuery =
-    resolvedTier === null
-      ? priceQuery.is('tier', null)
-      : priceQuery.eq('tier', resolvedTier);
-
-  const { data: priceRow, error: priceError } = await priceQuery.maybeSingle();
+    .eq('tier', resolvedTier)
+    .eq('duration_minutes', minutes)
+    .maybeSingle();
 
   if (priceError) throw new Error(priceError.message);
 

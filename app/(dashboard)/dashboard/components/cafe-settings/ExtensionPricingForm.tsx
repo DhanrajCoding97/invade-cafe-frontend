@@ -6,11 +6,12 @@ import { toast } from 'sonner';
 import { createClient } from '@/lib/supabase/client';
 import { Timer } from 'lucide-react';
 import { ExtensionPricingSkeleton } from '@/components/skeletons/ExtensionPricingSkeleton';
+
 const DURATIONS = [15, 30, 60, 120] as const;
 
 const ROWS = [
-  { device: 'pc', tier: null, label: 'PC' },
-  { device: 'vr', tier: null, label: 'PSVR' },
+  { device: 'pc', tier: '', label: 'PC' },
+  { device: 'vr', tier: '', label: 'PSVR' },
   { device: 'racing', tier: 'single', label: 'Racing Sim · Single' },
   { device: 'racing', tier: 'multiplayer', label: 'Racing Sim · Multiplayer' },
   { device: 'ps5', tier: '1p', label: 'PS5 · 1 Player' },
@@ -18,6 +19,7 @@ const ROWS = [
   { device: 'ps5', tier: '3p', label: 'PS5 · 3 Players' },
   { device: 'ps5', tier: '4p', label: 'PS5 · 4 Players' },
 ] as const;
+
 
 interface ExtensionPricingRow {
   device: string;

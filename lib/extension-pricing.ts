@@ -32,24 +32,22 @@ export function resolveExtensionTier(
   device: string,
   players: number | null | undefined,
   tier: string | null | undefined,
-): string | null {
+): string {
   if (device === 'ps5') {
     const p = players ?? 1;
-    return `${Math.min(Math.max(p, 1), 4)}p`; // clamp to 1p-4p just in case
+    return `${Math.min(Math.max(p, 1), 4)}p`;
   }
 
   if (device === 'racing') {
-    return tier ?? 'single'; // fall back to single if somehow unset
+    return tier ?? 'single';
   }
 
-  // pc / vr have no tier
-  return null;
+  return '';
 }
-
 export function getExtensionAmount(
   pricing: ExtensionPricingRow[] | undefined,
   device: string,
-  tier: string | null,
+  tier: string,
   minutes: number,
 ): number {
   const row = pricing?.find(
