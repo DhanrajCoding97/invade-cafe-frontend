@@ -217,6 +217,16 @@ const STATUS_COLOR: Record<
 //     </div>
 //   );
 // }
+import { getExtendedDuration, getExtendedTotal } from '@/lib/booking-extension';
+function ReceiptLine({ label, value }: { label: string; value: string }) {
+  return (
+    <div className='flex items-baseline gap-2'>
+      <span className='uppercase tracking-wider text-white/35'>{label}</span>
+      <span className='min-w-0 flex-1 translate-y-[-3px] border-b border-dotted border-white/10' />
+      <span className='text-right text-white/80'>{value}</span>
+    </div>
+  );
+}
 export function BookingCard({
   booking,
   role,
@@ -232,6 +242,9 @@ export function BookingCard({
   const displayName =
     booking.profiles?.full_name ?? booking.customer_name ?? 'Guest';
   const displayPhone = booking.profiles?.phone ?? booking.customer_phone ?? '—';
+
+  const { label: durationLabel, hasPendingExtension } = getExtendedDuration(booking);
+  const { total, pendingExtension } = getExtendedTotal(booking);
 
   return (
     <div className='relative overflow-hidden rounded-xl border border-cyan-500/20 bg-black/40'>
@@ -271,10 +284,7 @@ export function BookingCard({
         <ReceiptLine label='Station' value={booking.device} />
         <ReceiptLine label='Date' value={booking.date} />
         <ReceiptLine label='Time' value={booking.start_time} />
-        <ReceiptLine
-          label='Duration'
-          value={`${booking.duration_hours ?? 1}h`}
-        />
+        <ReceiptLine label='Duration' value={durationLabel} />
         <ReceiptLine
           label='Players'
           value={`${booking.players} ${booking.players === 1 ? 'player' : 'players'}`}
@@ -290,10 +300,23 @@ export function BookingCard({
         <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
           Total
         </span>
-        <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
-          ₹{booking.amount}
-        </span>
+        <div className='flex flex-col items-end gap-0.5'>
+          <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
+            {isOnline ? `₹${Number(booking.amount).toFixed(0)}` : `₹${total.toFixed(0)}`}
+          </span>
+          {isOnline && pendingExtension && (
+            <span className='text-[10px] text-amber-400'>
+              +₹{pendingExtension.amount} ext unpaid
+            </span>
+          )}
+        </div>
       </div>
+
+      {hasPendingExtension && (
+        <div className='px-4 -mt-2 pb-2'>
+          <span className='text-[10px] text-amber-400'>ext pending</span>
+        </div>
+      )}
 
       {/* perforation */}
       <div className='relative flex h-4 items-center'>
@@ -311,16 +334,6 @@ export function BookingCard({
           layout='compact'
         />
       </div>
-    </div>
-  );
-}
-
-function ReceiptLine({ label, value }: { label: string; value: string }) {
-  return (
-    <div className='flex items-baseline gap-2'>
-      <span className='uppercase tracking-wider text-white/35'>{label}</span>
-      <span className='min-w-0 flex-1 translate-y-[-3px] border-b border-dotted border-white/10' />
-      <span className='text-right text-white/80'>{value}</span>
     </div>
   );
 }
