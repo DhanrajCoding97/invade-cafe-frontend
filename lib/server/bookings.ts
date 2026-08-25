@@ -40,7 +40,7 @@ export async function getBookingById(id: string): Promise<BookingRow | null> {
 const BOOKING_SELECT = `
   *,
   profiles:user_id (full_name, avatar_url, email, phone),
-  session_extensions (id, amount, payment_status)
+  session_extensions (id, minutes, amount, payment_status)
 `;
 export async function fetchBookingsServer(): Promise<BookingRow[]> {
   const { createClient } = await import('@/lib/supabase/server');
