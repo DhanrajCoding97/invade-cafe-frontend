@@ -139,11 +139,12 @@ function Chip({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'flex h-11 items-center justify-center border px-2 font-mono text-[10px] uppercase transition-colors',
+        'flex h-11 w-full min-w-0 items-center justify-center overflow-hidden border px-2 font-mono text-[10px] uppercase transition-colors',
         active
           ? 'border-[#28F1FF] bg-[#28F1FF]/10 text-[#28F1FF]'
           : 'border-[#28F1FF]/15 text-white/60 hover:border-[#28F1FF]/40',
-        disabled && 'cursor-not-allowed opacity-30 hover:border-[#28F1FF]/15',
+        disabled &&
+          'cursor-not-allowed opacity-30 hover:border-[#28F1FF]/15',
         className,
       )}
     >
@@ -511,20 +512,25 @@ export default function ManualBookingForm({
                     ))}
                   </div>
                 ) : (
-                  <div className='grid grid-cols-4 gap-2 sm:grid-cols-5'>
-                    {stationsForDevice.map((s) => (
-                      <Chip
-                        key={s.id}
-                        active={field.value === s.id}
-                        disabled={lockStructuralFields}
-                        onClick={() => field.onChange(s.id)}
-                        className='flex-col gap-0.5 leading-none min-w-0'
-                      >
-                        <span className='min-w-0 truncate'>{s.name}</span>
-                        <span className='text-[7px] opacity-50'>{s.type}</span>
-                      </Chip>
-                    ))}
-                  </div>
+   <div className='grid grid-cols-[repeat(4,minmax(0,1fr))] gap-2 sm:grid-cols-[repeat(5,minmax(0,1fr))]'>
+  {stationsForDevice.map((s) => (
+    <Chip
+      key={s.id}
+      active={field.value === s.id}
+      disabled={lockStructuralFields}
+      onClick={() => field.onChange(s.id)}
+      className='flex-col gap-0.5 leading-none'
+    >
+      <span className='block w-full min-w-0 truncate'>
+        {s.name}
+      </span>
+
+      <span className='block w-full truncate text-[7px] opacity-50'>
+        {s.type}
+      </span>
+    </Chip>
+  ))}
+</div>
                 )}
 
                 {noStationsAvailable && (
