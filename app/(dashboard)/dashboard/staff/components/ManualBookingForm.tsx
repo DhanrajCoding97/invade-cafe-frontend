@@ -537,7 +537,7 @@ export default function ManualBookingForm({
 </Chip>
   ))}
 </div>
-                )}
+)}
 
                 {noStationsAvailable && (
                   <div className='rounded-none flex items-start gap-2 px-2 py-4 bg-black/80 border border-amber-400'>
