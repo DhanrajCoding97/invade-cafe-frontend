@@ -119,8 +119,7 @@ export function BookingActions({
     </Tooltip>
   );
 
-  const markPaidBtn = canMarkPaid && !hasPendingExtension && (
-    (isCompact ? (
+  const markPaidBtn = canMarkPaid && !hasPendingExtension && (isCompact ? (
       <Button
         key='paid'
         onClick={() =>
