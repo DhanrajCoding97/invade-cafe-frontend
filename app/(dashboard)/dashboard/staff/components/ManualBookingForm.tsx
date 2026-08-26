@@ -521,19 +521,17 @@ export default function ManualBookingForm({
   onClick={() => field.onChange(s.id)}
   className='flex-col gap-0.5 leading-none'
 >
-  {/* Mobile */}
-  <span className='text-sm font-semibold sm:hidden'>
-    {s.name.match(/\d+$/)?.[0] ?? s.name}
-  </span>
+<span className='text-sm font-semibold sm:hidden'>
+  {s.name.match(/Cockpit\s+([A-Z])/i)?.[1] ?? ''}
+</span>
 
-  {/* Desktop */}
-  <span className='hidden min-w-0 w-full truncate sm:block'>
-    {s.name}
-  </span>
+<span className='hidden min-w-0 w-full truncate sm:block'>
+  {s.name}
+</span>
 
-  <span className='text-[7px] opacity-50'>
-    {s.type}
-  </span>
+<span className='text-[7px] opacity-50'>
+  {s.name.match(/\(([^)]+)\)$/)?.[1] ?? s.type}
+</span>
 </Chip>
   ))}
 </div>
