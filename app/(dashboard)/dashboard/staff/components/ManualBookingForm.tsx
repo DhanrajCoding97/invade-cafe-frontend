@@ -522,7 +522,7 @@ export default function ManualBookingForm({
   className='flex-col gap-0.5 leading-none'
 >
 
-<span className='text-sm font-semibold sm:hidden'>
+<span className='text-xs font-semibold sm:hidden'>
   {s.type.toLowerCase() === 'racing'
     ? (s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1] ??
        s.name.match(/\(([^)]+)\)/)?.[1] ??
