@@ -139,12 +139,11 @@ function Chip({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        'flex h-11 w-full min-w-0 items-center justify-center overflow-hidden border px-2 font-mono text-[10px] uppercase transition-colors',
+        'flex min-h-11 items-center justify-center border px-2 py-1.5 font-mono text-[10px] uppercase transition-colors overflow-hidden',
         active
           ? 'border-[#28F1FF] bg-[#28F1FF]/10 text-[#28F1FF]'
           : 'border-[#28F1FF]/15 text-white/60 hover:border-[#28F1FF]/40',
-        disabled &&
-          'cursor-not-allowed opacity-30 hover:border-[#28F1FF]/15',
+        disabled && 'cursor-not-allowed opacity-30 hover:border-[#28F1FF]/15',
         className,
       )}
     >
@@ -152,6 +151,7 @@ function Chip({
     </button>
   );
 }
+
 
 /* ------------------------------------------------------------------ */
 
@@ -521,12 +521,14 @@ export default function ManualBookingForm({
   onClick={() => field.onChange(s.id)}
   className='flex-col gap-0.5 leading-none'
 >
+
 <span className='text-sm font-semibold sm:hidden'>
   {s.type.toLowerCase() === 'racing'
-    ? s.name.match(/Cockpit\s+([A-Z])/i)?.[1] ?? s.name
+    ? (s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1] ??
+       s.name.match(/\(([^)]+)\)/)?.[1] ??
+       s.name)
     : s.name}
 </span>
-
 <span className='hidden min-w-0 w-full truncate sm:block'>
   {s.name}
 </span>
