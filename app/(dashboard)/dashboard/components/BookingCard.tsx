@@ -297,27 +297,22 @@ export function BookingCard({
       </div>
 
       {/* total */}
-      <div className='mt-3 flex items-end justify-between px-4 pb-4'>
-        <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
-          Total
-        </span>
-        <div className='flex flex-col items-end gap-0.5'>
-          <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
-            {isOnline ? `₹${Number(booking.amount).toFixed(0)}` : `₹${total.toFixed(0)}`}
-          </span>
-          {isOnline && pendingExtension && (
-            <span className='text-[10px] text-amber-400'>
-              +₹{pendingExtension.amount} ext unpaid
-            </span>
-          )}
-        </div>
-      </div>
+       <div className='mt-3 flex items-end justify-between px-4 pb-4'>
+  <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
+    Total
+  </span>
+  <div className='flex flex-col items-end gap-0.5'>
+    <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
+      {isOnline ? `₹${Number(booking.amount).toFixed(0)}` : `₹${total.toFixed(0)}`}
+    </span>
+    {pendingExtension && (
+      <span className='text-[10px] text-amber-400'>
+        {isOnline ? 'ext unpaid' : 'ext pending'} (₹{pendingExtension.amount})
+      </span>
+    )}
+  </div>
+</div>
 
-      {hasPendingExtension && (
-        <div className='px-4 -mt-2 pb-2'>
-          <span className='text-[10px] text-amber-400'>ext pending</span>
-        </div>
-      )}
 
       {/* perforation */}
       <div className='relative flex h-4 items-center'>
