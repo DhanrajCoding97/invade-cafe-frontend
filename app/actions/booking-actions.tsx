@@ -88,7 +88,7 @@ export function BookingActions({
 
   // shared classes for the compact "receipt stub" buttons
   const stubBtn =
-    'flex h-14 flex-1 flex-col items-center justify-center gap-1 rounded-md border border-white/10 bg-white/[0.03] text-[10px] font-medium uppercase tracking-wider text-white/60 transition-colors hover:bg-white/[0.07] hover:text-white';
+    'flex min-h-14 flex-1 flex-col items-center justify-center gap-1 rounded-md border border-white/10 bg-white/[0.03] text-[10px] font-medium uppercase tracking-wider text-white/60 transition-colors hover:bg-white/[0.07] hover:text-white';
 
   const viewButton = isCompact ? (
     <Link
@@ -335,7 +335,7 @@ export function BookingActions({
           >
             <BadgeCheck aria-hidden='true' className='size-4' />
             <span className='whitespace-normal text-center text-[10px] leading-tight'>
-              Mark Extension Paid
+              Extension Paid
             </span>
           </Button>
         ) : (
@@ -405,7 +405,7 @@ export function BookingActions({
           >
             <BadgeCheck aria-hidden='true' className='size-4' />
             <span className='whitespace-normal text-center text-[10px] leading-tight'>
-              Mark All Paid
+              All Paid
             </span>
           </Button>
         ) : (
