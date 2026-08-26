@@ -514,21 +514,27 @@ export default function ManualBookingForm({
                 ) : (
    <div className='grid grid-cols-[repeat(4,minmax(0,1fr))] gap-2 sm:grid-cols-[repeat(5,minmax(0,1fr))]'>
   {stationsForDevice.map((s) => (
-    <Chip
-      key={s.id}
-      active={field.value === s.id}
-      disabled={lockStructuralFields}
-      onClick={() => field.onChange(s.id)}
-      className='flex-col gap-0.5 leading-none'
-    >
-      <span className='block w-full min-w-0 truncate'>
-        {s.name}
-      </span>
+     <Chip
+  key={s.id}
+  active={field.value === s.id}
+  disabled={lockStructuralFields}
+  onClick={() => field.onChange(s.id)}
+  className='flex-col gap-0.5 leading-none'
+>
+  {/* Mobile */}
+  <span className='text-sm font-semibold sm:hidden'>
+    {s.name.match(/\d+$/)?.[0] ?? s.name}
+  </span>
 
-      <span className='block w-full truncate text-[7px] opacity-50'>
-        {s.type}
-      </span>
-    </Chip>
+  {/* Desktop */}
+  <span className='hidden min-w-0 w-full truncate sm:block'>
+    {s.name}
+  </span>
+
+  <span className='text-[7px] opacity-50'>
+    {s.type}
+  </span>
+</Chip>
   ))}
 </div>
                 )}
