@@ -69,6 +69,7 @@ export function BookingActions({
     canCancel,
     canEdit,
     canRefund,
+    hasPendingExtension 
   } = useBookingActionState(booking, role);
 
   const [paymentMethod, setPaymentMethod] = useState<
@@ -118,8 +119,7 @@ export function BookingActions({
     </Tooltip>
   );
 
-  const markPaidBtn =
-    canMarkPaid &&
+  const markPaidBtn = canMarkPaid && !hasPendingExtension && (
     (isCompact ? (
       <Button
         key='paid'
