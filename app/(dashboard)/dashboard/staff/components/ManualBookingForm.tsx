@@ -518,9 +518,9 @@ export default function ManualBookingForm({
                         active={field.value === s.id}
                         disabled={lockStructuralFields}
                         onClick={() => field.onChange(s.id)}
-                        className='flex-col gap-0.5 leading-none'
+                        className='flex-col gap-0.5 leading-none min-w-0'
                       >
-                        <span className='truncate'>{s.name}</span>
+                        <span className='min-w-0 truncate'>{s.name}</span>
                         <span className='text-[7px] opacity-50'>{s.type}</span>
                       </Chip>
                     ))}
