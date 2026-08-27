@@ -314,7 +314,7 @@ export default function LiveSessionBoard({
             </div>
           </div>
         </div>
-        <div className='shrink-0 flex gap-2'>
+        <div className='shrink-0 flex flex-col md:flex-row gap-2'>
           {hasLiveCounts ? (
             <div className='flex flex-wrap items-center gap-2 md:self-baseline'>
               {totalActive > 0 && (
@@ -329,7 +329,7 @@ export default function LiveSessionBoard({
               )}
 
               {totalDue > 0 && (
-                <div className='flex items-center gap-2 border border-amber-400/20 bg-amber-400/5 px-3 py-1.5'>
+                <div className='min-h-[42px] flex items-center gap-2 border border-amber-400/20 bg-amber-400/5 px-3 py-1.5'>
                   <span className='font-mono text-xs font-semibold text-amber-400'>
                     {String(totalDue).padStart(2, '0')}
                   </span>
@@ -340,7 +340,7 @@ export default function LiveSessionBoard({
               )}
 
               {totalOverdue > 0 && (
-                <div className='flex items-center gap-2 border border-orange-400/20 bg-orange-400/5 px-3 py-1.5'>
+                <div className='min-h-[42px] flex items-center gap-2 border border-orange-400/20 bg-orange-400/5 px-3 py-1.5'>
                   <span className='font-mono text-xs font-semibold text-orange-400'>
                     {String(totalOverdue).padStart(2, '0')}
                   </span>
