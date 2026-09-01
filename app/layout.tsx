@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import SmoothScroll from '@/components/transitions/SmoothScroll';
 import { Providers } from '@/providers/QueryProvider';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from "@vercel/analytics/next"
 
 const baseUrl =
   process.env.Next_PUBLIC_BASE_URL ?? 'https://www.invadegamingcafe.com';
@@ -142,6 +143,7 @@ export default async function RootLayout({
           richColors
           closeButton
         />
+        <Analytics />
         <SpeedInsights />
       </body>
     </html>
