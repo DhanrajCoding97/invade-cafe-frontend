@@ -200,14 +200,6 @@ export function RoleSelect({ customer }: { customer: CustomerRow }) {
     }
   };
 
-  // Role hasn't resolved yet (e.g. a joined/secondary fetch that lands
-  // after the initial customer row) — show a skeleton the same size as the
-  // trigger instead of a Select with no matching value, which renders blank.
-  // if (!customer.role) {
-  //   console.log('logged');
-  //   return <Skeleton className='h-9 min-w-32 rounded-md' />;
-  // }
-
   if (!customer.role) {
     return <Skeleton className='h-9 w-32 rounded-md' />;
   }

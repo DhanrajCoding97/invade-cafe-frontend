@@ -41,47 +41,6 @@ export function useMyBookings() {
   });
 }
 
-// export function useMyBookings() {
-//   const supabase = createClient();
-
-//   return useQuery({
-//     queryKey: customerBookingKeys.all,
-//     queryFn: async () => {
-//       const {
-//         data: { user },
-//       } = await supabase.auth.getUser();
-//       if (!user) return [];
-
-//       const { data, error } = await supabase
-//         .from('bookings')
-//         .select('*')
-//         .eq('user_id', user.id)
-//         .order('date', { ascending: false })
-//         .order('start_time', { ascending: false });
-
-//       if (error) throw new Error(error.message);
-//       return data as BookingRow[];
-//     },
-//   });
-// }
-
-// export function useCancelMyBooking() {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: (bookingId: string) => cancelMyBooking(bookingId),
-//     onSuccess: () => {
-//       queryClient.invalidateQueries({ queryKey: customerBookingKeys.all });
-//       queryClient.invalidateQueries({ queryKey: ['refund-percent'] }); // match your actual key
-//     },
-//     onError: (err) => {
-//       console.log('toast about to show');
-//       setTimeout(() => {
-//         toast.error(err.message);
-//       }, 0);
-//     },
-//   });
-// }
-
 export function useCancelMyBooking() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -90,7 +49,7 @@ export function useCancelMyBooking() {
       if (!result.success) {
         throw new Error(result.message);
       }
-      return result; // { success: true, refundPercent }
+      return result;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: customerBookingKeys.all });
