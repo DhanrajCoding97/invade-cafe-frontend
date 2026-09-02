@@ -285,9 +285,9 @@ export function AppSidebar({ role, user, ...props }: AppSidebarProps) {
         <div className='flex items-center justify-between group-data-[collapsible=icon]:justify-center'>
           <SidebarTrigger />
 
-          <div className='group-data-[collapsible=icon]:hidden'>
+          {/* <div className='group-data-[collapsible=icon]:hidden'>
             <ModeToggle />
-          </div>
+          </div> */}
         </div>
       </SidebarHeader>
       <SidebarContent>

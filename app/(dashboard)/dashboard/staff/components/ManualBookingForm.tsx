@@ -152,7 +152,6 @@ function Chip({
   );
 }
 
-
 /* ------------------------------------------------------------------ */
 
 export default function ManualBookingForm({
@@ -260,6 +259,17 @@ export default function ManualBookingForm({
       : rawAmountOverride !== undefined
         ? rawAmountOverride
         : computedTotal;
+
+  //helper to format racing chip
+  function getRacingStationInfo(name: string) {
+    const platform = name.match(/\(([^)]+)\)/)?.[1] ?? '';
+    const cockpit = name.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+
+    return {
+      label: cockpit ? cockpit : platform,
+      platform,
+    };
+  }
 
   async function onSubmit(values: ManualBookingValues) {
     setSubmitting(true);
@@ -512,34 +522,62 @@ export default function ManualBookingForm({
                     ))}
                   </div>
                 ) : (
-   <div className='grid grid-cols-[repeat(4,minmax(0,1fr))] gap-2 sm:grid-cols-[repeat(5,minmax(0,1fr))]'>
-  {stationsForDevice.map((s) => (
-     <Chip
-  key={s.id}
-  active={field.value === s.id}
-  disabled={lockStructuralFields}
-  onClick={() => field.onChange(s.id)}
-  className='flex-col gap-0.5 leading-none'
->
+                  <div className='grid grid-cols-3 gap-2 sm:grid-cols-5'>
+                    {[...stationsForDevice]
+                      .sort((a, b) => {
+                        const numA = Number(a.name.match(/-(\d+)/)?.[1] ?? 0);
+                        const numB = Number(b.name.match(/-(\d+)/)?.[1] ?? 0);
 
-<span className='text-xs font-semibold sm:hidden'>
-  {s.type.toLowerCase() === 'racing'
-    ? (s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1] ??
-       s.name.match(/\(([^)]+)\)/)?.[1] ??
-       s.name)
-    : s.name}
-</span>
-<span className='hidden min-w-0 w-full truncate sm:block'>
-  {s.name}
-</span>
+                        return numA - numB;
+                      })
+                      .map((s) => {
+                        const isRacing = s.type.toLowerCase() === 'racing';
 
-<span className='text-[7px] opacity-50'>
-  {s.type}
-</span>
-</Chip>
-  ))}
-</div>
-)}
+                        if (isRacing) {
+                          const platform =
+                            s.name.match(/\(([^)]+)\)/)?.[1] ?? '';
+                          const cockpit =
+                            s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+
+                          return (
+                            <Chip
+                              key={s.id}
+                              active={field.value === s.id}
+                              disabled={lockStructuralFields}
+                              onClick={() => field.onChange(s.id)}
+                              className='flex-col gap-0.5 leading-none'
+                            >
+                              <span className='text-xs font-semibold'>
+                                {cockpit ?? platform}
+                              </span>
+
+                              <span className='text-[7px] uppercase opacity-50'>
+                                {platform} RACING
+                              </span>
+                            </Chip>
+                          );
+                        }
+
+                        return (
+                          <Chip
+                            key={s.id}
+                            active={field.value === s.id}
+                            disabled={lockStructuralFields}
+                            onClick={() => field.onChange(s.id)}
+                            className='flex-col gap-0.5 leading-none'
+                          >
+                            <span className='min-w-0 w-full truncate text-xs font-semibold'>
+                              {s.name}
+                            </span>
+
+                            <span className='text-[7px] uppercase opacity-50'>
+                              {s.type}
+                            </span>
+                          </Chip>
+                        );
+                      })}
+                  </div>
+                )}
 
                 {noStationsAvailable && (
                   <div className='rounded-none flex items-start gap-2 px-2 py-4 bg-black/80 border border-amber-400'>

@@ -85,8 +85,6 @@ async function generate() {
     .resize(900, null, { withoutEnlargement: true })
     .webp({ quality: 70 })
     .toFile(path.join(OUT_DIR, 'hero-bg-mobile.webp'));
-
-  console.log('✅ hero-bg images generated in', OUT_DIR);
 }
 
 generate().catch((err) => {

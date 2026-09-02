@@ -69,7 +69,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
             </AvatarFallback>
           </Avatar>
 
-          <span className='truncate text-xs font-bold uppercase tracking-wider text-cyan-400'>
+          <span className='truncate text-xs font-medium uppercase tracking-wider text-cyan-400'>
             {fullName}
           </span>
         </div>
@@ -77,7 +77,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
         {/* Dashboard */}
         <Link
           href='/dashboard'
-          className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-cyan-400/10 hover:text-cyan-400'
+          className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-[0.7rem] font-medium uppercase tracking-wider text-[#fff9] transition-all hover:bg-cyan-400/10 hover:text-[#67E8F9] hover:[text-shadow:0_0_10px_rgba(34,211,238,0.55)] cursor-pointer'
         >
           Dashboard
         </Link>
@@ -86,7 +86,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
         <button
           type='button'
           onClick={handleSignOut}
-          className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-cyan-400/10 hover:text-cyan-400'
+          className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-[0.7rem] font-medium uppercase tracking-wider text-[#fff9] transition-all hover:bg-cyan-400/10 hover:text-[#67E8F9] hover:[text-shadow:0_0_10px_rgba(34,211,238,0.55)] cursor-pointer'
         >
           <LogOut className='h-3.5 w-3.5' />
           Logout
@@ -116,7 +116,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
           >
             {/* Name */}
             <div className='border-b border-cyan-400/20 px-3 py-2'>
-              <p className='truncate text-xs font-bold uppercase tracking-wider text-cyan-400'>
+              <p className='truncate text-xs font-medium uppercase tracking-wider text-cyan-400'>
                 {fullName}
               </p>
             </div>
@@ -126,7 +126,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
               href='/dashboard'
               role='menuitem'
               onClick={() => setOpen(false)}
-              className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-cyan-400/10 hover:text-cyan-400'
+              className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-[0.7rem] font-medium uppercase tracking-wider text-[#fff9] transition-all hover:bg-cyan-400/10 hover:text-[#67E8F9] hover:[text-shadow:0_0_10px_rgba(34,211,238,0.55)]'
             >
               Dashboard
             </Link>
@@ -136,7 +136,7 @@ export default function SignOutButton({ name, avatar }: SignOutButtonProps) {
               type='button'
               role='menuitem'
               onClick={handleSignOut}
-              className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-xs font-bold uppercase tracking-wider text-white transition-colors hover:bg-cyan-400/10 hover:text-cyan-400'
+              className='flex w-full items-center gap-2 px-3 py-2.5 text-left text-[0.7rem] font-medium uppercase tracking-wider text-[#fff9] transition-all hover:bg-cyan-400/10 hover:text-[#67E8F9] hover:[text-shadow:0_0_10px_rgba(34,211,238,0.55)] cursor-pointer'
             >
               <LogOut className='h-3.5 w-3.5' />
               Logout

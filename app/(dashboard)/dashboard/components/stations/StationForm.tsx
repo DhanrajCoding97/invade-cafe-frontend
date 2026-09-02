@@ -77,9 +77,6 @@ export default function StationForm({
   const selectedType = watch('type');
 
   function onSubmit(values: StationFormOutput) {
-    console.log('onSubmit fired');
-    console.log(values);
-
     const hasSpecs = values.cpu || values.gpu || values.ram || values.storage;
     const payload = {
       type: values.type,
@@ -113,19 +110,12 @@ export default function StationForm({
         onSuccess: () => {
           onSuccess?.();
           toast.success('Station added');
-          console.log('attempted creating station');
         },
       });
     }
   }
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit, (errors) => {
-        console.log('Validation failed');
-        console.log(errors);
-      })}
-      className='flex flex-col gap-4'
-    >
+    <form onSubmit={handleSubmit(onSubmit)} className='flex flex-col gap-4'>
       <Controller
         name='type'
         control={control}

@@ -24,8 +24,7 @@ export function useRealtimeBookingSync() {
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'bookings' },
-        (payload) => {
-          console.log('[bookings-sync] event:', payload.eventType, payload.new);
+        () => {
           queryClient.invalidateQueries({ queryKey: ['bookings'] });
           queryClient.invalidateQueries({ queryKey: ['stations'] });
         },

@@ -46,50 +46,14 @@ export async function sendPushToStaffAndOwners(payload: {
           JSON.stringify(payload),
         );
 
-        console.log('Push notification sent:', {
-          subscriptionId: sub.id,
-          statusCode: result.statusCode,
-        });
-
         return result;
       } catch (err: any) {
-        console.error('Push notification failed:', {
-          subscriptionId: sub.id,
-          statusCode: err.statusCode,
-          body: err.body,
-          message: err.message,
-        });
-
         if (err.statusCode === 410) {
           await admin.from('push_subscriptions').delete().eq('id', sub.id);
-
-          console.log('Deleted expired push subscription:', sub.id);
         }
 
         throw err;
       }
     }),
   );
-
-  console.log('Push notification results:', results);
-
-  console.log('Push notification results:', results);
 }
-//   await Promise.allSettled(
-//     subs.map((sub) =>
-//       webpush
-//         .sendNotification(
-//           {
-//             endpoint: sub.endpoint,
-//             keys: { p256dh: sub.p256dh, auth: sub.auth },
-//           },
-//           JSON.stringify(payload),
-//         )
-//         .catch(async (err: any) => {
-//           // 410 Gone = subscription expired/revoked, clean it up
-//           if (err.statusCode === 410) {
-//             await admin.from('push_subscriptions').delete().eq('id', sub.id);
-//           }
-//         }),
-//     ),
-//   );

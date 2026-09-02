@@ -6,7 +6,6 @@ import { formatIST } from '@/lib/date-list';
 import { getCurrentUserRole } from '@/lib/auth/getCurrentUserRole';
 export default async function StaffDashboardPage() {
   const { user } = await getCurrentUserRole();
-  console.log(user.user_metadata.full_name);
   const data = await getDashboardData();
   const today = formatIST(new Date(), 'd MMM • EEEE');
   return (

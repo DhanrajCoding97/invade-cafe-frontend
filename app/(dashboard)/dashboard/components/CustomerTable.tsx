@@ -1,9 +1,16 @@
 // customers-table.tsx
 'use client';
-import { Search } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { getCustomersClient, customerKeys } from '@/lib/queries/customers';
-
 import {
   flexRender,
   getCoreRowModel,
@@ -129,7 +136,7 @@ export function CustomersTable({
           </div>
 
           {/* ---------- Mobile: cards (below md) ---------- */}
-          <div className='flex flex-col gap-3 md:hidden'>
+          <div className='flex flex-col gap-3 min-[840]:hidden'>
             {rows.length ? (
               rows.map((row) => (
                 <CustomerCard
@@ -144,7 +151,7 @@ export function CustomersTable({
             )}
           </div>
           {/*/* ---------- Desktop: table (md and up) ---------- */}
-          <div className='hidden md:block overflow-x-auto rounded-lg border'>
+          <div className='hidden min-[840]:block overflow-x-auto rounded-lg border'>
             <table className='w-full text-sm border-collapse shadow-lg'>
               <thead className='bg-muted/50'>
                 {table.getHeaderGroups().map((headerGroup) => (
@@ -195,28 +202,31 @@ export function CustomersTable({
             </table>
           </div>
 
-          <div className='flex items-center justify-between mt-4'>
+          <div className='flex flex-col min-[460]:flex-row min-[460]:items-center justify-between mt-4 gap-3'>
             <div className='flex items-center gap-2 text-sm text-muted-foreground'>
-              Rows per page:
-              <select
-                value={pagination.pageSize}
-                onChange={(e) =>
-                  setPagination((prev) => ({
-                    ...prev,
-                    pageSize: Number(e.target.value),
-                    pageIndex: 0,
-                  }))
-                }
-                className='bg-transparent border rounded px-2 py-1'
+              <Label htmlFor='page-size'>Rows per page:</Label>
+              <Select
+                name='page-size'
+                value={String(table.getState().pagination.pageSize)}
+                onValueChange={(value) => table.setPageSize(Number(value))}
               >
-                {[5, 10, 20, 50].map((size) => (
-                  <option key={size} value={size}>
-                    {size}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger className='w-20'>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[5, 10, 20].map((size) => (
+                    <SelectItem
+                      key={size}
+                      value={String(size)}
+                      className='hover:bg-amber-100'
+                    >
+                      {size}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-            <div className='flex items-center gap-2'>
+            {/* <div className='flex items-center gap-2'>
               <span className='text-sm text-muted-foreground'>
                 Page {pagination.pageIndex + 1} of {table.getPageCount()}
               </span>
@@ -235,6 +245,36 @@ export function CustomersTable({
                 disabled={!table.getCanNextPage()}
               >
                 Next →
+              </Button>
+            </div> */}
+            {/* Navigation buttons and page info */}
+            <div className='flex items-center gap-2'>
+              {/* "Page X of Y" indicator — uses 1-based numbering for display */}
+              <span className='mr-1 text-sm text-gray-500'>
+                Page {table.getState().pagination.pageIndex + 1} of{' '}
+                {table.getPageCount()}
+              </span>
+
+              {/* Previous button — disabled on first page */}
+              <Button
+                variant='cyber'
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
+                className='text-[12px]'
+              >
+                <ArrowLeft />
+                Prev
+              </Button>
+
+              {/* Next button — disabled on last page */}
+              <Button
+                variant='cyber'
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
+                className='text-[12px]'
+              >
+                Next
+                <ArrowRight />
               </Button>
             </div>
           </div>

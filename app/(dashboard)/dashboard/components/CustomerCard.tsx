@@ -3,7 +3,7 @@ import { RoleSelect } from './role-select';
 import { format } from 'date-fns';
 export default function CustomerCard({ customer }: { customer: CustomerRow }) {
   return (
-    <div className='rounded-xl border border-[#28F1FF]/20 bg-white/5 p-4'>
+    <div className='rounded-xl border border-[#28F1FF]/20 bg-black p-4'>
       <div className='flex items-start justify-between gap-3'>
         <div className='min-w-0'>
           <p className='truncate font-medium text-white'>
@@ -15,9 +15,6 @@ export default function CustomerCard({ customer }: { customer: CustomerRow }) {
           <p className='text-sm text-white/50'>{customer.phone ?? '-'}</p>
         </div>
 
-        {/* Primary action stays immediately visible — no scrolling needed.
-            Reuses the same RoleSelect as the desktop table, so the mutation
-            + optimistic update + toast logic lives in exactly one place. */}
         <div className='shrink-0'>
           <RoleSelect customer={customer} />
         </div>

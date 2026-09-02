@@ -62,22 +62,14 @@ export async function subscribeToPush() {
     throw new Error('Notifications are not supported');
   }
 
-  console.log('🔔 Registering service worker...');
-
   const registration = await navigator.serviceWorker.register('/sw.js');
-
-  console.log('✅ Service worker registered:', registration);
 
   // Check if this browser already has a subscription
   let subscription = await registration.pushManager.getSubscription();
 
-  console.log('Existing subscription:', subscription);
-
   // Ask for permission only if needed
   if (Notification.permission !== 'granted') {
     const permission = await Notification.requestPermission();
-
-    console.log('Notification permission:', permission);
 
     if (permission !== 'granted') {
       throw new Error('Notification permission denied');
@@ -92,14 +84,10 @@ export async function subscribeToPush() {
       throw new Error('VAPID public key is not configured');
     }
 
-    console.log('Creating new push subscription...');
-
     subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(vapidKey),
     });
-
-    console.log('✅ New push subscription created');
   }
 
   // Always send the subscription to our backend.
@@ -118,8 +106,6 @@ export async function subscribeToPush() {
 
     throw new Error(data?.error || 'Failed to save push subscription');
   }
-
-  console.log('✅ Push subscription saved');
 
   return subscription;
 }

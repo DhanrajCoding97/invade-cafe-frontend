@@ -80,6 +80,7 @@ const CORNER_CLIP_DOUBLE =
 
 const CORNER_CLIP_SINGLE =
   '[clip-path:polygon(0_0,100%_0,100%_calc(100%-14px),calc(100%-14px)_100%,0_100%)]';
+
 const buttonVariants = cva(
   "tracking-wider group/button inline-flex cursor-pointer shrink-0 items-center justify-center rounded-md border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20 dark:aria-invalid:border-destructive/50 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
@@ -99,11 +100,21 @@ const buttonVariants = cva(
           'py-1 px-0.5 bg-transparent border-transparent shadow-md text-muted-foreground hover:bg-secondary transition-all duration-300 ease-in group',
         'icon-plain':
           'group bg-transparent border-transparent shadow-none text-current hover:bg-transparent hover:text-current focus-visible:ring-0 focus-visible:border-transparent active:translate-y-0',
+        // cyber: cn(
+        //   CORNER_CLIP_SINGLE,
+        //   'rounded-none border-none bg-[#28F1FF] font-mono font-bold uppercase text-black',
+        //   'shadow-[0_0_18px_-4px_rgba(40,241,255,0.9)]',
+        //   'hover:bg-[#5DF6FF] hover:shadow-[0_0_28px_-2px_rgba(40,241,255,1)]',
+        //   'focus-visible:ring-[#28F1FF]/40',
+        //   'data-[glow=off]:shadow-none data-[glow=off]:hover:shadow-none',
+        // ),
         cyber: cn(
           CORNER_CLIP_SINGLE,
           'rounded-none border-none bg-[#28F1FF] font-mono font-bold uppercase text-black',
+          'transition-all duration-200',
           'shadow-[0_0_18px_-4px_rgba(40,241,255,0.9)]',
-          'hover:bg-[#5DF6FF] hover:shadow-[0_0_28px_-2px_rgba(40,241,255,1)]',
+          'hover:bg-white hover:shadow-[0_0_30px_2px_rgba(40,241,255,1)]',
+          'active:bg-[#28F1FF] active:shadow-[0_0_18px_-4px_rgba(40,241,255,0.9)]',
           'focus-visible:ring-[#28F1FF]/40',
           'data-[glow=off]:shadow-none data-[glow=off]:hover:shadow-none',
         ),

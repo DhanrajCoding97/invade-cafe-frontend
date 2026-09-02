@@ -1,5 +1,5 @@
 'use client';
-import { Search } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { type DateRange } from 'react-day-picker';
 import { isWithinInterval, startOfDay, endOfDay, parseISO } from 'date-fns';
@@ -256,7 +256,14 @@ export function BookingsTable<TData>({
                 Export CSV
               </Button>
             </div>
-
+            <div className='min-h-10.5 rounded-lg max-w-fit flex items-center gap-2 border border-[#28F1FF]/20 bg-[#0C1617] px-3 py-1.5'>
+              <span className='font-mono text-xs font-semibold text-[#28F1FF]/70'>
+                Total Bookings :
+              </span>
+              <span className='font-mono text-[10px] uppercase tracking-wider text-white'>
+                {data.length}
+              </span>
+            </div>
             {/* Search */}
             <div className='relative'>
               <Search className='pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-cyan-400/70' />
@@ -462,22 +469,26 @@ export function BookingsTable<TData>({
               </span>
 
               {/* Previous button — disabled on first page */}
-              <button
+              <Button
+                variant='cyber'
                 onClick={() => table.previousPage()}
                 disabled={!table.getCanPreviousPage()}
-                className='rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40'
+                className='text-[12px]'
               >
-                ← Prev
-              </button>
+                <ArrowLeft />
+                Prev
+              </Button>
 
               {/* Next button — disabled on last page */}
-              <button
+              <Button
+                variant='cyber'
                 onClick={() => table.nextPage()}
                 disabled={!table.getCanNextPage()}
-                className='rounded-md border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 shadow-sm transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40'
+                className='text-[12px]'
               >
-                Next →
-              </button>
+                Next
+                <ArrowRight />
+              </Button>
             </div>
           </div>
         </div>

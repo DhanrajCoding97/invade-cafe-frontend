@@ -23,29 +23,12 @@ export function useCancelBooking(options?: { onSuccess?: () => void }) {
     },
 
     onError: (err) => {
-      console.log('toast about to show');
-
       setTimeout(() => {
         toast.error(err.message);
       }, 0);
     },
   });
 }
-// export function useCancelBooking(options?: { onSuccess?: () => void }) {
-//   const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: (bookingId: string) => cancelBooking(bookingId),
-//     onSuccess: () =>
-//       queryClient.invalidateQueries({ queryKey: bookingKeys.all }),
-//     options?.onSuccess?.();
-//     onError: (err) => {
-//       console.log('toast about to show');
-//       setTimeout(() => {
-//         toast.error(err.message);
-//       }, 0);
-//     },
-//   });
-// }
 
 export function useMarkBookingAndExtensionsPaid(options?: {
   onSuccess?: () => void;

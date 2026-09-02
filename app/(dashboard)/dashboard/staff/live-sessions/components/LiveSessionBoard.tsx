@@ -318,7 +318,7 @@ export default function LiveSessionBoard({
           {hasLiveCounts ? (
             <div className='flex flex-wrap items-center gap-2 md:self-baseline'>
               {totalActive > 0 && (
-                <div className='min-h-[42px] flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-2'>
+                <div className='min-h-10.5 flex items-center gap-2 border border-cyan-400/20 bg-cyan-400/5 px-3 py-2'>
                   <span className='font-mono text-xs font-semibold text-cyan-400'>
                     {String(totalActive).padStart(2, '0')}
                   </span>
@@ -329,7 +329,7 @@ export default function LiveSessionBoard({
               )}
 
               {totalDue > 0 && (
-                <div className='min-h-[42px] flex items-center gap-2 border border-amber-400/20 bg-amber-400/5 px-3 py-1.5'>
+                <div className='min-h-10.5 flex items-center gap-2 border border-amber-400/20 bg-amber-400/5 px-3 py-1.5'>
                   <span className='font-mono text-xs font-semibold text-amber-400'>
                     {String(totalDue).padStart(2, '0')}
                   </span>
@@ -340,7 +340,7 @@ export default function LiveSessionBoard({
               )}
 
               {totalOverdue > 0 && (
-                <div className='min-h-[42px] flex items-center gap-2 border border-orange-400/20 bg-orange-400/5 px-3 py-1.5'>
+                <div className='min-h-10.5 flex items-center gap-2 border border-orange-400/20 bg-orange-400/5 px-3 py-1.5'>
                   <span className='font-mono text-xs font-semibold text-orange-400'>
                     {String(totalOverdue).padStart(2, '0')}
                   </span>
