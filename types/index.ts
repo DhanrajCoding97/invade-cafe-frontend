@@ -98,6 +98,8 @@ export interface BookingRow {
 
   customer_name: string | null;
   customer_phone: string | null;
+  customer_email?: string | null;
+  other_names?: string[] | null;
 
   station_id: string;
   device: 'pc' | 'ps5' | 'vr' | 'racing';

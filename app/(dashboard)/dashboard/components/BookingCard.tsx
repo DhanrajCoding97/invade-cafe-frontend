@@ -25,10 +25,10 @@ import { User } from '@supabase/supabase-js';
 
 const STATUS_COLOR: Record<
   BookingRow['status'],
-  'blue' | 'amber' | 'red' | 'green'
+  'cyan' | 'amber' | 'red' | 'green'
 > = {
-  confirmed: 'blue',
-  no_show: 'amber',
+  confirmed: 'cyan',
+  no_show: 'red',
   cancelled: 'red',
   completed: 'green',
 };
@@ -244,7 +244,8 @@ export function BookingCard({
     booking.profiles?.full_name ?? booking.customer_name ?? 'Guest';
   const displayPhone = booking.profiles?.phone ?? booking.customer_phone ?? '—';
 
-  const { label: durationLabel, hasPendingExtension } = getExtendedDuration(booking);
+  const { label: durationLabel, hasPendingExtension } =
+    getExtendedDuration(booking);
   const { total, pendingExtension } = getExtendedTotal(booking);
 
   return (
@@ -265,9 +266,14 @@ export function BookingCard({
               </Badge>
             )}
           </div>
-          <span className='font-mono text-xs text-white/40'>
-            {displayPhone}
-          </span>
+          <div className='flex flex-col gap-1'>
+            <span className='font-mono text-xs text-white/40'>
+              {displayPhone}
+            </span>
+            <span className='font-mono text-xs text-white/40'>
+              {booking.customer_email}
+            </span>
+          </div>
         </div>
 
         <Badge
@@ -290,6 +296,12 @@ export function BookingCard({
           label='Players'
           value={`${booking.players} ${booking.players === 1 ? 'player' : 'players'}`}
         />
+        {booking.other_names?.length ? (
+          <ReceiptLine
+            label='Other Players'
+            value={booking.other_names.join(', ')}
+          />
+        ) : null}
         <ReceiptLine
           label='Payment'
           value={`${booking.payment_status} · ${booking.payment_method ?? '—'}`}
@@ -297,22 +309,24 @@ export function BookingCard({
       </div>
 
       {/* total */}
-       <div className='mt-3 flex items-end justify-between px-4 pb-4'>
-  <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
-    Total
-  </span>
-  <div className='flex flex-col items-end gap-0.5'>
-    <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
-      {isOnline ? `₹${Number(booking.amount).toFixed(0)}` : `₹${total.toFixed(0)}`}
-    </span>
-    {pendingExtension && (
-      <span className='text-[10px] text-amber-400'>
-        {isOnline ? 'ext unpaid' : 'ext pending'} (₹{pendingExtension.amount})
-      </span>
-    )}
-  </div>
-</div>
-
+      <div className='mt-3 flex items-end justify-between px-4 pb-4'>
+        <span className='font-mono text-[10px] uppercase tracking-[0.2em] text-white/40'>
+          Total
+        </span>
+        <div className='flex flex-col items-end gap-0.5'>
+          <span className='text-2xl font-semibold tabular-nums text-cyan-300'>
+            {isOnline
+              ? `₹${Number(booking.amount).toFixed(0)}`
+              : `₹${total.toFixed(0)}`}
+          </span>
+          {pendingExtension && (
+            <span className='text-[10px] text-amber-400'>
+              {isOnline ? 'ext unpaid' : 'ext pending'} (₹
+              {pendingExtension.amount})
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* perforation */}
       <div className='relative flex h-4 items-center'>

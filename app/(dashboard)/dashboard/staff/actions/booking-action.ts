@@ -104,7 +104,7 @@ export async function endSession(bookingId: string) {
 
   return {
     success: true,
-  }; 
+  };
 }
 
 export async function extendSession(
@@ -233,7 +233,7 @@ export async function extendSession(
   if (insertError) throw new Error(insertError.message);
 
   return { ok: true as const, amountDue: amount };
-} 
+}
 
 // export async function extendSession(
 //   bookingId: string,
@@ -413,7 +413,6 @@ export async function extendSession(
 //   return { ok: true as const, amountDue: amount };
 // }
 
-
 export async function markExtensionPaid(extensionId: string) {
   const { user } = await requireRole(['owner', 'staff']);
   const supabase = await createClient();
@@ -474,8 +473,13 @@ export async function createManualBooking(values: ManualBookingValues) {
       status: 'confirmed',
       user_id: null,
       staff_id: user?.id ?? null,
+
       customer_name: values.customerName,
       customer_phone: values.customerPhone,
+      customer_email: values.customerEmail,
+
+      other_names: values.otherNames?.length ? values.otherNames : null,
+
       payment_method: values.paymentMethod,
       session_started_at: values.startNow ? new Date().toISOString() : null,
     })
@@ -544,6 +548,9 @@ export async function updateManualBooking(
       amount: total,
       customer_name: values.customerName,
       customer_phone: values.customerPhone,
+      customer_email: values.customerEmail,
+
+      other_names: values.otherNames?.length ? values.otherNames : null,
       payment_method: values.paymentMethod,
     })
     .eq('id', bookingId);

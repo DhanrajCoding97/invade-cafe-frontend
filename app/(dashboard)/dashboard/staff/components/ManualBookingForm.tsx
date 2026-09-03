@@ -65,6 +65,7 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
 import { getErrorMessages } from '@/lib/get-error-message';
 import { Station } from '@/types';
+import { formatIST, startOfTodayIST } from '@/lib/date-list';
 
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
@@ -84,7 +85,7 @@ const DEVICES: { value: Device; label: string }[] = [
 
 function nowDateAndTime() {
   const now = new Date();
-  const startTime = now.toTimeString().slice(0, 5);
+  const startTime = formatIST(now, 'HH:mm');
   return { date: now, startTime };
 }
 
@@ -122,12 +123,14 @@ function SectionHeader({ index, title }: { index: string; title: string }) {
 
 function Chip({
   active,
+  invalid,
   disabled,
   onClick,
   children,
   className,
 }: {
   active?: boolean;
+  invalid?: boolean;
   disabled?: boolean;
   onClick?: () => void;
   children: React.ReactNode;
@@ -142,7 +145,9 @@ function Chip({
         'flex min-h-11 items-center justify-center border px-2 py-1.5 font-mono text-[10px] uppercase transition-colors overflow-hidden',
         active
           ? 'border-[#28F1FF] bg-[#28F1FF]/10 text-[#28F1FF]'
-          : 'border-[#28F1FF]/15 text-white/60 hover:border-[#28F1FF]/40',
+          : invalid
+            ? 'border-destructive/50 text-white/60 hover:border-destructive'
+            : 'border-[#28F1FF]/15 text-white/60 hover:border-[#28F1FF]/40',
         disabled && 'cursor-not-allowed opacity-30 hover:border-[#28F1FF]/15',
         className,
       )}
@@ -179,11 +184,14 @@ export default function ManualBookingForm({
     handleSubmit,
     watch,
     setValue,
+    getValues,
     formState: { errors },
   } = useForm<ManualBookingValues>({
     resolver: zodResolver(manualBookingSchema),
     defaultValues: defaultValues ?? {
       customerName: '',
+      customerEmail: '',
+      otherNames: [],
       customerPhone: '',
       device: 'pc',
       duration: 1,
@@ -191,20 +199,21 @@ export default function ManualBookingForm({
       players: 1,
       tier: 'single',
       startNow: mode === 'create',
-      date: new Date(),
+      date: startOfTodayIST(),
       startTime: nowTime,
       paymentMethod: 'cash',
     },
   });
 
+  const watchedDate = watch('date');
   const startNow = watch('startNow');
   const stationId = watch('stationId');
 
   const device = watch('device');
   const tier = watch('tier');
   const paymentMethod = watch('paymentMethod');
-  const watchedDate = watch('date');
   const watchedStartTime = watch('startTime');
+
   const debouncedStartTime = useDebouncedValue(watchedStartTime, 400);
 
   const showPlayersSelect = device === 'ps5';
@@ -217,7 +226,7 @@ export default function ManualBookingForm({
   const errorMessages = getErrorMessages(errors);
   const hasErrors = errorMessages.length > 0;
 
-  const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
+  const dateStr = watchedDate ? formatIST(watchedDate, 'yyyy-MM-dd') : '';
   const watchedDevice = watch('device');
   const stationParams = useMemo(
     () => ({
@@ -295,6 +304,25 @@ export default function ManualBookingForm({
     }
   }
 
+  useEffect(() => {
+    if (mode === 'edit') {
+      console.log('edit dialog opened');
+      console.log(watch('amountOverride'));
+    }
+  }, [mode]);
+
+  //set other Names value
+  useEffect(() => {
+    const count = Math.max(playersValue - 1, 0);
+    const current = getValues('otherNames') ?? [];
+    if (current.length !== count) {
+      setValue(
+        'otherNames',
+        Array.from({ length: count }, (_, i) => current[i] ?? ''),
+      );
+    }
+  }, [playersValue, getValues, setValue]);
+
   // Keep date/time pinned to "now" while startNow is checked
   useEffect(() => {
     if (startNow) {
@@ -309,12 +337,22 @@ export default function ManualBookingForm({
     if (device === 'ps5') {
       setValue('tier', undefined);
     } else if (device === 'racing') {
-      setValue('players', 1);
+      setValue('players', tier === 'multiplayer' ? 2 : 1);
     } else {
       setValue('players', 1);
       setValue('tier', undefined);
     }
-  }, [device, setValue]);
+  }, [device, tier, setValue]);
+  // useEffect(() => {
+  //   if (device === 'ps5') {
+  //     setValue('tier', undefined);
+  //   } else if (device === 'racing') {
+  //     setValue('players', 1);
+  //   } else {
+  //     setValue('players', 1);
+  //     setValue('tier', undefined);
+  //   }
+  // }, [device, setValue]);
 
   useEffect(() => {
     if (stationsLoading) return;
@@ -396,6 +434,7 @@ export default function ManualBookingForm({
                   Phone number
                 </FieldLabel>
                 <PhoneInput
+                  aria-invalid={fieldState.invalid}
                   placeholder='8454994242'
                   id='customerPhone'
                   defaultCountry='IN'
@@ -403,6 +442,31 @@ export default function ManualBookingForm({
                   onChange={field.onChange}
                   onBlur={field.onBlur}
                   name={field.name}
+                  disabled={lockStructuralFields}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name='customerEmail'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='customerEmail' className={microLabel}>
+                  Email (optional)
+                </FieldLabel>
+                <Input
+                  {...field}
+                  id='customerEmail'
+                  type='email'
+                  aria-invalid={fieldState.invalid}
+                  placeholder='john@example.com'
+                  autoComplete='off'
+                  className={fieldCls}
                   disabled={lockStructuralFields}
                 />
                 {fieldState.invalid && (
@@ -427,6 +491,7 @@ export default function ManualBookingForm({
                 <div className='grid grid-cols-2 gap-2 sm:grid-cols-4'>
                   {DEVICES.map((d) => (
                     <Chip
+                      invalid={fieldState.invalid}
                       key={d.value}
                       active={field.value === d.value}
                       disabled={lockStructuralFields}
@@ -454,6 +519,7 @@ export default function ManualBookingForm({
                   <div className='grid grid-cols-4 gap-2'>
                     {[1, 2, 3, 4].map((n) => (
                       <Chip
+                        invalid={fieldState.invalid}
                         disabled={lockStructuralFields}
                         key={n}
                         active={Number(field.value ?? 1) === n}
@@ -480,12 +546,14 @@ export default function ManualBookingForm({
                   <FieldLabel className={microLabel}>Mode</FieldLabel>
                   <div className='grid grid-cols-2 gap-2'>
                     <Chip
+                      invalid={fieldState.invalid}
                       active={field.value === 'single'}
                       onClick={() => field.onChange('single')}
                     >
                       Singleplayer
                     </Chip>
                     <Chip
+                      invalid={fieldState.invalid}
                       active={field.value === 'multiplayer'}
                       onClick={() => field.onChange('multiplayer')}
                     >
@@ -498,6 +566,38 @@ export default function ManualBookingForm({
                 </Field>
               )}
             />
+          )}
+
+          {playersValue > 1 && (
+            <Field>
+              <FieldLabel className={microLabel}>Other players</FieldLabel>
+              <div className='flex flex-col gap-2'>
+                {Array.from({ length: playersValue - 1 }).map((_, i) => (
+                  <Controller
+                    key={i}
+                    name={`otherNames.${i}` as const}
+                    defaultValue=''
+                    control={control}
+                    render={({ field, fieldState }) => (
+                      <Field data-invalid={fieldState.invalid}>
+                        <Input
+                          {...field}
+                          id={`otherNames-${i}`}
+                          aria-invalid={fieldState.invalid}
+                          placeholder={`Player ${i + 2} name`}
+                          className={fieldCls}
+                          disabled={lockStructuralFields}
+                        />
+
+                        {fieldState.invalid && (
+                          <FieldError errors={[fieldState.error]} />
+                        )}
+                      </Field>
+                    )}
+                  />
+                ))}
+              </div>
+            </Field>
           )}
 
           {/* Station chip grid */}
@@ -541,6 +641,7 @@ export default function ManualBookingForm({
 
                           return (
                             <Chip
+                              invalid={fieldState.invalid}
                               key={s.id}
                               active={field.value === s.id}
                               disabled={lockStructuralFields}
@@ -560,6 +661,7 @@ export default function ManualBookingForm({
 
                         return (
                           <Chip
+                            invalid={fieldState.invalid}
                             key={s.id}
                             active={field.value === s.id}
                             disabled={lockStructuralFields}
@@ -665,7 +767,6 @@ export default function ManualBookingForm({
                             selected={field.value}
                             onSelect={(d) => {
                               field.onChange(d);
-                              setValue('startTime', '');
                             }}
                             disabled={(d) =>
                               d < new Date(new Date().setHours(0, 0, 0, 0))
@@ -731,6 +832,7 @@ export default function ManualBookingForm({
                     id='duration'
                     type='number'
                     inputMode='numeric'
+                    aria-invalid={fieldState.invalid}
                     value={field.value ?? ''}
                     onChange={(e) => {
                       const val = e.target.valueAsNumber;
@@ -764,6 +866,7 @@ export default function ManualBookingForm({
                 <div className='grid grid-cols-2 gap-2 sm:grid-cols-3'>
                   {PAYMENT_METHODS.map((m) => (
                     <Chip
+                      invalid={fieldState.invalid}
                       key={m.value}
                       active={field.value === m.value}
                       disabled={lockStructuralFields}
@@ -790,6 +893,7 @@ export default function ManualBookingForm({
                 </FieldLabel>
                 <Input
                   id='amountOverride'
+                  aria-invalid={fieldState.invalid}
                   type='number'
                   inputMode='decimal'
                   value={field.value ?? ''}
@@ -824,6 +928,7 @@ export default function ManualBookingForm({
                 <Textarea
                   {...field}
                   value={field.value ?? ''}
+                  aria-invalid={fieldState.invalid}
                   id='notes'
                   rows={3}
                   placeholder='...ENTRY_LOG'
