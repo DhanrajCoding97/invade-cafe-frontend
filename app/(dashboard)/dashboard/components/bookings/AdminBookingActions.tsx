@@ -115,7 +115,7 @@ export default function AdminBookingActions({
               booking.payment_method === null
                 ? 'cash'
                 : booking.payment_method,
-            amountOverride: booking.amount,
+            amountOverride: undefined,
             startNow: !!booking.session_started_at,
           }}
           onSuccess={() => setEditOpen(false)}

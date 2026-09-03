@@ -5,6 +5,17 @@ export const manualBookingSchema = z
   .object({
     customerName: z.string().trim().min(1, 'Name is required'),
 
+    customerEmail: z
+      .string()
+      .trim()
+      .email('Invalid email')
+      .optional()
+      .or(z.literal('')),
+
+    otherNames: z
+      .array(z.string().trim().min(1, 'Player name is required'))
+      .optional(),
+
     customerPhone: z
       .string()
       .refine(isValidPhoneNumber, { message: 'Invalid phone number' }),
