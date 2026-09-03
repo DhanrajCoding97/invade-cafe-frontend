@@ -1,5 +1,6 @@
 import { type Station, type StationRow } from '@/types';
 import { createClient } from '../supabase/client';
+import { parseISTDateTime } from '../date-list';
 
 export const stationKeys = {
   all: ['stations'] as const,
@@ -86,7 +87,8 @@ export async function fetchAvailableStations({
   if (stationsError) throw stationsError;
   if (bookingsError) throw bookingsError;
 
-  const requestedStart = new Date(`${date}T${startTime}`);
+  // const requestedStart = new Date(`${date}T${startTime}`);
+  const requestedStart = parseISTDateTime(date, startTime);
   const requestedEnd = new Date(requestedStart);
   requestedEnd.setHours(requestedEnd.getHours() + duration);
 
@@ -95,7 +97,7 @@ export async function fetchAvailableStations({
     duration_hours: number;
     extended_until: string | null;
   }) {
-    const bStart = new Date(`${date}T${b.start_time}`); // `date` closes over the outer param, unchanged
+    const bStart = parseISTDateTime(date, b.start_time);
     const scheduledEnd = new Date(bStart);
     scheduledEnd.setHours(scheduledEnd.getHours() + Number(b.duration_hours));
     const extendedEnd = b.extended_until ? new Date(b.extended_until) : null;
@@ -107,7 +109,7 @@ export async function fetchAvailableStations({
   if (device === 'vr') {
     const vrAlreadyBooked = (dayBookings ?? []).some((b) => {
       if (b.device !== 'vr') return false;
-      const bStart = new Date(`${date}T${b.start_time}`);
+      const bStart = parseISTDateTime(date, b.start_time);
       const bEnd = getBookingEnd(b);
       return requestedStart < bEnd && bStart < requestedEnd;
     });

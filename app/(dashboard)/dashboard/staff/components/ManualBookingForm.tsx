@@ -65,6 +65,7 @@ import { useDebouncedValue } from '@/hooks/use-debounced-value';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
 import { getErrorMessages } from '@/lib/get-error-message';
 import { Station } from '@/types';
+import { formatIST, startOfTodayIST } from '@/lib/date-list';
 
 type Device = z.infer<typeof manualBookingSchema>['device'];
 type PAYMENT_METHOD = z.infer<typeof manualBookingSchema>['paymentMethod'];
@@ -84,7 +85,7 @@ const DEVICES: { value: Device; label: string }[] = [
 
 function nowDateAndTime() {
   const now = new Date();
-  const startTime = now.toTimeString().slice(0, 5);
+  const startTime = formatIST(now, 'HH:mm');
   return { date: now, startTime };
 }
 
@@ -191,20 +192,21 @@ export default function ManualBookingForm({
       players: 1,
       tier: 'single',
       startNow: mode === 'create',
-      date: new Date(),
+      date: startOfTodayIST(),
       startTime: nowTime,
       paymentMethod: 'cash',
     },
   });
 
+  const watchedDate = watch('date');
   const startNow = watch('startNow');
   const stationId = watch('stationId');
 
   const device = watch('device');
   const tier = watch('tier');
   const paymentMethod = watch('paymentMethod');
-  const watchedDate = watch('date');
   const watchedStartTime = watch('startTime');
+
   const debouncedStartTime = useDebouncedValue(watchedStartTime, 400);
 
   const showPlayersSelect = device === 'ps5';
@@ -217,17 +219,28 @@ export default function ManualBookingForm({
   const errorMessages = getErrorMessages(errors);
   const hasErrors = errorMessages.length > 0;
 
-  const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
+  // const dateStr = watchedDate ? format(watchedDate, 'yyyy-MM-dd') : '';
+  const dateStr = watchedDate ? formatIST(watchedDate, 'yyyy-MM-dd') : '';
   const watchedDevice = watch('device');
-  const stationParams = useMemo(
-    () => ({
+  // const stationParams = useMemo(
+  //   () => ({
+  //     device,
+  //     date: dateStr,
+  //     startTime: watchedStartTime,
+  //     duration: durationValue,
+  //   }),
+  //   [device, dateStr, watchedStartTime, durationValue],
+  // );
+  const stationParams = useMemo(() => {
+    const params = {
       device,
       date: dateStr,
       startTime: watchedStartTime,
       duration: durationValue,
-    }),
-    [device, dateStr, watchedStartTime, durationValue],
-  );
+    };
+
+    return params;
+  }, [device, dateStr, watchedStartTime, durationValue]);
 
   const debouncedStationParams = useDebouncedValue(stationParams, 400);
   const { data, isLoading: stationsLoading } = useAvailableStations({
@@ -665,7 +678,6 @@ export default function ManualBookingForm({
                             selected={field.value}
                             onSelect={(d) => {
                               field.onChange(d);
-                              setValue('startTime', '');
                             }}
                             disabled={(d) =>
                               d < new Date(new Date().setHours(0, 0, 0, 0))
