@@ -480,6 +480,8 @@ export async function createManualBooking(values: ManualBookingValues) {
 
       other_names: values.otherNames?.length ? values.otherNames : null,
 
+      amount_override: values.amountOverride ?? null,
+
       payment_method: values.paymentMethod,
       session_started_at: values.startNow ? new Date().toISOString() : null,
     })
@@ -551,6 +553,7 @@ export async function updateManualBooking(
       customer_email: values.customerEmail,
 
       other_names: values.otherNames?.length ? values.otherNames : null,
+      amount_override: values.amountOverride ?? null,
       payment_method: values.paymentMethod,
     })
     .eq('id', bookingId);
