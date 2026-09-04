@@ -152,12 +152,34 @@ export function BookingsTable<TData>({
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [statusFilter, setStatusFilter] = useState('all');
   const [paymentFilter, setPaymentFilter] = useState('all');
+  // const tableData = useMemo(() => {
+  //   let rows = data as any[];
+
+  //   if (dateRange?.from) {
+  //     const from = startOfDay(dateRange.from);
+  //     const to = endOfDay(dateRange.to ?? dateRange.from);
+  //     rows = rows.filter((row) =>
+  //       isWithinInterval(parseISO(row.date), { start: from, end: to }),
+  //     );
+  //   }
+
+  //   if (statusFilter !== 'all') {
+  //     rows = rows.filter((row) => row.status === statusFilter);
+  //   }
+
+  //   if (paymentFilter !== 'all') {
+  //     rows = rows.filter((row) => row.payment_status === paymentFilter);
+  //   }
+
+  //   return rows;
+  // }, [data, dateRange, statusFilter, paymentFilter]);
   const tableData = useMemo(() => {
-    let rows = data as any[];
+    let rows = (data as any[]).filter((row) => row.is_group_primary !== false);
 
     if (dateRange?.from) {
       const from = startOfDay(dateRange.from);
       const to = endOfDay(dateRange.to ?? dateRange.from);
+
       rows = rows.filter((row) =>
         isWithinInterval(parseISO(row.date), { start: from, end: to }),
       );
@@ -173,7 +195,6 @@ export function BookingsTable<TData>({
 
     return rows;
   }, [data, dateRange, statusFilter, paymentFilter]);
-
   const tableColumns = useMemo(() => columns, [columns]);
 
   // clear filter button

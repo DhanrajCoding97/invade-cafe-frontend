@@ -23,17 +23,56 @@ import { useProfile } from '@/hooks/use-profile';
 import { useUpdatePhone } from '@/hooks/use-update-phone';
 import { useCafeSettings } from '@/hooks/use-cafe-settings';
 
-async function fetchStationName(stationId: string): Promise<string> {
+// async function fetchStationName(stationId: string): Promise<string> {
+//   const supabase = createClient();
+//   const { data, error } = await supabase
+//     .from('stations')
+//     .select('name')
+//     .eq('id', stationId)
+//     .single();
+//   if (error) throw error;
+//   return data.name;
+// }
+async function fetchStationName(
+  stationId: string,
+  linkedStationId?: string | null,
+): Promise<string> {
   const supabase = createClient();
+
+  // Racing multiplayer uses two physical stations
+  if (linkedStationId) {
+    const { data, error } = await supabase
+      .from('stations')
+      .select('id, name')
+      .in('id', [stationId, linkedStationId]);
+
+    if (error) throw error;
+
+    const stationMap = new Map(
+      (data ?? []).map((station) => [station.id, station.name]),
+    );
+
+    const stationName = stationMap.get(stationId);
+    const linkedStationName = stationMap.get(linkedStationId);
+
+    if (!stationName || !linkedStationName) {
+      throw new Error('One or more stations not found.');
+    }
+
+    return `${stationName} + ${linkedStationName}`;
+  }
+
+  // Normal single station
   const { data, error } = await supabase
     .from('stations')
     .select('name')
     .eq('id', stationId)
     .single();
+
   if (error) throw error;
+
   return data.name;
 }
-
 interface SummaryStepProps {
   session: { id: string } | null;
   onGoogleLogin: () => void;
@@ -70,12 +109,16 @@ export default function SummaryStep({
   const needsPhone = !!session && !profileLoading && !profile?.phone;
 
   //fetch station
+  // const { data: stationName, isLoading } = useQuery({
+  //   queryKey: ['station-name', values.stationId],
+  //   queryFn: () => fetchStationName(values.stationId),
+  //   enabled: !!values.stationId,
+  // });
   const { data: stationName, isLoading } = useQuery({
-    queryKey: ['station-name', values.stationId],
-    queryFn: () => fetchStationName(values.stationId),
+    queryKey: ['station-name', values.stationId, values.linkedStationId],
+    queryFn: () => fetchStationName(values.stationId, values.linkedStationId),
     enabled: !!values.stationId,
   });
-
   const rate = cafeSettings
     ? getDisplayRate({
         device: values.device,

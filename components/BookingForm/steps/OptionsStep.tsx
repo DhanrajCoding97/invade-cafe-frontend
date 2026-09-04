@@ -4,11 +4,13 @@
 import { Controller, useFormContext } from 'react-hook-form';
 import { Field, FieldLabel, FieldError } from '@/components/ui/field';
 import { type BookingFormValues } from '@/lib/schemas/BookingFormSchema';
+import { useCafeSettings } from '@/hooks/use-cafe-settings';
 
 export default function OptionsStep() {
   const { control, watch } = useFormContext<BookingFormValues>();
   const device = watch('device');
-
+  const { data: cafeSettings, isLoading: isSettingsLoading } =
+    useCafeSettings();
   // if (device === 'ps5') {
   //   return (
   //     <Controller
@@ -49,13 +51,36 @@ export default function OptionsStep() {
   //   );
   // }
 
+  // if (device === 'ps5') {
+  //   const OPTIONS = [
+  //     { value: 1, label: '1 Player', rateLabel: '₹100/hr' },
+  //     { value: 2, label: '2 Players', rateLabel: '₹160/hr' },
+  //     { value: 3, label: '3 Players', rateLabel: '₹240/hr' },
+  //     { value: 4, label: '4 Players', rateLabel: '₹300/hr' },
+  //   ] as const;
   if (device === 'ps5') {
     const OPTIONS = [
-      { value: 1, label: '1 Player', rateLabel: '₹100/hr' },
-      { value: 2, label: '2 Players', rateLabel: '₹160/hr' },
-      { value: 3, label: '3 Players', rateLabel: '₹240/hr' },
-      { value: 4, label: '4 Players', rateLabel: '₹300/hr' },
-    ] as const;
+      {
+        value: 1 as const,
+        label: '1 Player',
+        rateLabel: cafeSettings ? `₹${cafeSettings.ps5_rate_1p}/hr` : '—',
+      },
+      {
+        value: 2 as const,
+        label: '2 Players',
+        rateLabel: cafeSettings ? `₹${cafeSettings.ps5_rate_2p}/hr` : '—',
+      },
+      {
+        value: 3 as const,
+        label: '3 Players',
+        rateLabel: cafeSettings ? `₹${cafeSettings.ps5_rate_3p}/hr` : '—',
+      },
+      {
+        value: 4 as const,
+        label: '4 Players',
+        rateLabel: cafeSettings ? `₹${cafeSettings.ps5_rate_4p}/hr` : '—',
+      },
+    ];
 
     return (
       <Controller
@@ -100,12 +125,28 @@ export default function OptionsStep() {
     );
   }
 
+  // if (device === 'racing') {
+  //   const TIERS = [
+  //     { value: 'single', label: 'Single Player', rateLabel: '₹150/hr' },
+  //     { value: 'multiplayer', label: 'Multiplayer', rateLabel: '₹300/hr' },
+  //   ] as const;
   if (device === 'racing') {
     const TIERS = [
-      { value: 'single', label: 'Single Player', rateLabel: '₹150/hr' },
-      { value: 'multiplayer', label: 'Multiplayer', rateLabel: '₹300/hr' },
-    ] as const;
-
+      {
+        value: 'single' as const,
+        label: 'Single Player',
+        rateLabel: cafeSettings
+          ? `₹${cafeSettings.racing_single_rate}/hr`
+          : '—',
+      },
+      {
+        value: 'multiplayer' as const,
+        label: 'Multiplayer',
+        rateLabel: cafeSettings
+          ? `₹${cafeSettings.racing_multiplayer_rate}/hr`
+          : '—',
+      },
+    ];
     return (
       <Controller
         name='tier'

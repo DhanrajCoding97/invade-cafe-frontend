@@ -17,17 +17,56 @@ declare global {
   }
 }
 
-async function fetchStationName(stationId: string): Promise<string> {
+// async function fetchStationName(stationId: string): Promise<string> {
+//   const supabase = createClient();
+//   const { data, error } = await supabase
+//     .from('stations')
+//     .select('name')
+//     .eq('id', stationId)
+//     .single();
+//   if (error) throw error;
+//   return data.name;
+// }
+async function fetchStationName(
+  stationId: string,
+  linkedStationId?: string | null,
+): Promise<string> {
   const supabase = createClient();
+
+  // Racing multiplayer uses two stations
+  if (linkedStationId) {
+    const { data, error } = await supabase
+      .from('stations')
+      .select('id, name')
+      .in('id', [stationId, linkedStationId]);
+
+    if (error) throw error;
+
+    const stationMap = new Map(
+      (data ?? []).map((station) => [station.id, station.name]),
+    );
+
+    const stationName = stationMap.get(stationId);
+    const linkedStationName = stationMap.get(linkedStationId);
+
+    if (!stationName || !linkedStationName) {
+      throw new Error('One or more stations not found.');
+    }
+
+    return `${stationName} + ${linkedStationName}`;
+  }
+
+  // Normal station
   const { data, error } = await supabase
     .from('stations')
     .select('name')
     .eq('id', stationId)
     .single();
+
   if (error) throw error;
+
   return data.name;
 }
-
 function loadRazorpayScript(): Promise<boolean> {
   return new Promise((resolve) => {
     if (window.Razorpay) return resolve(true);
@@ -57,9 +96,14 @@ export default function PaymentStep({
 
   const queryClient = useQueryClient();
 
+  // const { data: stationName, isLoading: stationLoading } = useQuery({
+  //   queryKey: ['station-name', values.stationId],
+  //   queryFn: () => fetchStationName(values.stationId),
+  //   enabled: !!values.stationId,
+  // });
   const { data: stationName, isLoading: stationLoading } = useQuery({
-    queryKey: ['station-name', values.stationId],
-    queryFn: () => fetchStationName(values.stationId),
+    queryKey: ['station-name', values.stationId, values.linkedStationId],
+    queryFn: () => fetchStationName(values.stationId, values.linkedStationId),
     enabled: !!values.stationId,
   });
 
@@ -88,6 +132,7 @@ export default function PaymentStep({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           stationId: values.stationId,
+          linkedStationId: values.linkedStationId,
           device: values.device,
           tier: values.tier,
           players: values.players,

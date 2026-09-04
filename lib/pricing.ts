@@ -56,7 +56,9 @@ export function getDisplayRate({
 }: RateArgs): number {
   switch (device) {
     case 'pc':
-      return settings.pc_rate;
+      return tier === 'multiplayer'
+        ? settings.racing_multiplayer_rate
+        : settings.pc_rate;
 
     case 'vr':
       return settings.psvr_rate;
