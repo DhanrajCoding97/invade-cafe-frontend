@@ -99,6 +99,7 @@ export default function AdminBookingActions({
           mode='edit'
           bookingId={booking.id}
           isOnlineBooking={booking.payment_method === 'razorpay'}
+          previousAmount={booking.amount}
           defaultValues={{
             customerName:
               booking.profiles?.full_name ?? booking.customer_name ?? '',

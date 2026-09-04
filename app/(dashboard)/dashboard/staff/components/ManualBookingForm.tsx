@@ -95,6 +95,7 @@ interface ManualBookingFormProps {
   defaultValues?: Partial<ManualBookingValues>;
   isOnlineBooking?: boolean;
   onSuccess?: (bookingId: string) => void;
+  previousAmount?: number;
 }
 
 /* ------------------------------------------------------------------ */
@@ -165,6 +166,7 @@ export default function ManualBookingForm({
   defaultValues,
   isOnlineBooking,
   onSuccess,
+  previousAmount,
 }: ManualBookingFormProps) {
   const queryClient = useQueryClient();
   const [submitting, setSubmitting] = useState(false);
@@ -883,7 +885,7 @@ export default function ManualBookingForm({
             )}
           />
 
-          <Controller
+          {/* <Controller
             name='amountOverride'
             control={control}
             render={({ field, fieldState }) => (
@@ -915,8 +917,48 @@ export default function ManualBookingForm({
                 )}
               </Field>
             )}
+          /> */}
+          <Controller
+            name='amountOverride'
+            control={control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor='amountOverride' className={microLabel}>
+                  Override amount (₹)
+                </FieldLabel>
+                <Input
+                  id='amountOverride'
+                  aria-invalid={fieldState.invalid}
+                  type='number'
+                  inputMode='decimal'
+                  value={field.value ?? ''}
+                  onChange={(e) => {
+                    const val = e.target.valueAsNumber;
+                    field.onChange(Number.isNaN(val) ? undefined : val);
+                  }}
+                  onBlur={field.onBlur}
+                  name={field.name}
+                  ref={field.ref}
+                  disabled={
+                    paymentMethod === 'complimentary' || lockStructuralFields
+                  }
+                  placeholder={String(computedTotal)}
+                  className={cn(fieldCls, 'font-mono')}
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
           />
-
+          {mode === 'edit' &&
+            previousAmount !== undefined &&
+            previousAmount !== computedTotal && (
+              <p className='text-[10px] text-amber-400/70 font-mono'>
+                Previous charge was ₹{previousAmount}. Re-enter an override if
+                this booking included add-ons.
+              </p>
+            )}
           <Controller
             name='notes'
             control={control}
