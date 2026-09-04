@@ -1,6 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import {
   Field,
@@ -252,22 +252,22 @@ export default function ManualBookingForm({
     !stationsLoading && stationsForDevice.length === 0;
 
   const selectedStation = stationsForDevice.find((s) => s.id === stationId);
+  const rate = cafeSettings
+    ? getDisplayRate({
+        device,
+        players: playersValue,
+        tier,
+        fallbackRate: selectedStation?.hourly_rate ?? 0,
+        settings: cafeSettings,
+      })
+    : 0;
 
-  const rate =
-    selectedStation && cafeSettings
-      ? getDisplayRate({
-          device,
-          players: playersValue,
-          tier,
-          fallbackRate: selectedStation.hourly_rate,
-          settings: cafeSettings,
-        })
-      : 0;
   const computedTotal = calculateTotal(rate, durationValue);
+
   const displayTotal =
     paymentMethod === 'complimentary'
       ? 0
-      : rawAmountOverride !== undefined
+      : rawAmountOverride != null
         ? rawAmountOverride
         : computedTotal;
 
@@ -306,13 +306,6 @@ export default function ManualBookingForm({
     }
   }
 
-  useEffect(() => {
-    if (mode === 'edit') {
-      console.log('edit dialog opened');
-      console.log(watch('amountOverride'));
-    }
-  }, [mode]);
-
   //set other Names value
   useEffect(() => {
     const count = Math.max(playersValue - 1, 0);
@@ -345,6 +338,46 @@ export default function ManualBookingForm({
       setValue('tier', undefined);
     }
   }, [device, tier, setValue]);
+  const previousPricingConfig = useRef<{
+    device: typeof device;
+    players: number;
+    tier: typeof tier;
+    duration: number;
+  } | null>(null);
+
+  useEffect(() => {
+    const currentConfig = {
+      device,
+      players: playersValue,
+      tier,
+      duration: durationValue,
+    };
+
+    // First run = form initialization.
+    // Keep the backend amountOverride untouched.
+    if (previousPricingConfig.current === null) {
+      previousPricingConfig.current = currentConfig;
+      return;
+    }
+
+    const previous = previousPricingConfig.current;
+
+    const pricingChanged =
+      previous.device !== currentConfig.device ||
+      previous.players !== currentConfig.players ||
+      previous.tier !== currentConfig.tier ||
+      previous.duration !== currentConfig.duration;
+
+    if (pricingChanged) {
+      setValue('amountOverride', computedTotal, {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+
+    previousPricingConfig.current = currentConfig;
+  }, [device, playersValue, tier, durationValue, computedTotal, setValue]);
+
   // useEffect(() => {
   //   if (device === 'ps5') {
   //     setValue('tier', undefined);
@@ -884,40 +917,7 @@ export default function ManualBookingForm({
               </Field>
             )}
           />
-
-          {/* <Controller
-            name='amountOverride'
-            control={control}
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor='amountOverride' className={microLabel}>
-                  Override amount (₹)
-                </FieldLabel>
-                <Input
-                  id='amountOverride'
-                  aria-invalid={fieldState.invalid}
-                  type='number'
-                  inputMode='decimal'
-                  value={field.value ?? ''}
-                  onChange={(e) => {
-                    const val = e.target.valueAsNumber;
-                    field.onChange(Number.isNaN(val) ? 0 : val);
-                  }}
-                  onBlur={field.onBlur}
-                  name={field.name}
-                  ref={field.ref}
-                  disabled={
-                    paymentMethod === 'complimentary' || lockStructuralFields
-                  }
-                  placeholder={String(computedTotal)}
-                  className={cn(fieldCls, 'font-mono')}
-                />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          /> */}
+          {/* amountOverride Controller */}
           <Controller
             name='amountOverride'
             control={control}
@@ -926,25 +926,23 @@ export default function ManualBookingForm({
                 <FieldLabel htmlFor='amountOverride' className={microLabel}>
                   Override amount (₹)
                 </FieldLabel>
+
                 <Input
                   id='amountOverride'
-                  aria-invalid={fieldState.invalid}
                   type='number'
                   inputMode='decimal'
+                  aria-invalid={fieldState.invalid}
                   value={field.value ?? ''}
                   onChange={(e) => {
-                    const val = e.target.valueAsNumber;
-                    field.onChange(Number.isNaN(val) ? undefined : val);
+                    const value = e.target.value;
+
+                    field.onChange(value === '' ? null : Number(value));
                   }}
                   onBlur={field.onBlur}
                   name={field.name}
                   ref={field.ref}
-                  disabled={
-                    paymentMethod === 'complimentary' || lockStructuralFields
-                  }
-                  placeholder={String(computedTotal)}
-                  className={cn(fieldCls, 'font-mono')}
                 />
+
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
                 )}

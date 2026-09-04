@@ -114,6 +114,7 @@ export interface BookingRow {
   players: number;
 
   amount: number;
+  amount_override: number | null;
 
   payment_method: 'cash' | 'upi_manual' | 'razorpay' | 'complimentary' | null;
 

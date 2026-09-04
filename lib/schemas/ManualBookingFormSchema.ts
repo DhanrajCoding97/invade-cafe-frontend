@@ -40,7 +40,8 @@ export const manualBookingSchema = z
 
     paymentMethod: z.enum(['cash', 'upi_manual', 'complimentary']),
 
-    amountOverride: z.number().min(0).optional(),
+    // amountOverride: z.number().min(0).optional(),
+    amountOverride: z.number().min(0).nullable().optional(),
 
     notes: z.string().max(300).optional(),
   })
