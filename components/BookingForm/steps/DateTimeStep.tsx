@@ -136,7 +136,7 @@ export default function DateTimeStep() {
         return hour * 60 + minute;
       })()
     : 0;
-  const PLAY_NOW_BUFFER = 10; // minutes of operational slack before close
+  const PLAY_NOW_BUFFER = 15;
 
   //custom time slots
   const customTimeConflict =
@@ -184,7 +184,7 @@ export default function DateTimeStep() {
   const cafeIsOpenNow =
     nowMinutes >= OPEN_MINUTES && nowMinutes < CLOSE_MINUTES;
   const playNowFits =
-    nowMinutes + duration * 60 < CLOSE_MINUTES - PLAY_NOW_BUFFER;
+    nowMinutes + duration * 60 <= CLOSE_MINUTES + PLAY_NOW_BUFFER;
 
   const playNowConflict = hasConflictMinutes(
     nowString,
@@ -193,6 +193,24 @@ export default function DateTimeStep() {
     bookings,
   );
   const canPlayNow = today && cafeIsOpenNow && playNowFits && !playNowConflict;
+
+  const LAST_MINUTE_START = CLOSE_MINUTES - 60;
+  const LAST_MINUTE_END = CLOSE_MINUTES - 45;
+
+  const isLastMinuteWindow =
+    today && nowMinutes >= LAST_MINUTE_START && nowMinutes < LAST_MINUTE_END;
+
+  const formatMinutesToTime = (minutes: number) => {
+    const hour = Math.floor(minutes / 60);
+    const minute = minutes % 60;
+
+    const period = hour >= 12 ? 'PM' : 'AM';
+    const displayHour = hour % 12 || 12;
+
+    return `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`;
+  };
+
+  const lastMinuteEndString = formatMinutesToTime(LAST_MINUTE_END);
 
   useEffect(() => {
     const lenis = getLenisInstance();
@@ -319,9 +337,14 @@ export default function DateTimeStep() {
                     ].join(' ')}
                   >
                     <Zap className='h-4 w-4' />
-                    {canPlayNow
+                    {/* {canPlayNow
                       ? `Play now — starts ${nowString}`
-                      : 'Play now unavailable'}
+                      : 'Play now unavailable'} */}
+                    {isLastMinuteWindow
+                      ? `Last-minute session available until ${lastMinuteEndString}`
+                      : canPlayNow
+                        ? `Play now — starts ${nowString}`
+                        : 'Play now unavailable'}
                   </button>
                 )}
 
