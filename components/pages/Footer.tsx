@@ -132,7 +132,7 @@ export function Footer() {
             </div>
           </div>
         </CardsReveal>
-        <LineReveal triggerRef={sectionRef} delay={0.5}>
+        <LineReveal triggerRef={sectionRef} delay={1.4}>
           <div className='mt-12 flex flex-col gap-3 border-t border-neon-cyan/15 pt-6 text-xs text-[#bcbcbc] sm:flex-row sm:items-center sm:justify-between'>
             <p>
               © {new Date().getFullYear()} Invade Gaming Cafe. All rights

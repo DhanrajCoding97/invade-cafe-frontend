@@ -17,7 +17,6 @@ export function parseISTDateTime(dateStr: string, timeStr: string): Date {
 
   return new Date(`${dateStr}T${normalizedTime}+05:30`);
 }
-
 export function formatIST(date: Date, formatStr: string): string {
   return formatInTimeZone(date, IST, formatStr);
 }

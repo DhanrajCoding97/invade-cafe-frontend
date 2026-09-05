@@ -97,7 +97,7 @@ export function PushNotificationToggle() {
     <button
       onClick={handleEnable}
       disabled={loading}
-      className='group p-2 flex items-center gap-2 border border-gray-500 text-base text-gray-500 disabled:opacity-50'
+      className='cursor-pointer group p-2 flex items-center gap-2 border border-gray-500 text-base text-gray-500 disabled:opacity-50'
     >
       {loading ? 'Enabling...' : 'Enable push notifications'}
       <BellIcon className='h-4.5 w-4.5 group-hover:motion-preset-seesaw-lg' />

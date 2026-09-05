@@ -26,6 +26,8 @@ export const manualBookingSchema = z
 
     stationId: z.string().min(1, 'Select a station'),
 
+    linkedStationId: z.string().check(z.uuid()).nullable().optional(),
+
     duration: z.number().min(1),
 
     players: z.number().int().min(1).max(4).optional(),

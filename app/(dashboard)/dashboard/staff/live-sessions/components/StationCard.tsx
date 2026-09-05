@@ -17,21 +17,7 @@ import { Loader2, Trash2Icon } from 'lucide-react';
 import { markNoShow } from '@/app/actions/bookings';
 import CountdownTicker from '../../../components/stations/CountdownTicker';
 import { cn } from '@/lib/utils';
-
-type Booking = {
-  id: string;
-  station_id: string;
-  date: string;
-  start_time: string;
-  duration_hours: string | number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  session_started_at: string | null;
-  session_ended_at: string | null;
-  extended_until: string | null;
-  customer_name: string | null;
-  device: string;
-  profiles: { full_name: string } | null;
-};
+import { type Booking } from '@/types';
 
 type Station = { id: string; name: string; type: string };
 
@@ -227,7 +213,7 @@ export function StationCard({
           {!booking && (
             <span className='h-1.5 w-1.5 shrink-0 rounded-full bg-white/20' />
           )}
-          <span className='truncate text-sm font-semibold tracking-wide text-neutral-100'>
+          <span className='break-all text-sm font-semibold tracking-wide text-neutral-100'>
             {station.name}
           </span>
           {booking?.device === 'vr' && (

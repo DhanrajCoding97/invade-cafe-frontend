@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { custom, z } from 'zod';
 
 export const bookingSchema = z
   .object({
@@ -9,18 +9,19 @@ export const bookingSchema = z
     duration: z.number().min(1),
     players: z.number().min(1).max(4).optional(),
     tier: z.enum(['single', 'multiplayer']).optional(),
+    linkedStationId: z.string().check(z.uuid()).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     if (data.device === 'ps5' && !data.players) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['players'],
         message: 'Select number of players',
       });
     }
     if (data.device === 'racing' && !data.tier) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
+        code: 'custom',
         path: ['tier'],
         message: 'Select a mode',
       });
