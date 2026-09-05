@@ -13,227 +13,227 @@ import {
 import { revalidatePath } from 'next/cache';
 import { sendPushToStaffAndOwners } from '@/lib/push-notifications/send-push';
 
-export async function startSession(bookingId: string) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from('bookings')
-    .update({ session_started_at: new Date().toISOString() })
-    .eq('id', bookingId);
-
-  if (error) throw new Error(error.message);
-  revalidatePath('/dashboard/staff');
-}
-
 export async function getRpc() {
   const supabase = await createClient();
 
   const { data, error } = await supabase.rpc('get_my_role');
 }
 
-export async function endSession(bookingId: string) {
-  const supabase = await createClient();
+// export async function startSession(bookingId: string) {
+//   const supabase = await createClient();
 
-  // 1. Get the booking and station name before updating it
-  const { data: booking, error: bookingError } = await supabase
-    .from('bookings')
-    .select(
-      `
-      id,
-      station_id,
-      status,
-      stations (
-        name
-      )
-    `,
-    )
-    .eq('id', bookingId)
-    .single();
+//   const { data, error } = await supabase
+//     .from('bookings')
+//     .update({ session_started_at: new Date().toISOString() })
+//     .eq('id', bookingId);
 
-  if (bookingError) {
-    throw new Error(bookingError.message);
-  }
+//   if (error) throw new Error(error.message);
+//   revalidatePath('/dashboard/staff');
+// }
 
-  if (!booking) {
-    throw new Error('Booking not found');
-  }
+// export async function endSession(bookingId: string) {
+//   const supabase = await createClient();
 
-  // Prevent ending an already completed/cancelled booking
-  if (booking.status === 'completed') {
-    throw new Error('Session has already ended');
-  }
+//   // 1. Get the booking and station name before updating it
+//   const { data: booking, error: bookingError } = await supabase
+//     .from('bookings')
+//     .select(
+//       `
+//       id,
+//       station_id,
+//       status,
+//       stations (
+//         name
+//       )
+//     `,
+//     )
+//     .eq('id', bookingId)
+//     .single();
 
-  if (booking.status === 'cancelled') {
-    throw new Error('Cannot end a cancelled booking');
-  }
+//   if (bookingError) {
+//     throw new Error(bookingError.message);
+//   }
 
-  // Supabase relation can be an object or array depending on relationship
-  const station = Array.isArray(booking.stations)
-    ? booking.stations[0]
-    : booking.stations;
+//   if (!booking) {
+//     throw new Error('Booking not found');
+//   }
 
-  const stationName = station?.name ?? 'Station';
+//   // Prevent ending an already completed/cancelled booking
+//   if (booking.status === 'completed') {
+//     throw new Error('Session has already ended');
+//   }
 
-  // 2. End the session
-  const { error: updateError } = await supabase
-    .from('bookings')
-    .update({
-      session_ended_at: new Date().toISOString(),
-      status: 'completed',
-    })
-    .eq('id', bookingId);
+//   if (booking.status === 'cancelled') {
+//     throw new Error('Cannot end a cancelled booking');
+//   }
 
-  if (updateError) {
-    throw new Error(updateError.message);
-  }
+//   // Supabase relation can be an object or array depending on relationship
+//   const station = Array.isArray(booking.stations)
+//     ? booking.stations[0]
+//     : booking.stations;
 
-  // 3. Notify staff + owners
-  // Don't fail the session-ending operation if push notification fails.
-  try {
-    await sendPushToStaffAndOwners({
-      title: 'Session ended',
-      body: `${stationName} — session has ended`,
-      url: '/dashboard/staff',
-    });
-  } catch (error) {
-    console.error('Failed to send session-ended push notification:', error);
-  }
+//   const stationName = station?.name ?? 'Station';
 
-  // 4. Refresh the staff dashboard
-  revalidatePath('/dashboard/staff');
+//   // 2. End the session
+//   const { error: updateError } = await supabase
+//     .from('bookings')
+//     .update({
+//       session_ended_at: new Date().toISOString(),
+//       status: 'completed',
+//     })
+//     .eq('id', bookingId);
 
-  return {
-    success: true,
-  };
-}
+//   if (updateError) {
+//     throw new Error(updateError.message);
+//   }
 
-export async function extendSession(
-  bookingId: string,
-  stationId: string,
-  minutes: number,
-) {
-  const supabase = await createClient();
+//   // 3. Notify staff + owners
+//   // Don't fail the session-ending operation if push notification fails.
+//   try {
+//     await sendPushToStaffAndOwners({
+//       title: 'Session ended',
+//       body: `${stationName} — session has ended`,
+//       url: '/dashboard/staff',
+//     });
+//   } catch (error) {
+//     console.error('Failed to send session-ended push notification:', error);
+//   }
 
-  const { data: booking, error: fetchError } = await supabase
-    .from('bookings')
-    .select(
-      'device, extended_until, session_started_at, duration_hours, date, players, tier',
-    )
-    .eq('id', bookingId)
-    .single();
+//   // 4. Refresh the staff dashboard
+//   revalidatePath('/dashboard/staff');
 
-  if (fetchError || !booking) throw new Error('Booking not found');
-  if (!booking.session_started_at)
-    throw new Error('Session has not started yet');
+//   return {
+//     success: true,
+//   };
+// }
 
-  const actualEnd = new Date(booking.session_started_at);
-  actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
-  const currentEnd = booking.extended_until
-    ? new Date(booking.extended_until)
-    : actualEnd;
-  const newEnd = new Date(currentEnd.getTime() + minutes * 60_000);
+// export async function extendSession(
+//   bookingId: string,
+//   stationId: string,
+//   minutes: number,
+// ) {
+//   const supabase = await createClient();
 
-  let hasConflict = false;
-  let conflictReason = 'Station is booked right after — cannot extend.';
+//   const { data: booking, error: fetchError } = await supabase
+//     .from('bookings')
+//     .select(
+//       'device, extended_until, session_started_at, duration_hours, date, players, tier',
+//     )
+//     .eq('id', bookingId)
+//     .single();
 
-  if (booking.device === 'vr') {
-    // VR is one shared headset across every PS5 — check it globally,
-    // not just against this station's own bookings.
-    const { data: vrData, error: vrError } = await supabase.rpc(
-      'get_vr_conflict_after',
-      {
-        p_date: booking.date,
-        p_after: currentEnd.toISOString(),
-        p_new_end: newEnd.toISOString(),
-        p_exclude_booking_id: bookingId,
-      },
-    );
-    if (vrError) throw new Error(vrError.message);
+//   if (fetchError || !booking) throw new Error('Booking not found');
+//   if (!booking.session_started_at)
+//     throw new Error('Session has not started yet');
 
-    hasConflict = !!vrData?.[0]?.conflict_start;
-    conflictReason =
-      'VR is booked right after on another station — cannot extend.';
-  } else {
-    const { data: conflicts, error: conflictError } = await supabase
-      .from('bookings')
-      .select('id, start_time')
-      .eq('station_id', stationId)
-      .eq('date', booking.date)
-      .in('status', ['confirmed'])
-      .neq('id', bookingId);
+//   const actualEnd = new Date(booking.session_started_at);
+//   actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
+//   const currentEnd = booking.extended_until
+//     ? new Date(booking.extended_until)
+//     : actualEnd;
+//   const newEnd = new Date(currentEnd.getTime() + minutes * 60_000);
 
-    if (conflictError) throw new Error(conflictError.message);
+//   let hasConflict = false;
+//   let conflictReason = 'Station is booked right after — cannot extend.';
 
-    hasConflict =
-      conflicts?.some((c) => {
-        const nextStart = new Date(`${booking.date}T${c.start_time}`);
-        return nextStart < newEnd;
-      }) ?? false;
-  }
+//   if (booking.device === 'vr') {
+//     // VR is one shared headset across every PS5 — check it globally,
+//     // not just against this station's own bookings.
+//     const { data: vrData, error: vrError } = await supabase.rpc(
+//       'get_vr_conflict_after',
+//       {
+//         p_date: booking.date,
+//         p_after: currentEnd.toISOString(),
+//         p_new_end: newEnd.toISOString(),
+//         p_exclude_booking_id: bookingId,
+//       },
+//     );
+//     if (vrError) throw new Error(vrError.message);
 
-  if (hasConflict) {
-    return { ok: false as const, reason: conflictReason };
-  }
+//     hasConflict = !!vrData?.[0]?.conflict_start;
+//     conflictReason =
+//       'VR is booked right after on another station — cannot extend.';
+//   } else {
+//     const { data: conflicts, error: conflictError } = await supabase
+//       .from('bookings')
+//       .select('id, start_time')
+//       .eq('station_id', stationId)
+//       .eq('date', booking.date)
+//       .in('status', ['confirmed'])
+//       .neq('id', bookingId);
 
-  const { error: updateError } = await supabase
-    .from('bookings')
-    .update({ extended_until: newEnd.toISOString() })
-    .eq('id', bookingId);
+//     if (conflictError) throw new Error(conflictError.message);
 
-  if (updateError) {
-    // Belt-and-suspenders: our manual pre-check above can race with
-    // another extend/booking happening at the same instant. The DB's
-    // exclusion constraint is the real guard — this just gives a clean
-    // message instead of a raw Postgres error if that race is ever hit.
-    if (updateError.code === '23P01') {
-      return {
-        ok: false as const,
-        reason:
-          booking.device === 'vr'
-            ? 'VR is booked right after on another station — cannot extend.'
-            : 'Station is booked right after — cannot extend.',
-      };
-    }
-    throw new Error(updateError.message);
-  }
+//     hasConflict =
+//       conflicts?.some((c) => {
+//         const nextStart = new Date(`${booking.date}T${c.start_time}`);
+//         return nextStart < newEnd;
+//       }) ?? false;
+//   }
 
-  const resolvedTier = resolveExtensionTier(
-    booking.device,
-    booking.players,
-    booking.tier,
-  );
+//   if (hasConflict) {
+//     return { ok: false as const, reason: conflictReason };
+//   }
 
-  const { data: priceRow, error: priceError } = await supabase
-    .from('extension_pricing')
-    .select('price')
-    .eq('device', booking.device)
-    .eq('tier', resolvedTier)
-    .eq('duration_minutes', minutes)
-    .maybeSingle();
+//   const { error: updateError } = await supabase
+//     .from('bookings')
+//     .update({ extended_until: newEnd.toISOString() })
+//     .eq('id', bookingId);
 
-  if (priceError) throw new Error(priceError.message);
+//   if (updateError) {
+//     // Belt-and-suspenders: our manual pre-check above can race with
+//     // another extend/booking happening at the same instant. The DB's
+//     // exclusion constraint is the real guard — this just gives a clean
+//     // message instead of a raw Postgres error if that race is ever hit.
+//     if (updateError.code === '23P01') {
+//       return {
+//         ok: false as const,
+//         reason:
+//           booking.device === 'vr'
+//             ? 'VR is booked right after on another station — cannot extend.'
+//             : 'Station is booked right after — cannot extend.',
+//       };
+//     }
+//     throw new Error(updateError.message);
+//   }
 
-  if (!priceRow) {
-    console.warn(
-      `No extension price found for device=${booking.device} tier=${resolvedTier} minutes=${minutes}`,
-    );
-  }
+//   const resolvedTier = resolveExtensionTier(
+//     booking.device,
+//     booking.players,
+//     booking.tier,
+//   );
 
-  const amount = priceRow?.price ?? 0;
+//   const { data: priceRow, error: priceError } = await supabase
+//     .from('extension_pricing')
+//     .select('price')
+//     .eq('device', booking.device)
+//     .eq('tier', resolvedTier)
+//     .eq('duration_minutes', minutes)
+//     .maybeSingle();
 
-  const { error: insertError } = await supabase
-    .from('session_extensions')
-    .insert({
-      booking_id: bookingId,
-      minutes,
-      amount,
-      payment_status: 'pending',
-    });
+//   if (priceError) throw new Error(priceError.message);
 
-  if (insertError) throw new Error(insertError.message);
+//   if (!priceRow) {
+//     console.warn(
+//       `No extension price found for device=${booking.device} tier=${resolvedTier} minutes=${minutes}`,
+//     );
+//   }
 
-  return { ok: true as const, amountDue: amount };
-}
+//   const amount = priceRow?.price ?? 0;
+
+//   const { error: insertError } = await supabase
+//     .from('session_extensions')
+//     .insert({
+//       booking_id: bookingId,
+//       minutes,
+//       amount,
+//       payment_status: 'pending',
+//     });
+
+//   if (insertError) throw new Error(insertError.message);
+
+//   return { ok: true as const, amountDue: amount };
+// }
 
 // export async function extendSession(
 //   bookingId: string,
@@ -412,6 +412,232 @@ export async function extendSession(
 
 //   return { ok: true as const, amountDue: amount };
 // }
+export async function startSession(
+  bookingId: string,
+  linkedBookingId?: string,
+) {
+  const supabase = await createClient();
+  const ids = linkedBookingId ? [bookingId, linkedBookingId] : [bookingId];
+
+  const { error } = await supabase
+    .from('bookings')
+    .update({ session_started_at: new Date().toISOString() })
+    .in('id', ids);
+
+  if (error) throw new Error(error.message);
+  revalidatePath('/dashboard/staff');
+}
+
+export async function endSession(bookingId: string, linkedBookingId?: string) {
+  const supabase = await createClient();
+  const ids = linkedBookingId ? [bookingId, linkedBookingId] : [bookingId];
+
+  const { data: rows, error: bookingError } = await supabase
+    .from('bookings')
+    .select(`id, status, stations ( name )`)
+    .in('id', ids);
+
+  if (bookingError) throw new Error(bookingError.message);
+  if (!rows || rows.length === 0) throw new Error('Booking not found');
+
+  const primary = rows.find((r) => r.id === bookingId) ?? rows[0];
+  if (primary.status === 'completed')
+    throw new Error('Session has already ended');
+  if (primary.status === 'cancelled')
+    throw new Error('Cannot end a cancelled booking');
+
+  const stationLabel = rows
+    .map((r) => {
+      const station = Array.isArray(r.stations) ? r.stations[0] : r.stations;
+      return station?.name ?? 'Station';
+    })
+    .join(' + ');
+
+  const { error: updateError } = await supabase
+    .from('bookings')
+    .update({ session_ended_at: new Date().toISOString(), status: 'completed' })
+    .in('id', ids);
+
+  if (updateError) throw new Error(updateError.message);
+
+  try {
+    await sendPushToStaffAndOwners({
+      title: 'Session ended',
+      body: `${stationLabel} — session has ended`,
+      url: '/dashboard/staff',
+    });
+  } catch (error) {
+    console.error('Failed to send session-ended push notification:', error);
+  }
+
+  revalidatePath('/dashboard/staff');
+  return { success: true };
+}
+
+async function extendSingleStation(
+  supabase: any,
+  bookingId: string,
+  stationId: string,
+  minutes: number,
+) {
+  const { data: booking, error: fetchError } = await supabase
+    .from('bookings')
+    .select(
+      'device, extended_until, session_started_at, duration_hours, date, players, tier',
+    )
+    .eq('id', bookingId)
+    .single();
+
+  if (fetchError || !booking)
+    return { ok: false as const, reason: 'Booking not found' };
+  if (!booking.session_started_at)
+    return { ok: false as const, reason: 'Session has not started yet' };
+
+  const actualEnd = new Date(booking.session_started_at);
+  actualEnd.setHours(actualEnd.getHours() + Number(booking.duration_hours));
+  const currentEnd = booking.extended_until
+    ? new Date(booking.extended_until)
+    : actualEnd;
+  const newEnd = new Date(currentEnd.getTime() + minutes * 60_000);
+
+  let hasConflict = false;
+  let conflictReason = 'Station is booked right after — cannot extend.';
+
+  if (booking.device === 'vr') {
+    const { data: vrData, error: vrError } = await supabase.rpc(
+      'get_vr_conflict_after',
+      {
+        p_date: booking.date,
+        p_after: currentEnd.toISOString(),
+        p_new_end: newEnd.toISOString(),
+        p_exclude_booking_id: bookingId,
+      },
+    );
+    if (vrError) return { ok: false as const, reason: vrError.message };
+    hasConflict = !!vrData?.[0]?.conflict_start;
+    conflictReason =
+      'VR is booked right after on another station — cannot extend.';
+  } else {
+    const { data: conflicts, error: conflictError } = await supabase
+      .from('bookings')
+      .select('id, start_time')
+      .eq('station_id', stationId)
+      .eq('date', booking.date)
+      .in('status', ['confirmed'])
+      .neq('id', bookingId);
+
+    if (conflictError)
+      return { ok: false as const, reason: conflictError.message };
+
+    hasConflict =
+      conflicts?.some((c: any) => {
+        const nextStart = new Date(`${booking.date}T${c.start_time}`);
+        return nextStart < newEnd;
+      }) ?? false;
+  }
+
+  if (hasConflict) return { ok: false as const, reason: conflictReason };
+
+  const { error: updateError } = await supabase
+    .from('bookings')
+    .update({ extended_until: newEnd.toISOString() })
+    .eq('id', bookingId);
+
+  if (updateError) {
+    if (updateError.code === '23P01') {
+      return {
+        ok: false as const,
+        reason:
+          booking.device === 'vr'
+            ? 'VR is booked right after on another station — cannot extend.'
+            : 'Station is booked right after — cannot extend.',
+      };
+    }
+    return { ok: false as const, reason: updateError.message };
+  }
+
+  return {
+    ok: true as const,
+    previousExtendedUntil: booking.extended_until as string | null,
+    device: booking.device as string,
+    players: booking.players as number,
+    tier: booking.tier as string | null,
+  };
+}
+
+export async function extendSession(
+  bookingId: string,
+  stationId: string,
+  minutes: number,
+  linkedBookingId?: string,
+  linkedStationId?: string,
+) {
+  const supabase = await createClient();
+
+  const primary = await extendSingleStation(
+    supabase,
+    bookingId,
+    stationId,
+    minutes,
+  );
+  if (!primary.ok) return { ok: false as const, reason: primary.reason };
+
+  if (linkedBookingId && linkedStationId) {
+    const secondary = await extendSingleStation(
+      supabase,
+      linkedBookingId,
+      linkedStationId,
+      minutes,
+    );
+    if (!secondary.ok) {
+      // Roll back the primary so the two stations' clocks don't drift apart.
+      await supabase
+        .from('bookings')
+        .update({ extended_until: primary.previousExtendedUntil })
+        .eq('id', bookingId);
+      return { ok: false as const, reason: secondary.reason };
+    }
+  }
+
+  const resolvedTier = resolveExtensionTier(
+    primary.device,
+    primary.players,
+    primary.tier,
+  );
+
+  const { data: priceRow, error: priceError } = await supabase
+    .from('extension_pricing')
+    .select('price')
+    .eq('device', primary.device)
+    .eq('tier', resolvedTier)
+    .eq('duration_minutes', minutes)
+    .maybeSingle();
+
+  if (priceError) throw new Error(priceError.message);
+
+  if (!priceRow) {
+    console.warn(
+      `No extension price found for device=${primary.device} tier=${resolvedTier} minutes=${minutes}`,
+    );
+  }
+
+  const amount = priceRow?.price ?? 0;
+
+  // Charged once, against the primary row only — matches the same
+  // one-payment-per-group model your booking creation already uses.
+  const { error: insertError } = await supabase
+    .from('session_extensions')
+    .insert({
+      booking_id: bookingId,
+      minutes,
+      amount,
+      payment_status: 'pending',
+    });
+
+  if (insertError) throw new Error(insertError.message);
+
+  return { ok: true as const, amountDue: amount };
+}
 
 export async function markExtensionPaid(extensionId: string) {
   const { user } = await requireRole(['owner', 'staff']);

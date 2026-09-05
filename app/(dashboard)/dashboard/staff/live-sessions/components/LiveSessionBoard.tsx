@@ -17,27 +17,82 @@ import { toast } from 'sonner';
 import { PushNotificationToggle } from './PushNotificationToggle';
 import { cn } from '@/lib/utils';
 import { useRealtimeSessionBoard } from '@/hooks/use-realtime-session-board';
-
+import { type Booking } from '@/types';
 function getTimeLeft(endIso: string) {
   return Math.max(
     0,
     Math.round((new Date(endIso).getTime() - Date.now()) / 60_000),
   );
 }
-export type Booking = {
-  id: string;
-  station_id: string;
-  date: string;
-  start_time: string;
-  duration_hours: string | number;
-  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
-  session_started_at: string | null;
-  session_ended_at: string | null;
-  extended_until: string | null;
-  customer_name: string | null;
-  device: string;
-  profiles: { full_name: string } | null;
+
+type DisplayUnit = {
+  key: string;
+  station: Station;
+  booking: Booking | undefined;
+  linkedBookingId?: string;
+  linkedStationId?: string;
 };
+
+function buildDisplayUnits(
+  stationsList: Station[],
+  bookings: Booking[],
+): DisplayUnit[] {
+  const currentBookingFor = (stationId: string) =>
+    bookings
+      .filter((b) => b.station_id === stationId && b.status === 'confirmed')
+      .sort((a, b) => a.start_time.localeCompare(b.start_time))[0];
+
+  const seen = new Set<string>();
+  const units: DisplayUnit[] = [];
+
+  for (const station of stationsList) {
+    if (seen.has(station.id)) continue;
+    const booking = currentBookingFor(station.id);
+
+    if (booking?.group_id) {
+      const partnerBooking = bookings.find(
+        (b) => b.group_id === booking.group_id && b.id !== booking.id,
+      );
+      const partnerStation = partnerBooking
+        ? stationsList.find((s) => s.id === partnerBooking.station_id)
+        : undefined;
+
+      if (partnerBooking && partnerStation) {
+        seen.add(station.id);
+        seen.add(partnerStation.id);
+
+        const primaryBooking = booking.is_group_primary
+          ? booking
+          : partnerBooking;
+        const secondaryBooking = booking.is_group_primary
+          ? partnerBooking
+          : booking;
+        const primaryStation = booking.is_group_primary
+          ? station
+          : partnerStation;
+        const secondaryStation = booking.is_group_primary
+          ? partnerStation
+          : station;
+
+        const [nameA, nameB] = [station.name, partnerStation.name].sort();
+
+        units.push({
+          key: booking.group_id,
+          station: { ...primaryStation, name: `${nameA} + ${nameB}` },
+          booking: primaryBooking,
+          linkedBookingId: secondaryBooking.id,
+          linkedStationId: secondaryStation.id,
+        });
+        continue;
+      }
+    }
+
+    seen.add(station.id);
+    units.push({ key: station.id, station, booking });
+  }
+
+  return units;
+}
 
 type Station = { id: string; name: string; type: string };
 
@@ -117,9 +172,55 @@ export default function LiveSessionBoard({
       return next;
     });
   }
-  function handleStart(booking: Booking) {
+  // function handleStart(booking: Booking) {
+  //   addPending(booking.id);
+  //   const promise = startSession(booking.id).finally(() =>
+  //     removePending(booking.id),
+  //   );
+  //   toast.promise(promise, {
+  //     loading: 'Starting session…',
+  //     success: 'Session started',
+  //     error: (err) =>
+  //       err instanceof Error ? err.message : 'Failed to start session',
+  //   });
+  // }
+
+  // async function handleEnd(booking: Booking) {
+  //   addPending(booking.id);
+
+  //   try {
+  //     await toast.promise(endSession(booking.id), {
+  //       loading: 'Ending session...',
+  //       success: 'Session ended',
+  //       error: (err) =>
+  //         err instanceof Error ? err.message : 'Failed to end session',
+  //     });
+  //   } finally {
+  //     removePending(booking.id);
+  //   }
+  // }
+
+  // function handleExtend(booking: Booking, stationId: string, minutes: number) {
+  //   addPending(booking.id);
+  //   const promise = extendSession(booking.id, stationId, minutes)
+  //     .then((res) => {
+  //       if (!res.ok) throw new Error(res.reason);
+  //       return res;
+  //     })
+  //     .finally(() => removePending(booking.id));
+
+  //   toast.promise(promise, {
+  //     loading: 'Extending session…',
+  //     success: (res: any) =>
+  //       `Extended by ${minutes} min — ₹${res.amountDue} due`,
+  //     error: (err) =>
+  //       err instanceof Error ? err.message : 'Failed to extend session',
+  //   });
+  // }
+
+  function handleStart(booking: Booking, linkedBookingId?: string) {
     addPending(booking.id);
-    const promise = startSession(booking.id).finally(() =>
+    const promise = startSession(booking.id, linkedBookingId).finally(() =>
       removePending(booking.id),
     );
     toast.promise(promise, {
@@ -130,11 +231,10 @@ export default function LiveSessionBoard({
     });
   }
 
-  async function handleEnd(booking: Booking) {
+  async function handleEnd(booking: Booking, linkedBookingId?: string) {
     addPending(booking.id);
-
     try {
-      await toast.promise(endSession(booking.id), {
+      await toast.promise(endSession(booking.id, linkedBookingId), {
         loading: 'Ending session...',
         success: 'Session ended',
         error: (err) =>
@@ -145,9 +245,21 @@ export default function LiveSessionBoard({
     }
   }
 
-  function handleExtend(booking: Booking, stationId: string, minutes: number) {
+  function handleExtend(
+    booking: Booking,
+    stationId: string,
+    minutes: number,
+    linkedBookingId?: string,
+    linkedStationId?: string,
+  ) {
     addPending(booking.id);
-    const promise = extendSession(booking.id, stationId, minutes)
+    const promise = extendSession(
+      booking.id,
+      stationId,
+      minutes,
+      linkedBookingId,
+      linkedStationId,
+    )
       .then((res) => {
         if (!res.ok) throw new Error(res.reason);
         return res;
@@ -375,10 +487,13 @@ export default function LiveSessionBoard({
         </TabsList>
 
         {tabs.map(({ key }) => {
+          // const tabStations = stationsForTab(key);
+          // const occupied = tabStations.filter((s) => currentBookingFor(s.id));
+          // const free = tabStations.filter((s) => !currentBookingFor(s.id));
           const tabStations = stationsForTab(key);
-          const occupied = tabStations.filter((s) => currentBookingFor(s.id));
-          const free = tabStations.filter((s) => !currentBookingFor(s.id));
-
+          const tabUnits = buildDisplayUnits(tabStations, bookings);
+          const occupied = tabUnits.filter((u) => u.booking);
+          const free = tabUnits.filter((u) => !u.booking);
           return (
             <TabsContent key={key} value={key} className='mt-6 min-w-0'>
               {occupied.length > 0 && (
@@ -391,7 +506,26 @@ export default function LiveSessionBoard({
                   </div>
 
                   <div className='grid min-w-0 grid-cols-[repeat(auto-fill,minmax(320px,1fr))] sm:grid-cols-[repeat(auto-fill,minmax(360px,1fr))] gap-3 sm:gap-4'>
-                    {occupied.map((station) => (
+                    {occupied.map((unit) => (
+                      <StationCard
+                        key={unit.key}
+                        station={unit.station}
+                        booking={unit.booking}
+                        pendingIds={pendingIds}
+                        onStart={(b) => handleStart(b, unit.linkedBookingId)}
+                        onEnd={(b) => handleEnd(b, unit.linkedBookingId)}
+                        onExtend={(b, stationId, minutes) =>
+                          handleExtend(
+                            b,
+                            stationId,
+                            minutes,
+                            unit.linkedBookingId,
+                            unit.linkedStationId,
+                          )
+                        }
+                      />
+                    ))}
+                    {/* {occupied.map((station) => (
                       <StationCard
                         key={station.id}
                         station={station}
@@ -401,7 +535,7 @@ export default function LiveSessionBoard({
                         onEnd={handleEnd}
                         onExtend={handleExtend}
                       />
-                    ))}
+                    ))} */}
                   </div>
                 </section>
               )}
@@ -416,10 +550,10 @@ export default function LiveSessionBoard({
                   </div>
 
                   <div className='grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 sm:gap-4'>
-                    {free.map((station) => (
+                    {free.map((unit) => (
                       <StationCard
-                        key={station.id}
-                        station={station}
+                        key={unit.key}
+                        station={unit.station}
                         booking={undefined}
                         pendingIds={pendingIds}
                         onStart={handleStart}

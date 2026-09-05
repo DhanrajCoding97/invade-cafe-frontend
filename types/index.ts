@@ -280,3 +280,10 @@ export type Profile = {
   email: string | null;
   phone: string | null;
 };
+
+export type DisplayUnit = {
+  key: string;
+  station: Station; // representative station object, name overridden for combos
+  booking: Booking | undefined;
+  linkedBookingId?: string; // the secondary row's id, for cascading actions
+};
