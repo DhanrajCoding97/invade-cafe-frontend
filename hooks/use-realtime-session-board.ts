@@ -4,7 +4,7 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { createClient } from '@/lib/supabase/client';
-import type { Booking } from '@/app/(dashboard)/dashboard/staff/live-sessions/components/LiveSessionBoard';
+import type { Booking } from '@/types';
 
 export function useRealtimeSessionBoard(
   setBookings: React.Dispatch<React.SetStateAction<Booking[]>>,

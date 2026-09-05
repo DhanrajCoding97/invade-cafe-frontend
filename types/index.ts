@@ -91,6 +91,23 @@ export interface SessionExtension {
   payment_status: 'pending' | 'paid';
 }
 
+export type Booking = {
+  id: string;
+  group_id: string | null;
+  is_group_primary: boolean | null;
+  station_id: string;
+  date: string;
+  start_time: string;
+  duration_hours: string | number;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'completed';
+  session_started_at: string | null;
+  session_ended_at: string | null;
+  extended_until: string | null;
+  customer_name: string | null;
+  device: string;
+  profiles: { full_name: string } | null;
+};
+
 export interface BookingRow {
   id: string;
 
@@ -279,11 +296,4 @@ export type Profile = {
   created_at: string | null;
   email: string | null;
   phone: string | null;
-};
-
-export type DisplayUnit = {
-  key: string;
-  station: Station; // representative station object, name overridden for combos
-  booking: Booking | undefined;
-  linkedBookingId?: string; // the secondary row's id, for cascading actions
 };

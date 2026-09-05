@@ -213,7 +213,7 @@ export function StationCard({
           {!booking && (
             <span className='h-1.5 w-1.5 shrink-0 rounded-full bg-white/20' />
           )}
-          <span className='truncate text-sm font-semibold tracking-wide text-neutral-100'>
+          <span className='break-all text-sm font-semibold tracking-wide text-neutral-100'>
             {station.name}
           </span>
           {booking?.device === 'vr' && (

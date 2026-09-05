@@ -198,6 +198,7 @@ export default function ManualBookingForm({
       device: 'pc',
       duration: 1,
       stationId: '',
+      linkedStationId: null,
       players: 1,
       tier: 'single',
       startNow: mode === 'create',
@@ -233,11 +234,12 @@ export default function ManualBookingForm({
   const stationParams = useMemo(
     () => ({
       device,
+      tier,
       date: dateStr,
       startTime: watchedStartTime,
       duration: durationValue,
     }),
-    [device, dateStr, watchedStartTime, durationValue],
+    [device, tier, dateStr, watchedStartTime, durationValue],
   );
 
   const debouncedStationParams = useDebouncedValue(stationParams, 400);
@@ -328,6 +330,16 @@ export default function ManualBookingForm({
   }, [startNow, setValue]);
 
   // device → reset tier/players
+  // useEffect(() => {
+  //   if (device === 'ps5') {
+  //     setValue('tier', undefined);
+  //   } else if (device === 'racing') {
+  //     setValue('players', tier === 'multiplayer' ? 2 : 1);
+  //   } else {
+  //     setValue('players', 1);
+  //     setValue('tier', undefined);
+  //   }
+  // }, [device, tier, setValue]);
   useEffect(() => {
     if (device === 'ps5') {
       setValue('tier', undefined);
@@ -338,6 +350,7 @@ export default function ManualBookingForm({
       setValue('tier', undefined);
     }
   }, [device, tier, setValue]);
+
   const previousPricingConfig = useRef<{
     device: typeof device;
     players: number;
@@ -379,6 +392,25 @@ export default function ManualBookingForm({
   }, [device, playersValue, tier, durationValue, computedTotal, setValue]);
 
   // useEffect(() => {
+  //   if (stationsLoading) return;
+  //   if (stationId && !stationsForDevice.some((s) => s.id === stationId)) {
+  //     setValue('stationId', '');
+  //   }
+  // }, [stationsForDevice, stationId, stationsLoading, setValue]);
+  useEffect(() => {
+    if (stationsLoading) return;
+    if (!stationId) return;
+
+    const stillValid = stationsForDevice.some((s: any) =>
+      s.isCombo ? s.comboStationIds?.includes(stationId) : s.id === stationId,
+    );
+
+    if (!stillValid) {
+      setValue('stationId', '');
+      setValue('linkedStationId', null);
+    }
+  }, [stationsForDevice, stationId, stationsLoading, setValue]);
+  // useEffect(() => {
   //   if (device === 'ps5') {
   //     setValue('tier', undefined);
   //   } else if (device === 'racing') {
@@ -389,15 +421,9 @@ export default function ManualBookingForm({
   //   }
   // }, [device, setValue]);
 
-  useEffect(() => {
-    if (stationsLoading) return;
-    if (stationId && !stationsForDevice.some((s) => s.id === stationId)) {
-      setValue('stationId', '');
-    }
-  }, [stationsForDevice, stationId, stationsLoading, setValue]);
-
   return (
     <form
+      autoComplete='off'
       onSubmit={handleSubmit(onSubmit, (errors) => {
         const firstError = Object.values(errors)[0];
         if (firstError?.message) {
@@ -657,8 +683,8 @@ export default function ManualBookingForm({
                     ))}
                   </div>
                 ) : (
-                  <div className='grid grid-cols-3 gap-2 sm:grid-cols-5'>
-                    {[...stationsForDevice]
+                  <div className='grid grid-cols-[repeat(auto-fit,minmax(100px,1fr))] gap-2'>
+                    {/* {[...stationsForDevice]
                       .sort((a, b) => {
                         const numA = Number(a.name.match(/-(\d+)/)?.[1] ?? 0);
                         const numB = Number(b.name.match(/-(\d+)/)?.[1] ?? 0);
@@ -707,6 +733,198 @@ export default function ManualBookingForm({
                               {s.name}
                             </span>
 
+                            <span className='text-[7px] uppercase opacity-50'>
+                              {s.type}
+                            </span>
+                          </Chip>
+                        );
+                      })} */}
+                    {/* {[...stationsForDevice]
+                      .sort((a, b) => {
+                        const numA = Number(a.name.match(/-(\d+)/)?.[1] ?? 0);
+                        const numB = Number(b.name.match(/-(\d+)/)?.[1] ?? 0);
+                        return numA - numB;
+                      })
+                      .map((s) => {
+                        const isCombo = (s as any).isCombo;
+                        const isRacing = s.type.toLowerCase() === 'racing';
+
+                        if (isCombo) {
+                          const active =
+                            field.value === (s as any).comboStationIds?.[0];
+                          return (
+                            <Chip
+                              invalid={fieldState.invalid}
+                              key={s.id}
+                              active={active}
+                              disabled={lockStructuralFields}
+                              onClick={() => {
+                                const [primaryId, secondaryId] = (s as any)
+                                  .comboStationIds;
+                                field.onChange(primaryId);
+                                setValue('linkedStationId', secondaryId, {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                });
+                              }}
+                              className='flex-col gap-0.5 leading-none'
+                            >
+                              <span className='text-xs font-semibold'>
+                                {s.name}
+                              </span>
+                              <span className='text-[7px] uppercase opacity-50'>
+                                PC DUO
+                              </span>
+                            </Chip>
+                          );
+                        }
+
+                        const handleSelect = () => {
+                          field.onChange(s.id);
+                          setValue('linkedStationId', null, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        };
+
+                        if (isRacing) {
+                          const platform =
+                            s.name.match(/\(([^)]+)\)/)?.[1] ?? '';
+                          const cockpit =
+                            s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+                          return (
+                            <Chip
+                              invalid={fieldState.invalid}
+                              key={s.id}
+                              active={field.value === s.id}
+                              disabled={lockStructuralFields}
+                              onClick={handleSelect}
+                              className='flex-col gap-0.5 leading-none'
+                            >
+                              <span className='text-xs font-semibold'>
+                                {cockpit ?? platform}
+                              </span>
+                              <span className='text-[7px] uppercase opacity-50'>
+                                {platform} RACING
+                              </span>
+                            </Chip>
+                          );
+                        }
+
+                        return (
+                          <Chip
+                            invalid={fieldState.invalid}
+                            key={s.id}
+                            active={field.value === s.id}
+                            disabled={lockStructuralFields}
+                            onClick={handleSelect}
+                            className='flex-col gap-0.5 leading-none'
+                          >
+                            <span className='min-w-0 w-full truncate text-xs font-semibold'>
+                              {s.name}
+                            </span>
+                            <span className='text-[7px] uppercase opacity-50'>
+                              {s.type}
+                            </span>
+                          </Chip>
+                        );
+                      })} */}
+                    {[...stationsForDevice]
+                      .sort((a, b) => {
+                        const numA = Number(a.name.match(/-(\d+)/)?.[1] ?? 0);
+                        const numB = Number(b.name.match(/-(\d+)/)?.[1] ?? 0);
+                        return numA - numB;
+                      })
+                      .map((s) => {
+                        const isCombo = (s as any).isCombo;
+                        const isRacing = s.type.toLowerCase() === 'racing';
+
+                        if (isCombo) {
+                          const active =
+                            field.value === (s as any).comboStationIds?.[0];
+
+                          // Shorten "Racing Cockpit A (PC) + Racing Cockpit B (PC)" → "Cockpit A + B"
+                          const [nameA, nameB] = s.name.split(' + ');
+                          const cockpitA =
+                            nameA?.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+                          const cockpitB =
+                            nameB?.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+                          const comboLabel =
+                            cockpitA && cockpitB
+                              ? `Cockpit ${cockpitA} + ${cockpitB}`
+                              : s.name;
+
+                          return (
+                            <Chip
+                              invalid={fieldState.invalid}
+                              key={s.id}
+                              active={active}
+                              disabled={lockStructuralFields}
+                              onClick={() => {
+                                const [primaryId, secondaryId] = (s as any)
+                                  .comboStationIds;
+                                field.onChange(primaryId);
+                                setValue('linkedStationId', secondaryId, {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                });
+                              }}
+                              className='flex-col gap-0.5 leading-none'
+                            >
+                              <span className='text-xs font-semibold'>
+                                {comboLabel}
+                              </span>
+                              <span className='text-[7px] uppercase opacity-50'>
+                                PC RACING DUO · BOTH COCKPITS
+                              </span>
+                            </Chip>
+                          );
+                        }
+
+                        const handleSelect = () => {
+                          field.onChange(s.id);
+                          setValue('linkedStationId', null, {
+                            shouldValidate: true,
+                            shouldDirty: true,
+                          });
+                        };
+
+                        if (isRacing) {
+                          const platform =
+                            s.name.match(/\(([^)]+)\)/)?.[1] ?? '';
+                          const cockpit =
+                            s.name.match(/Cockpit\s+([A-Z])\b/i)?.[1];
+                          return (
+                            <Chip
+                              invalid={fieldState.invalid}
+                              key={s.id}
+                              active={field.value === s.id}
+                              disabled={lockStructuralFields}
+                              onClick={handleSelect}
+                              className='flex-col gap-0.5 leading-none'
+                            >
+                              <span className='text-xs font-semibold'>
+                                {cockpit ?? platform}
+                              </span>
+                              <span className='text-[7px] uppercase opacity-50'>
+                                {platform} RACING
+                              </span>
+                            </Chip>
+                          );
+                        }
+
+                        return (
+                          <Chip
+                            invalid={fieldState.invalid}
+                            key={s.id}
+                            active={field.value === s.id}
+                            disabled={lockStructuralFields}
+                            onClick={handleSelect}
+                            className='flex-col gap-0.5 leading-none'
+                          >
+                            <span className='min-w-0 w-full truncate text-xs font-semibold'>
+                              {s.name}
+                            </span>
                             <span className='text-[7px] uppercase opacity-50'>
                               {s.type}
                             </span>
